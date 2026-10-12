@@ -7,10 +7,12 @@ from pydantic import BaseModel, Field
 
 from config import CONFIG
 from services.gemini_service import GeminiService
+from services.ai_caption_service import AICaptionService
 from services.s3_service import S3Service
 from services.postiz_service import PostizService
 from services.queue_service import QueueService
 from services.facebook_service import FacebookService
+from services.multi_platform_service import MultiPlatformPublisher
 
 router = APIRouter(prefix="/api", tags=["Growthcrew Studio"])
 
@@ -211,13 +213,14 @@ async def generate_post(req: GeneratePostRequest):
     if not req.topic:
         raise HTTPException(status_code=400, detail="Please enter a topic or concept for the post.")
 
-    # 1. Generate text caption, hook, and hashtags using Gemini AI
-    generated = GeminiService.generate_post(
+    # 1. Generate text caption, hook, and hashtags using In2Peta DeepSeek-Flash (with Gemini fallback)
+    generated = AICaptionService.generate_post(
         topic=req.topic,
-        tone=req.tone or "Warm & Friendly",
+        tone=req.tone or "Warm & Engaging",
         format_type=req.format or "feed",
         call_to_action=req.callToAction or "",
-        custom_instructions=req.customInstructions or ""
+        custom_instructions=req.customInstructions or "",
+        platforms=req.platforms or ["facebook", "instagram", "linkedin", "x", "reddit", "youtube", "discord"]
     )
 
     # 2. Channels & Settings
@@ -336,21 +339,23 @@ async def create_queue_post(post: CreateQueuePostRequest):
 
     saved = QueueService.add_to_queue(data)
 
-    if data.get("status") == "PUBLISHED" and saved.get("integrationId"):
-        try:
-            postiz_result = PostizService.create_post(
-                integration_id=saved["integrationId"],
-                content=saved.get("fullPostText", ""),
-                post_type="now",
-                media_url=saved.get("visualUrl"),
-                media_type=saved.get("mediaType", "image")
-            )
-            saved = QueueService.update_post(saved["id"], {
-                "postizPostId": extract_postiz_id(postiz_result),
-                "publishedAt": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
-            })
-        except Exception as e:
-            print(f"Publish note: {e}")
+    if data.get("status") == "PUBLISHED":
+        target_platforms = data.get("platforms") or ["facebook", "instagram", "linkedin", "x", "reddit", "youtube", "discord"]
+        clean_text = data.get("fullPostText") or data.get("caption") or ""
+        media_url = data.get("visualUrl") or data.get("mediaUrl")
+        broadcast_result = MultiPlatformPublisher.broadcast_to_all(
+            platforms=target_platforms,
+            text=clean_text,
+            media_url=media_url
+        )
+        final_post_id = None
+        if "facebook" in broadcast_result.get("platforms", {}):
+            final_post_id = broadcast_result["platforms"]["facebook"].get("id")
+        saved = QueueService.update_post(saved["id"], {
+            "postizPostId": final_post_id,
+            "publishedAt": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+            "broadcastResult": broadcast_result
+        })
 
     return {"success": True, "post": saved}
 
@@ -411,72 +416,66 @@ async def publish_now(post_id: str):
         else:
             raise HTTPException(status_code=404, detail="No post found to publish")
 
-    channels = QueueService.get_channels()
-    integration_id = post.get("integrationId") or (channels[0].get("id") if channels else None)
     clean_text = post.get("fullPostText", "") or post.get("caption", "")
     media_url = post.get("visualUrl") or post.get("mediaUrl")
+    target_platforms = post.get("platforms") or ["facebook", "instagram", "linkedin", "x", "reddit", "youtube", "discord"]
 
-    # 1. Direct Meta Graph API publishing if Page token configured (e.g. on Render)
-    fb_direct_result = None
-    has_valid_fb_token = bool(
-        CONFIG.FB_PAGE_ACCESS_TOKEN 
-        and CONFIG.FB_PAGE_ACCESS_TOKEN.strip() 
-        and not CONFIG.FB_PAGE_ACCESS_TOKEN.startswith("Your ")
+    # Multi-platform simultaneous broadcasting: same post to all selected channels!
+    broadcast_result = MultiPlatformPublisher.broadcast_to_all(
+        platforms=target_platforms,
+        text=clean_text,
+        media_url=media_url
     )
-    if has_valid_fb_token and CONFIG.FB_PAGE_ID:
-        try:
-            fb_direct_result = FacebookService.publish_post(
-                page_id=CONFIG.FB_PAGE_ID,
-                access_token=CONFIG.FB_PAGE_ACCESS_TOKEN.strip(),
-                message=clean_text,
-                image_url=media_url
-            )
-            print("Direct Facebook Publish Success:", fb_direct_result)
-        except Exception as fb_err:
-            print("Direct Facebook Publish Error:", fb_err)
-            raise HTTPException(status_code=502, detail=f"Meta / Facebook Graph API Error: {fb_err}")
 
-    # 2. Postiz publishing if direct Meta was not executed
-    postiz_result = None
-    if not fb_direct_result:
-        # Check if running in cloud (Render) where 127.0.0.1 is not reachable
-        is_cloud = bool(os.getenv("RENDER") or (os.getenv("PORT") and "127.0.0.1" in CONFIG.POSTIZ_API_URL))
-        if is_cloud and ("127.0.0.1" in CONFIG.POSTIZ_API_URL or "localhost" in CONFIG.POSTIZ_API_URL):
-            raise HTTPException(
-                status_code=400,
-                detail="Direct Facebook publishing requires 'FB_PAGE_ACCESS_TOKEN' to be set in your Render environment variables. Postiz at 127.0.0.1 is local to your laptop and cannot be reached from Render."
-            )
+    final_post_id = None
+    if "facebook" in broadcast_result.get("platforms", {}):
+        final_post_id = broadcast_result["platforms"]["facebook"].get("id")
 
-        if not integration_id:
-            raise HTTPException(status_code=400, detail="No connected channel found. Please connect your channel first.")
-
-        try:
-            postiz_result = PostizService.create_post(
-                integration_id=integration_id,
-                content=clean_text,
-                post_type="now",
-                media_url=media_url,
-                media_type=post.get("mediaType", "image")
-            )
-        except Exception as e:
-            print(f"Publish error: {e}")
-            raise HTTPException(status_code=502, detail=f"Failed to broadcast to Postiz/Facebook: {e}")
-
-    final_post_id = extract_postiz_id(postiz_result) or (fb_direct_result.get("postId") if fb_direct_result else None)
     updated = QueueService.update_post(post_id, {
         "status": "PUBLISHED",
         "postizPostId": final_post_id,
         "publishedAt": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
-        "reviewedAt": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
+        "reviewedAt": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+        "broadcastResult": broadcast_result
     })
 
     return {
-        "success": True,
-        "message": "Post published immediately to your channel!",
+        "success": broadcast_result.get("success", True),
+        "message": broadcast_result.get("summary", "Post published across all channels!"),
         "post": updated,
         "postizPostId": final_post_id,
-        "directFacebook": bool(fb_direct_result)
+        "directFacebook": "facebook" in broadcast_result.get("platforms", {}),
+        "broadcastResult": broadcast_result
     }
+
+class CustomChannelConnectRequest(BaseModel):
+    platform: str
+    handle: Optional[str] = None
+    name: Optional[str] = None
+    fbPageId: Optional[str] = None
+    fbAccessToken: Optional[str] = None
+    discordWebhookUrl: Optional[str] = None
+
+@router.post("/channels/custom-connect")
+async def custom_connect_channel(req: CustomChannelConnectRequest):
+    if req.platform in ("facebook", "instagram") and req.fbPageId and req.fbAccessToken:
+        CONFIG.FB_PAGE_ID = req.fbPageId.strip()
+        CONFIG.FB_PAGE_ACCESS_TOKEN = req.fbAccessToken.strip()
+    if req.platform == "discord" and req.discordWebhookUrl:
+        CONFIG.DISCORD_WEBHOOK_URL = req.discordWebhookUrl.strip()
+
+    channel_obj = {
+        "id": f"chan_{int(time.time() * 1000)}",
+        "name": req.name or f"Connected ({req.platform.title()})",
+        "handle": req.handle or f"@{req.platform.lower()}",
+        "platform": req.platform.lower(),
+        "platforms": [req.platform.lower()],
+        "avatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop&q=80",
+        "connected": True,
+        "provider": "Custom Auth"
+    }
+    updated = QueueService.add_channel(channel_obj)
+    return {"success": True, "channel": channel_obj, "channels": updated}
 
 @router.get("/facebook/status")
 async def get_facebook_status():

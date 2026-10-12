@@ -40,7 +40,7 @@ import LoginPage from './LoginPage';
 import OutreachPanel from './OutreachPanel';
 import LandingPage from './LandingPage';
 
-// Custom SVG Icons for Meta Social Channels
+// Custom SVG Icons for Multi-Platform Social Channels
 const InstagramIcon = ({ className = 'w-4 h-4' }) => (
   <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <rect width="20" height="20" x="2" y="2" rx="5" ry="5" />
@@ -54,6 +54,46 @@ const FacebookIcon = ({ className = 'w-4 h-4' }) => (
     <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
   </svg>
 );
+
+const LinkedInIcon = ({ className = 'w-4 h-4' }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="currentColor">
+    <path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.28 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.75M6.46 10.9v8.37h2.79V10.9H6.46M7.86 6.54a1.63 1.63 0 1 0 0 3.26 1.63 1.63 0 0 0 0-3.26z" />
+  </svg>
+);
+
+const XIcon = ({ className = 'w-4 h-4' }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="currentColor">
+    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+  </svg>
+);
+
+const RedditIcon = ({ className = 'w-4 h-4' }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="currentColor">
+    <path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2zm6.2 12.3c.1.3.1.5.1.7 0 2.4-2.8 4.3-6.3 4.3s-6.3-1.9-6.3-4.3c0-.2 0-.5.1-.7-.6-.4-1-.9-1-1.6 0-1.1.9-2 2-2 .5 0 1 .2 1.3.6 1-.7 2.4-1.2 3.9-1.3l.8-3.7 2.6.6c.1-.6.7-1 1.4-1 1.1 0 2 .9 2 2s-.9 2-2 2c-.6 0-1.1-.3-1.4-.8l-2-.5-.6 2.8c1.5.1 2.8.6 3.8 1.3.4-.4.8-.6 1.4-.6 1.1 0 2 .9 2 2 0 .7-.4 1.2-1 1.6z" />
+  </svg>
+);
+
+const YouTubeIcon = ({ className = 'w-4 h-4' }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="currentColor">
+    <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.5 12 3.5 12 3.5s-7.505 0-9.377.55a3.016 3.016 0 0 0-2.122 2.136C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.55 9.376.55 9.376.55s7.505 0 9.377-.55a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
+  </svg>
+);
+
+const DiscordIcon = ({ className = 'w-4 h-4' }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="currentColor">
+    <path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994.021-.041.001-.09-.041-.106a13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.929 1.793 8.18 1.793 12.061 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.894.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.028zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z" />
+  </svg>
+);
+
+const ALL_PLATFORMS = [
+  { id: 'facebook', name: 'Facebook Page', color: '#1877F2', icon: FacebookIcon, badgeBg: 'bg-[#1877F2]/15 text-[#38BDF8] border-[#1877F2]/30' },
+  { id: 'instagram', name: 'Instagram', color: '#E1306C', icon: InstagramIcon, badgeBg: 'bg-[#E1306C]/15 text-[#FF5376] border-[#E1306C]/30' },
+  { id: 'linkedin', name: 'LinkedIn', color: '#0A66C2', icon: LinkedInIcon, badgeBg: 'bg-[#0A66C2]/15 text-[#38BDF8] border-[#0A66C2]/30' },
+  { id: 'x', name: 'X (Twitter)', color: '#FFFFFF', icon: XIcon, badgeBg: 'bg-white/10 text-white border-white/20' },
+  { id: 'reddit', name: 'Reddit', color: '#FF4500', icon: RedditIcon, badgeBg: 'bg-[#FF4500]/15 text-[#FF6B4A] border-[#FF4500]/30' },
+  { id: 'youtube', name: 'YouTube', color: '#FF0000', icon: YouTubeIcon, badgeBg: 'bg-[#FF0000]/15 text-rose-400 border-[#FF0000]/30' },
+  { id: 'discord', name: 'Discord', color: '#5865F2', icon: DiscordIcon, badgeBg: 'bg-[#5865F2]/15 text-[#818CF8] border-[#5865F2]/30' },
+];
 
 const API_BASE = import.meta.env.VITE_API_URL ? import.meta.env.VITE_API_URL.replace(/\/$/, '') : '';
 const SCALORA_GRADIENT = 'bg-gradient-to-r from-[#FF6B4A] to-[#FFA84A]';
@@ -214,10 +254,25 @@ export default function App({ defaultTab = 'studio', apiUrl } = {}) {
   const [editCaption, setEditCaption] = useState('');
   const [editHashtags, setEditHashtags] = useState('');
 
-  // Aspect ratio & Target Platform
+  // Aspect ratio & Target Platform (All 7 Supported Channels)
   const [aspectRatio, setAspectRatio] = useState('portrait'); // 'square' | 'portrait' | 'reel'
-  const [selectedPlatforms, setSelectedPlatforms] = useState(['instagram', 'facebook']);
+  const [selectedPlatforms, setSelectedPlatforms] = useState([
+    'facebook',
+    'instagram',
+    'linkedin',
+    'x',
+    'reddit',
+    'youtube',
+    'discord',
+  ]);
+  const [activePreviewPlatform, setActivePreviewPlatform] = useState('instagram');
+  const [broadcastModalData, setBroadcastModalData] = useState(null);
   const [expandedCaption, setExpandedCaption] = useState(false);
+
+  // Custom channel credentials input state
+  const [customFbPageId, setCustomFbPageId] = useState('');
+  const [customFbToken, setCustomFbToken] = useState('');
+  const [customDiscordWebhook, setCustomDiscordWebhook] = useState('');
 
   // Queue & Modals
   const [queueFilter, setQueueFilter] = useState('ALL');
@@ -264,39 +319,60 @@ export default function App({ defaultTab = 'studio', apiUrl } = {}) {
     return () => clearInterval(interval);
   }, []);
 
-  // Handle Connecting Custom Handle
+  // Handle Connecting Custom Channel & Credentials
   const handleConnectInstagram = async (e) => {
     e.preventDefault();
-    if (!customHandleInput.trim()) return;
+    if (!customHandleInput.trim() && !customFbPageId.trim() && !customDiscordWebhook.trim()) {
+      showToast('Please provide a handle, Page ID, or Webhook URL to connect.', 'error');
+      return;
+    }
     const formatted = customHandleInput.trim().replace(/^@/, '');
-    const isFb = customPlatform === 'facebook';
-    const newChan = {
-      id: `custom_${Date.now()}`,
-      name: `Mytestpage (${isFb ? 'Facebook Page' : 'Instagram'})`,
-      handle: isFb ? `@${formatted}.fb` : `@${formatted}`,
-      platform: customPlatform,
-      platforms: [customPlatform],
-      avatar: attachedMediaUrl || SAMPLE_IN2PETA_MEDIA[0].url,
-      connected: true,
-      provider: 'Meta Graph API',
-    };
+    const cleanPlatform = customPlatform.toLowerCase();
+    const platName = ALL_PLATFORMS.find((p) => p.id === cleanPlatform)?.name || cleanPlatform;
+    
     try {
-      await fetch(`${API_BASE}/api/channels`, {
+      const res = await fetch(`${API_BASE}/api/channels/custom-connect`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(newChan),
+        body: JSON.stringify({
+          platform: cleanPlatform,
+          handle: formatted ? `@${formatted}` : `@${cleanPlatform}`,
+          name: formatted ? `${formatted} (${platName})` : `My ${platName}`,
+          fbPageId: customFbPageId.trim() || undefined,
+          fbAccessToken: customFbToken.trim() || undefined,
+          discordWebhookUrl: customDiscordWebhook.trim() || undefined,
+        }),
       });
-      setChannels((prev) => [...prev.filter((c) => c.id !== newChan.id), newChan]);
-      setActiveChannel(newChan);
+
+      const data = await res.json();
+      if (data.channels && Array.isArray(data.channels)) {
+        setChannels(data.channels);
+        setActiveChannel(data.channel || data.channels[data.channels.length - 1]);
+      } else {
+        const fallbackChan = {
+          id: `custom_${Date.now()}`,
+          name: formatted ? `${formatted} (${platName})` : `My ${platName}`,
+          handle: formatted ? `@${formatted}` : `@${cleanPlatform}`,
+          platform: cleanPlatform,
+          platforms: [cleanPlatform],
+          avatar: attachedMediaUrl || SAMPLE_IN2PETA_MEDIA[0].url,
+          connected: true,
+          provider: 'Custom Connected',
+        };
+        setChannels((prev) => [...prev, fallbackChan]);
+        setActiveChannel(fallbackChan);
+      }
+
       setShowConnectModal(false);
       setCustomHandleInput('');
+      setCustomFbPageId('');
+      setCustomFbToken('');
+      setCustomDiscordWebhook('');
       fetchData();
-      showToast(`Connected ${newChan.name} successfully!`, 'success');
+      showToast(`Connected ${platName} channel successfully!`, 'success');
     } catch {
-      setChannels((prev) => [...prev, newChan]);
-      setActiveChannel(newChan);
+      showToast(`Connected ${cleanPlatform} channel.`, 'success');
       setShowConnectModal(false);
-      showToast(`Connected ${newChan.name}.`, 'success');
     }
   };
 
@@ -516,7 +592,12 @@ export default function App({ defaultTab = 'studio', apiUrl } = {}) {
 
       const data = await res.json();
       if (!res.ok) throw new Error(data.detail || data.error || 'Publish failed');
-      showToast('Published.', 'success');
+      if (data.broadcastResult) {
+        setBroadcastModalData(data.broadcastResult);
+        showToast(`🚀 Published to ${selectedPlatforms.length} platforms!`, 'success');
+      } else {
+        showToast('Published successfully.', 'success');
+      }
       fetchData();
       setActiveTab('history');
     } catch (err) {
@@ -1030,9 +1111,14 @@ export default function App({ defaultTab = 'studio', apiUrl } = {}) {
                       2
                     </span>
                     <div>
-                      <h2 className="text-sm font-extrabold text-white tracking-tight">Caption</h2>
-                      <p className="text-[11px] text-slate-400">Topic in, caption out</p>
+                      <h2 className="text-sm font-extrabold text-white tracking-tight">AI Caption Studio</h2>
+                      <p className="text-[11px] text-slate-400">Generate high-converting multi-platform posts</p>
                     </div>
+                  </div>
+
+                  <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-[10px] font-bold">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                    <span>In2Peta DeepSeek-Flash</span>
                   </div>
                 </div>
 
@@ -1058,47 +1144,73 @@ export default function App({ defaultTab = 'studio', apiUrl } = {}) {
 
                 {/* Topic Input Field */}
                 <div className="space-y-1.5">
-                  <label className="text-xs font-bold text-slate-300 block">Topic</label>
+                  <label className="text-xs font-bold text-slate-300 block">Topic / Concept</label>
                   <textarea
                     rows={3}
-                    placeholder="What is this post about?"
+                    placeholder="What is this post about? (e.g. 20% off summer HVAC service, energy saving tips, product showcase)"
                     value={topic}
                     onChange={(e) => setTopic(e.target.value)}
                     className="w-full bg-[#07080b] border border-white/10 rounded-2xl p-3.5 text-xs text-white placeholder:text-slate-600 focus:outline-none focus:border-[#FF6B4A]/60 focus:ring-2 focus:ring-[#FF6B4A]/15 leading-relaxed resize-none"
                   />
                 </div>
 
-                {/* Target Channels Toggle */}
-                <div className="space-y-1.5">
-                  <label className="text-xs font-bold text-slate-300 block">Target Publishing Channels:</label>
-                  <div className="flex items-center gap-3">
-                    <label className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white/[0.03] border border-white/10 cursor-pointer text-xs">
-                      <input
-                        type="checkbox"
-                        checked={selectedPlatforms.includes('instagram')}
-                        onChange={(e) => {
-                          if (e.target.checked) setSelectedPlatforms([...selectedPlatforms, 'instagram']);
-                          else setSelectedPlatforms(selectedPlatforms.filter((p) => p !== 'instagram'));
-                        }}
-                        className="rounded text-[#FF6B4A]"
-                      />
-                      <InstagramIcon className="w-3.5 h-3.5 text-[#FF5376]" />
-                      <span>Instagram</span>
+                {/* Target Channels Multi-Selector (All 7 Supported Platforms) */}
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <label className="text-xs font-bold text-slate-300 flex items-center gap-1.5">
+                      <span>Publishing Channels</span>
+                      <span className="text-[10px] font-normal text-slate-400">
+                        ({selectedPlatforms.length} / {ALL_PLATFORMS.length} selected)
+                      </span>
                     </label>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (selectedPlatforms.length === ALL_PLATFORMS.length) {
+                          setSelectedPlatforms(['instagram', 'facebook']);
+                        } else {
+                          setSelectedPlatforms(ALL_PLATFORMS.map((p) => p.id));
+                        }
+                      }}
+                      className="text-[11px] text-[#FFA84A] hover:underline font-bold cursor-pointer"
+                    >
+                      {selectedPlatforms.length === ALL_PLATFORMS.length ? 'Reset to Meta' : 'Select All 7 Channels'}
+                    </button>
+                  </div>
 
-                    <label className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white/[0.03] border border-white/10 cursor-pointer text-xs">
-                      <input
-                        type="checkbox"
-                        checked={selectedPlatforms.includes('facebook')}
-                        onChange={(e) => {
-                          if (e.target.checked) setSelectedPlatforms([...selectedPlatforms, 'facebook']);
-                          else setSelectedPlatforms(selectedPlatforms.filter((p) => p !== 'facebook'));
-                        }}
-                        className="rounded text-[#38BDF8]"
-                      />
-                      <FacebookIcon className="w-3.5 h-3.5 text-[#38BDF8]" />
-                      <span>Facebook Page</span>
-                    </label>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                    {ALL_PLATFORMS.map((plat) => {
+                      const Icon = plat.icon;
+                      const isSelected = selectedPlatforms.includes(plat.id);
+                      return (
+                        <button
+                          key={plat.id}
+                          type="button"
+                          onClick={() => {
+                            if (isSelected) {
+                              if (selectedPlatforms.length > 1) {
+                                setSelectedPlatforms(selectedPlatforms.filter((p) => p !== plat.id));
+                              } else {
+                                showToast('Keep at least 1 platform selected.', 'info');
+                              }
+                            } else {
+                              setSelectedPlatforms([...selectedPlatforms, plat.id]);
+                            }
+                          }}
+                          className={`flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-medium border transition-all cursor-pointer ${
+                            isSelected
+                              ? `${plat.badgeBg} shadow-md font-bold`
+                              : 'bg-white/[0.02] text-slate-400 border-white/5 hover:border-white/20'
+                          }`}
+                        >
+                          <div className="w-4 h-4 shrink-0 flex items-center justify-center">
+                            <Icon className="w-3.5 h-3.5" />
+                          </div>
+                          <span className="truncate">{plat.name}</span>
+                          {isSelected && <Check className="w-3 h-3 ml-auto shrink-0" />}
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
 
@@ -1161,7 +1273,7 @@ export default function App({ defaultTab = 'studio', apiUrl } = {}) {
                     <span className="w-6 h-6 rounded-lg bg-[#FFA84A]/20 text-[#FFA84A] flex items-center justify-center font-extrabold text-xs border border-[#FFA84A]/30">
                       3
                     </span>
-                    <h3 className="text-sm font-extrabold text-white">Preview</h3>
+                    <h3 className="text-sm font-extrabold text-white">Live Channel Preview</h3>
                   </div>
 
                   {/* Aspect Ratio Selector */}
@@ -1193,101 +1305,361 @@ export default function App({ defaultTab = 'studio', apiUrl } = {}) {
                   </div>
                 </div>
 
-                {/* iPhone Frame */}
-                <div className="bg-[#000000] border-4 border-slate-800 rounded-[36px] overflow-hidden shadow-2xl max-w-[360px] mx-auto">
-                  {/* Phone Header / Profile Bar */}
-                  <div className="px-4 py-3 flex items-center justify-between border-b border-white/5">
-                    <div className="flex items-center gap-2.5">
-                      <div className="w-8 h-8 rounded-full p-[1.5px] bg-gradient-to-tr from-[#FF6B4A] via-[#FF5376] to-[#FFA84A]">
+                {/* Multi-Platform Preview Selector Tabs */}
+                <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none">
+                  {ALL_PLATFORMS.map((plat) => {
+                    const Icon = plat.icon;
+                    const isActive = activePreviewPlatform === plat.id;
+                    const isTarget = selectedPlatforms.includes(plat.id);
+                    return (
+                      <button
+                        key={plat.id}
+                        type="button"
+                        onClick={() => setActivePreviewPlatform(plat.id)}
+                        className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-[11px] font-bold whitespace-nowrap border transition-all cursor-pointer ${
+                          isActive
+                            ? `${plat.badgeBg} shadow-md`
+                            : 'bg-white/[0.02] text-slate-400 border-white/5 hover:text-white'
+                        }`}
+                      >
+                        <Icon className="w-3.5 h-3.5" />
+                        <span>{plat.name.split(' ')[0]}</span>
+                        {isTarget && <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />}
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {/* Dynamic Multi-Platform Preview Mockup */}
+                <div className="bg-[#000000] border-4 border-slate-800 rounded-[32px] overflow-hidden shadow-2xl max-w-[370px] mx-auto text-left">
+                  {/* FACEBOOK MOCKUP */}
+                  {activePreviewPlatform === 'facebook' && (
+                    <div className="p-4 space-y-3 bg-[#18191a] text-slate-100">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2.5">
+                          <img
+                            src={activeChannel?.avatar || SAMPLE_IN2PETA_MEDIA[0].url}
+                            alt="Facebook avatar"
+                            className="w-9 h-9 rounded-full object-cover border border-white/10"
+                          />
+                          <div>
+                            <div className="flex items-center gap-1">
+                              <span className="text-xs font-bold text-white">{activeChannel?.name || 'Mytestpage'}</span>
+                              <CheckCircle2 className="w-3.5 h-3.5 text-[#1877F2] fill-[#1877F2]" />
+                            </div>
+                            <span className="text-[10px] text-slate-400">Just now · 🌎</span>
+                          </div>
+                        </div>
+                        <MoreHorizontal className="w-4 h-4 text-slate-400" />
+                      </div>
+
+                      {/* Hook & Caption */}
+                      <div className="text-xs space-y-1.5">
+                        {editHook && <p className="font-bold text-white">{editHook}</p>}
+                        <p className="text-slate-300 text-[11px] leading-relaxed whitespace-pre-line line-clamp-3">
+                          {editCaption || 'Your generated post caption will appear here.'}
+                        </p>
+                        {editHashtags && <p className="text-[#38BDF8] text-[11px]">{editHashtags}</p>}
+                      </div>
+
+                      {/* Media */}
+                      <div className="rounded-xl overflow-hidden aspect-[16/9] bg-slate-950">
+                        {attachedMediaType === 'video' ? (
+                          <video src={attachedMediaUrl} controls autoPlay loop muted className="w-full h-full object-cover" />
+                        ) : (
+                          <img src={attachedMediaUrl} alt="Facebook media" className="w-full h-full object-cover" />
+                        )}
+                      </div>
+
+                      {/* Facebook Reaction Bar */}
+                      <div className="pt-2 border-t border-white/10 flex items-center justify-around text-slate-400 text-xs font-semibold">
+                        <div className="flex items-center gap-1.5 hover:text-[#1877F2] cursor-pointer">
+                          <span>👍</span> <span>Like</span>
+                        </div>
+                        <div className="flex items-center gap-1.5 hover:text-white cursor-pointer">
+                          <span>💬</span> <span>Comment</span>
+                        </div>
+                        <div className="flex items-center gap-1.5 hover:text-white cursor-pointer">
+                          <span>↗️</span> <span>Share</span>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* LINKEDIN MOCKUP */}
+                  {activePreviewPlatform === 'linkedin' && (
+                    <div className="p-4 space-y-3 bg-[#1b1f23] text-slate-100">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2.5">
+                          <img
+                            src={activeChannel?.avatar || SAMPLE_IN2PETA_MEDIA[0].url}
+                            alt="LinkedIn avatar"
+                            className="w-10 h-10 rounded-full object-cover border border-[#0A66C2]/40"
+                          />
+                          <div>
+                            <span className="text-xs font-bold text-white block">In2Peta Growthcrew</span>
+                            <span className="text-[10px] text-slate-400 block truncate max-w-[190px]">
+                              AI Automation & Growth Specialist • 1st
+                            </span>
+                            <span className="text-[9px] text-slate-500">1m • Edited • 🌐</span>
+                          </div>
+                        </div>
+                        <span className="text-[11px] text-[#0A66C2] font-bold cursor-pointer">+ Follow</span>
+                      </div>
+
+                      <div className="text-xs space-y-1.5">
+                        {editHook && <p className="font-bold text-white">{editHook}</p>}
+                        <p className="text-slate-300 text-[11px] leading-relaxed whitespace-pre-line line-clamp-3">
+                          {editCaption || 'Your professional business post caption will appear here.'}
+                        </p>
+                        {editHashtags && <p className="text-[#0A66C2] text-[11px]">{editHashtags}</p>}
+                      </div>
+
+                      <div className="rounded-xl overflow-hidden aspect-[16/9] bg-slate-950">
+                        <img src={attachedMediaUrl} alt="LinkedIn media" className="w-full h-full object-cover" />
+                      </div>
+
+                      <div className="pt-2 border-t border-white/10 flex items-center justify-between text-slate-400 text-[11px] font-semibold px-2">
+                        <span>👏 Like</span>
+                        <span>💬 Comment</span>
+                        <span>🔄 Repost</span>
+                        <span>✈️ Send</span>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* X / TWITTER MOCKUP */}
+                  {activePreviewPlatform === 'x' && (
+                    <div className="p-4 space-y-3 bg-[#000000] text-slate-100">
+                      <div className="flex items-start gap-3">
                         <img
                           src={activeChannel?.avatar || SAMPLE_IN2PETA_MEDIA[0].url}
-                          alt="profile"
-                          className="w-full h-full rounded-full object-cover bg-slate-900"
+                          alt="X avatar"
+                          className="w-9 h-9 rounded-full object-cover"
                         />
-                      </div>
-                      <div>
-                        <div className="flex items-center gap-1">
-                          <span className="text-xs font-bold text-white">{activeChannel?.name || 'Mytestpage'}</span>
-                          <CheckCircle2 className="w-3 h-3 text-[#38BDF8] fill-[#38BDF8]/20" />
+                        <div className="flex-1 space-y-2">
+                          <div className="flex items-center gap-1.5">
+                            <span className="text-xs font-bold text-white">{activeChannel?.name || 'Mytestpage'}</span>
+                            <span className="text-[11px] text-slate-500">@mytestpage · 1m</span>
+                          </div>
+
+                          <div className="text-xs space-y-1">
+                            {editHook && <p className="font-semibold text-white">{editHook}</p>}
+                            <p className="text-slate-200 text-xs leading-relaxed whitespace-pre-line line-clamp-4">
+                              {editCaption || 'Your tweet text will appear here.'}
+                            </p>
+                            {editHashtags && <p className="text-[#1D9BF0] text-xs">{editHashtags}</p>}
+                          </div>
+
+                          <div className="rounded-2xl overflow-hidden aspect-[16/9] bg-slate-950 border border-white/10">
+                            <img src={attachedMediaUrl} alt="X media" className="w-full h-full object-cover" />
+                          </div>
+
+                          <div className="flex items-center justify-between text-slate-500 text-xs pt-1 px-1">
+                            <span>💬 24</span>
+                            <span>🔁 12</span>
+                            <span>❤️ 98</span>
+                            <span>📊 1.4K</span>
+                          </div>
                         </div>
-                        <span className="text-[10px] text-slate-400">{activeChannel?.handle || '@mytestpage'}</span>
                       </div>
                     </div>
-                    <MoreHorizontal className="w-4 h-4 text-slate-400" />
-                  </div>
+                  )}
 
-                  {/* Media Display */}
-                  <div
-                    className={`relative w-full bg-slate-950 overflow-hidden ${
-                      aspectRatio === 'square'
-                        ? 'aspect-square'
-                        : aspectRatio === 'reel'
-                        ? 'aspect-[9/16]'
-                        : 'aspect-[4/5]'
-                    }`}
-                  >
-                    {attachedMediaType === 'video' ? (
-                      <video
-                        src={attachedMediaUrl}
-                        controls
-                        autoPlay
-                        loop
-                        muted
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <img
-                        src={attachedMediaUrl}
-                        alt="Instagram preview"
-                        className="w-full h-full object-cover"
-                      />
-                    )}
-                  </div>
-
-                  {/* Action Bar (Heart, Comment, Share, Bookmark) */}
-                  <div className="p-3.5 space-y-2.5">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-3.5">
-                        <Heart className="w-5 h-5 text-slate-300 hover:text-rose-500 cursor-pointer transition-colors" />
-                        <MessageCircle className="w-5 h-5 text-slate-300 hover:text-white cursor-pointer transition-colors" />
-                        <Share2 className="w-5 h-5 text-slate-300 hover:text-white cursor-pointer transition-colors" />
+                  {/* REDDIT MOCKUP */}
+                  {activePreviewPlatform === 'reddit' && (
+                    <div className="p-4 space-y-2.5 bg-[#0e1113] text-slate-100 border border-white/5">
+                      <div className="flex items-center gap-2 text-[11px] text-slate-400">
+                        <span className="font-bold text-white">r/GrowthHacking</span>
+                        <span>•</span>
+                        <span>Posted by u/aarya 2m ago</span>
                       </div>
-                      <Bookmark className="w-5 h-5 text-slate-300 hover:text-[#FFA84A] cursor-pointer transition-colors" />
+                      <h4 className="text-xs font-bold text-white leading-snug">
+                        {editHook || topic || 'Exciting update on our growth stack!'}
+                      </h4>
+                      <p className="text-[11px] text-slate-300 leading-relaxed line-clamp-3">
+                        {editCaption || 'Community post discussion body.'}
+                      </p>
+                      <div className="rounded-xl overflow-hidden aspect-[16/9] bg-black">
+                        <img src={attachedMediaUrl} alt="Reddit media" className="w-full h-full object-cover" />
+                      </div>
+                      <div className="flex items-center gap-4 text-xs font-bold text-slate-400 pt-1">
+                        <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/5">
+                          <span>⬆️</span> <span>42</span> <span>⬇️</span>
+                        </div>
+                        <div className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-white/5">
+                          <span>💬</span> <span>18 comments</span>
+                        </div>
+                      </div>
                     </div>
+                  )}
 
-                    {/* Caption Preview */}
-                    <div className="text-xs space-y-1.5">
-                      {editHook && (
-                        <p className="font-extrabold text-white text-xs leading-snug">
-                          {editHook}
-                        </p>
-                      )}
+                  {/* YOUTUBE COMMUNITY MOCKUP */}
+                  {activePreviewPlatform === 'youtube' && (
+                    <div className="p-4 space-y-3 bg-[#0f0f0f] text-slate-100">
+                      <div className="flex items-center gap-2.5">
+                        <img
+                          src={activeChannel?.avatar || SAMPLE_IN2PETA_MEDIA[0].url}
+                          alt="YouTube avatar"
+                          className="w-9 h-9 rounded-full object-cover"
+                        />
+                        <div>
+                          <div className="flex items-center gap-1">
+                            <span className="text-xs font-bold text-white">GrowthCrew Official</span>
+                            <span className="text-[10px] text-slate-400">✓</span>
+                          </div>
+                          <span className="text-[10px] text-slate-500">12 minutes ago</span>
+                        </div>
+                      </div>
 
-                      <p className={`text-slate-300 text-[11px] leading-relaxed whitespace-pre-line ${expandedCaption ? '' : 'line-clamp-3'}`}>
-                        {editCaption || (
-                          <span className="text-slate-600 italic">
-                            Caption preview
-                          </span>
-                        )}
+                      <p className="text-xs text-slate-200 leading-relaxed whitespace-pre-line line-clamp-3">
+                        {editHook ? `${editHook}\n\n` : ''}
+                        {editCaption || 'YouTube Community update post.'}
                       </p>
 
-                      {editCaption && editCaption.length > 120 && (
-                        <button
-                          type="button"
-                          onClick={() => setExpandedCaption(!expandedCaption)}
-                          className="text-[10px] text-slate-500 hover:text-slate-300 font-bold block cursor-pointer"
-                        >
-                          {expandedCaption ? 'show less' : '...more'}
-                        </button>
-                      )}
+                      <div className="rounded-xl overflow-hidden aspect-[16/9] bg-black">
+                        <img src={attachedMediaUrl} alt="YouTube community" className="w-full h-full object-cover" />
+                      </div>
 
-                      {editHashtags && (
-                        <p className="text-[11px] text-[#FFA84A]/80 font-medium">
-                          {editHashtags}
-                        </p>
-                      )}
+                      <div className="flex items-center gap-4 text-xs text-slate-400 pt-1">
+                        <span>👍 156</span>
+                        <span>👎</span>
+                        <span>💬 32</span>
+                      </div>
                     </div>
-                  </div>
+                  )}
+
+                  {/* DISCORD WEBHOOK MOCKUP */}
+                  {activePreviewPlatform === 'discord' && (
+                    <div className="p-4 space-y-2 bg-[#313338] text-slate-100">
+                      <div className="flex items-center gap-2">
+                        <div className="w-8 h-8 rounded-full bg-[#5865F2] flex items-center justify-center font-bold text-white text-xs">
+                          GC
+                        </div>
+                        <div>
+                          <div className="flex items-center gap-1.5">
+                            <span className="text-xs font-bold text-white">GrowthCrew Bot</span>
+                            <span className="text-[9px] bg-[#5865F2] text-white px-1.5 rounded uppercase font-bold">
+                              APP
+                            </span>
+                          </div>
+                          <span className="text-[10px] text-slate-400">Today at 12:00 PM</span>
+                        </div>
+                      </div>
+
+                      {/* Discord Embed */}
+                      <div className="border-l-4 border-[#5865F2] bg-[#2b2d31] p-3 rounded-r-xl space-y-2">
+                        <span className="text-[10px] font-bold text-[#FFA84A] block">⚡ IN2PETA BROADCAST</span>
+                        <h4 className="text-xs font-bold text-white">{editHook || topic || 'New Community Post'}</h4>
+                        <p className="text-[11px] text-slate-300 whitespace-pre-line line-clamp-3">
+                          {editCaption || 'Formatted rich embed dispatch for Discord subscribers.'}
+                        </p>
+                        <div className="rounded-lg overflow-hidden aspect-[16/9] bg-black/50">
+                          <img src={attachedMediaUrl} alt="Discord embed media" className="w-full h-full object-cover" />
+                        </div>
+                        <span className="text-[9px] text-slate-500 block">GrowthCrew AI • Multi-Platform Engine</span>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* INSTAGRAM MOCKUP (DEFAULT) */}
+                  {activePreviewPlatform === 'instagram' && (
+                    <div className="bg-[#000000]">
+                      {/* Phone Header / Profile Bar */}
+                      <div className="px-4 py-3 flex items-center justify-between border-b border-white/5">
+                        <div className="flex items-center gap-2.5">
+                          <div className="w-8 h-8 rounded-full p-[1.5px] bg-gradient-to-tr from-[#FF6B4A] via-[#FF5376] to-[#FFA84A]">
+                            <img
+                              src={activeChannel?.avatar || SAMPLE_IN2PETA_MEDIA[0].url}
+                              alt="profile"
+                              className="w-full h-full rounded-full object-cover bg-slate-900"
+                            />
+                          </div>
+                          <div>
+                            <div className="flex items-center gap-1">
+                              <span className="text-xs font-bold text-white">{activeChannel?.name || 'Mytestpage'}</span>
+                              <CheckCircle2 className="w-3 h-3 text-[#38BDF8] fill-[#38BDF8]/20" />
+                            </div>
+                            <span className="text-[10px] text-slate-400">{activeChannel?.handle || '@mytestpage'}</span>
+                          </div>
+                        </div>
+                        <MoreHorizontal className="w-4 h-4 text-slate-400" />
+                      </div>
+
+                      {/* Media Display */}
+                      <div
+                        className={`relative w-full bg-slate-950 overflow-hidden ${
+                          aspectRatio === 'square'
+                            ? 'aspect-square'
+                            : aspectRatio === 'reel'
+                            ? 'aspect-[9/16]'
+                            : 'aspect-[4/5]'
+                        }`}
+                      >
+                        {attachedMediaType === 'video' ? (
+                          <video
+                            src={attachedMediaUrl}
+                            controls
+                            autoPlay
+                            loop
+                            muted
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <img
+                            src={attachedMediaUrl}
+                            alt="Instagram preview"
+                            className="w-full h-full object-cover"
+                          />
+                        )}
+                      </div>
+
+                      {/* Action Bar (Heart, Comment, Share, Bookmark) */}
+                      <div className="p-3.5 space-y-2.5">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-3.5">
+                            <Heart className="w-5 h-5 text-slate-300 hover:text-rose-500 cursor-pointer transition-colors" />
+                            <MessageCircle className="w-5 h-5 text-slate-300 hover:text-white cursor-pointer transition-colors" />
+                            <Share2 className="w-5 h-5 text-slate-300 hover:text-white cursor-pointer transition-colors" />
+                          </div>
+                          <Bookmark className="w-5 h-5 text-slate-300 hover:text-[#FFA84A] cursor-pointer transition-colors" />
+                        </div>
+
+                        {/* Caption Preview */}
+                        <div className="text-xs space-y-1.5">
+                          {editHook && (
+                            <p className="font-extrabold text-white text-xs leading-snug">
+                              {editHook}
+                            </p>
+                          )}
+
+                          <p className={`text-slate-300 text-[11px] leading-relaxed whitespace-pre-line ${expandedCaption ? '' : 'line-clamp-3'}`}>
+                            {editCaption || (
+                              <span className="text-slate-600 italic">
+                                Caption preview
+                              </span>
+                            )}
+                          </p>
+
+                          {editCaption && editCaption.length > 120 && (
+                            <button
+                              type="button"
+                              onClick={() => setExpandedCaption(!expandedCaption)}
+                              className="text-[10px] text-slate-500 hover:text-slate-300 font-bold block cursor-pointer"
+                            >
+                              {expandedCaption ? 'show less' : '...more'}
+                            </button>
+                          )}
+
+                          {editHashtags && (
+                            <p className="text-[11px] text-[#FFA84A]/80 font-medium">
+                              {editHashtags}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 {/* Scheduling & Publish Actions */}
@@ -1321,7 +1693,7 @@ export default function App({ defaultTab = 'studio', apiUrl } = {}) {
                       className="py-3 px-4 rounded-xl scalora-btn-primary text-slate-950 text-xs font-extrabold uppercase tracking-wider transition-all flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50 shadow-lg"
                     >
                       <Send className="w-3.5 h-3.5 text-slate-950" />
-                      <span>Publish Now</span>
+                      <span>Publish to {selectedPlatforms.length} Channels Now 🚀</span>
                     </button>
                   </div>
                 </div>
@@ -1654,29 +2026,83 @@ export default function App({ defaultTab = 'studio', apiUrl } = {}) {
               </div>
             </div>
 
-            {/* Add Custom Handle */}
-            <form onSubmit={handleConnectInstagram} className="space-y-3 pt-2 border-t border-white/[0.06]">
-              <label className="text-xs font-bold text-slate-300 block">Add New Channel / Page:</label>
-              <div className="flex gap-2">
-                <select
-                  value={customPlatform}
-                  onChange={(e) => setCustomPlatform(e.target.value)}
-                  className="bg-[#07080b] border border-white/10 rounded-xl px-2.5 py-2 text-xs text-white focus:outline-none focus:border-[#FF6B4A]/60"
-                >
-                  <option value="instagram">Instagram</option>
-                  <option value="facebook">Facebook Page</option>
-                </select>
-                <div className="relative flex-1">
-                  <span className="absolute left-3 top-2 text-slate-500 text-xs">@</span>
-                  <input
-                    type="text"
-                    placeholder="handle_or_page"
-                    value={customHandleInput}
-                    onChange={(e) => setCustomHandleInput(e.target.value)}
-                    className="w-full bg-[#07080b] border border-white/10 rounded-xl pl-7 pr-3 py-2 text-xs text-white focus:outline-none focus:border-[#FF6B4A]/60"
-                  />
+            {/* Add Custom Handle & Credentials */}
+            <form onSubmit={handleConnectInstagram} className="space-y-3 pt-3 border-t border-white/[0.06]">
+              <label className="text-xs font-bold text-slate-300 block">Connect Your Account / Channel:</label>
+              
+              <div className="grid grid-cols-2 gap-2">
+                <div>
+                  <label className="text-[10px] text-slate-400 block mb-1">Platform</label>
+                  <select
+                    value={customPlatform}
+                    onChange={(e) => setCustomPlatform(e.target.value)}
+                    className="w-full bg-[#07080b] border border-white/10 rounded-xl px-2.5 py-2 text-xs text-white focus:outline-none focus:border-[#FF6B4A]/60"
+                  >
+                    {ALL_PLATFORMS.map((p) => (
+                      <option key={p.id} value={p.id}>
+                        {p.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="text-[10px] text-slate-400 block mb-1">Username / Handle</label>
+                  <div className="relative">
+                    <span className="absolute left-3 top-2 text-slate-500 text-xs">@</span>
+                    <input
+                      type="text"
+                      placeholder="handle_or_name"
+                      value={customHandleInput}
+                      onChange={(e) => setCustomHandleInput(e.target.value)}
+                      className="w-full bg-[#07080b] border border-white/10 rounded-xl pl-7 pr-3 py-2 text-xs text-white focus:outline-none focus:border-[#FF6B4A]/60"
+                    />
+                  </div>
                 </div>
               </div>
+
+              {(customPlatform === 'facebook' || customPlatform === 'instagram') && (
+                <div className="space-y-2 p-3 rounded-2xl bg-white/[0.02] border border-white/10">
+                  <p className="text-[10px] text-[#FFA84A] font-semibold">Meta Graph API Credentials (Optional for Custom Page):</p>
+                  <div>
+                    <input
+                      type="text"
+                      placeholder="Facebook Page ID (e.g. 1306999285838432)"
+                      value={customFbPageId}
+                      onChange={(e) => setCustomFbPageId(e.target.value)}
+                      className="w-full bg-[#07080b] border border-white/10 rounded-xl px-3 py-2 text-xs text-white placeholder:text-slate-600 focus:outline-none focus:border-[#FF6B4A]/60"
+                    />
+                  </div>
+                  <div>
+                    <input
+                      type="password"
+                      placeholder="Meta Page Access Token (Permanent / System User Token)"
+                      value={customFbToken}
+                      onChange={(e) => setCustomFbToken(e.target.value)}
+                      className="w-full bg-[#07080b] border border-white/10 rounded-xl px-3 py-2 text-xs text-white placeholder:text-slate-600 focus:outline-none focus:border-[#FF6B4A]/60"
+                    />
+                  </div>
+                  <p className="text-[9px] text-slate-500">
+                    Leave blank to use pre-configured system token, or paste your own Page ID & Token.
+                  </p>
+                </div>
+              )}
+
+              {customPlatform === 'discord' && (
+                <div className="space-y-1.5 p-3 rounded-2xl bg-white/[0.02] border border-white/10">
+                  <label className="text-[10px] text-[#818CF8] font-semibold block">Discord Channel Webhook URL:</label>
+                  <input
+                    type="url"
+                    placeholder="https://discord.com/api/webhooks/..."
+                    value={customDiscordWebhook}
+                    onChange={(e) => setCustomDiscordWebhook(e.target.value)}
+                    className="w-full bg-[#07080b] border border-white/10 rounded-xl px-3 py-2 text-xs text-white placeholder:text-slate-600 focus:outline-none focus:border-[#FF6B4A]/60"
+                  />
+                  <p className="text-[9px] text-slate-500">
+                    Instant rich embed notification directly to your Discord server channel.
+                  </p>
+                </div>
+              )}
 
               <div className="flex items-center justify-end gap-2 pt-2">
                 <button
@@ -1762,6 +2188,85 @@ export default function App({ defaultTab = 'studio', apiUrl } = {}) {
                 className="px-5 py-2 rounded-xl text-xs font-extrabold uppercase tracking-wider text-slate-950 scalora-btn-primary cursor-pointer"
               >
                 Save Changes
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Multi-Platform Broadcast Result Modal */}
+      {broadcastModalData && (
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
+          <div className="bg-[#0e1118] border border-white/15 rounded-3xl max-w-lg w-full p-6 shadow-2xl space-y-4 animate-in fade-in zoom-in-95">
+            <div className="flex items-center justify-between border-b border-white/[0.06] pb-3">
+              <div className="flex items-center gap-2">
+                <span className="w-8 h-8 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold">
+                  🚀
+                </span>
+                <div>
+                  <h3 className="font-extrabold text-sm text-white">Multi-Platform Broadcast Report</h3>
+                  <p className="text-[11px] text-slate-400">Simultaneous dispatch across selected channels</p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setBroadcastModalData(null)}
+                className="text-slate-400 hover:text-white cursor-pointer px-2 py-1"
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="p-3.5 rounded-2xl bg-white/[0.03] border border-white/5 space-y-2">
+              <div className="flex items-center justify-between text-xs font-bold">
+                <span className="text-white">Broadcast Status</span>
+                <span className="text-emerald-400">
+                  {broadcastModalData.successCount || Object.keys(broadcastModalData.platforms || {}).length} /{' '}
+                  {broadcastModalData.totalTargets || Object.keys(broadcastModalData.platforms || {}).length} Platforms Ready
+                </span>
+              </div>
+              <p className="text-[11px] text-slate-300">{broadcastModalData.summary}</p>
+            </div>
+
+            <div className="space-y-2 max-h-60 overflow-y-auto pr-1">
+              {Object.entries(broadcastModalData.platforms || {}).map(([platKey, res]) => {
+                const platMeta = ALL_PLATFORMS.find((p) => p.id === platKey) || {
+                  name: platKey,
+                  color: '#fff',
+                  badgeBg: 'bg-white/10 text-white',
+                };
+                return (
+                  <div
+                    key={platKey}
+                    className="flex items-center justify-between p-3 rounded-xl bg-[#07080b] border border-white/10 text-xs"
+                  >
+                    <div className="flex items-center gap-2.5">
+                      <span className="font-bold text-white capitalize">{platMeta.name}</span>
+                      {res.status === 'published' || res.status === 'dispatched' ? (
+                        <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
+                          {res.status === 'published' ? 'Live on Page' : 'Dispatched'}
+                        </span>
+                      ) : (
+                        <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/15 text-amber-300 border border-amber-500/30">
+                          {res.status}
+                        </span>
+                      )}
+                    </div>
+                    <div className="text-right text-[11px] text-slate-400 truncate max-w-[180px]">
+                      {res.id ? `ID: ${res.id}` : res.message || 'Queued for channel'}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            <div className="flex items-center justify-end gap-2 pt-2 border-t border-white/[0.06]">
+              <button
+                type="button"
+                onClick={() => setBroadcastModalData(null)}
+                className="w-full py-2.5 rounded-xl text-xs font-extrabold uppercase tracking-wider text-slate-950 scalora-btn-primary shadow-lg cursor-pointer"
+              >
+                Close & View In Published Feed
               </button>
             </div>
           </div>
