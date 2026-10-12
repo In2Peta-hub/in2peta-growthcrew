@@ -336,7 +336,8 @@ async def agentmail_webhook(request: Request, x_outreach_webhook_secret: str | N
     if not isinstance(data, dict):
         data = {}
     event_type = str(event.get("type") or "")
-    if "sent" in event_type or data.get("direction") == "outbound":
+    direction = str(data.get("direction") or data.get("folder") or data.get("status") or "").strip().lower()
+    if "sent" in event_type or direction in ("outbound", "sent", "outgoing", "send", "delivered"):
         return {"success": True, "skipped": True}
     inbox_id = str(data.get("inbox_id") or data.get("inboxId") or "")
     message_id = str(data.get("message_id") or data.get("messageId") or data.get("id") or "")
@@ -346,12 +347,9 @@ async def agentmail_webhook(request: Request, x_outreach_webhook_secret: str | N
     if not settings["email"].get("centralInbox"):
         return _fail(400, "Central inbox is not configured")
     try:
-        service.forward_reply(inbox_id, message_id, settings["email"]["centralInbox"])
+        handled = service.handle_inbound_webhook(inbox_id, message_id, settings["email"]["centralInbox"])
     except Exception as exc:
         return _fail(400, str(exc))
-    try:
-        full = service.fetch_message(inbox_id, message_id)
-        service.record_inbound(inbox_id, message_id, full["from"], full["subject"], full["body"])
-    except Exception:
-        pass
+    if not handled:
+        return {"success": True, "skipped": True, "reason": "unknown-sender"}
     return {"success": True, "forwardedTo": settings["email"]["centralInbox"]}

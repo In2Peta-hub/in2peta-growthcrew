@@ -506,9 +506,30 @@ def record_inbound(inbox_id: str, message_id: str, sender: str, subject: str, bo
     return store.mark_replied(lead["id"])
 
 
+OUTBOUND_STATES = {"outbound", "sent", "outgoing", "send", "delivered"}
+
+
+def _is_outbound_message(message: dict) -> bool:
+    raw = str(field(message, "direction") or field(message, "folder") or field(message, "status") or "").strip().lower()
+    return raw in OUTBOUND_STATES
+
+
+def _extract_sender_email(from_raw: Any) -> str:
+    if isinstance(from_raw, str):
+        match = __import__("re").search(r"<([^>]+)>", from_raw)
+        return (match.group(1) if match else from_raw).strip().lower()
+    if isinstance(from_raw, dict):
+        candidate = from_raw.get("email") or from_raw.get("address") or from_raw.get("from") or ""
+        if isinstance(candidate, str):
+            match = __import__("re").search(r"<([^>]+)>", candidate)
+            return (match.group(1) if match else candidate).strip().lower()
+    return ""
+
+
 def relay_replies(inbox_ids: list[str], destination: str) -> list[dict]:
     if not (destination or "").strip():
         raise GrowthcrewError("Reply destination inbox is not configured.")
+    destination_email = destination.strip().lower()
     forwarded = []
     for inbox_id in inbox_ids:
         listing = agentmail_request(f"/inboxes/{quote(inbox_id, safe='')}/messages?limit=25")
@@ -516,18 +537,25 @@ def relay_replies(inbox_ids: list[str], destination: str) -> list[dict]:
         if not isinstance(messages, list):
             continue
         for message in messages:
-            if not isinstance(message, dict) or field(message, "direction") == "outbound":
+            if not isinstance(message, dict) or _is_outbound_message(message):
                 continue
             message_id = str(field(message, "message_id") or field(message, "messageId") or field(message, "id") or "")
             if not message_id or store.find_message_by_provider(message_id):
+                continue
+            # Only true inbound replies from known leads are forwarded.
+            # Outbound sends go only to the lead (Reply-To is header-only).
+            sender = _extract_sender_email(field(message, "from"))
+            if not sender or not is_valid_email(sender):
+                continue
+            if sender == destination_email:
+                continue
+            if not store.get_lead_by_email(sender):
                 continue
             agentmail_request(
                 f"/inboxes/{quote(inbox_id, safe='')}/messages/{quote(message_id, safe='')}/forward",
                 "POST",
                 {"to": destination},
             )
-            from_raw = field(message, "from")
-            sender = from_raw if isinstance(from_raw, str) else str((from_raw or {}).get("email") or "")
             if sender:
                 try:
                     record_inbound(inbox_id, message_id, sender, str(field(message, "subject") or ""), str(field(message, "body_text") or field(message, "body") or ""))
@@ -550,10 +578,32 @@ def fetch_message(inbox_id: str, message_id: str) -> dict[str, str]:
     message = field(data, "message") or data
     if not isinstance(message, dict):
         message = {}
-    from_raw = field(message, "from")
-    sender = from_raw if isinstance(from_raw, str) else str((from_raw or {}).get("email") or "")
+    sender = _extract_sender_email(field(message, "from"))
     body = str(field(message, "body_text") or field(message, "text") or field(message, "body") or "")
-    return {"from": sender, "subject": str(field(message, "subject") or ""), "body": body}
+    direction = str(field(message, "direction") or field(message, "folder") or field(message, "status") or "")
+    return {"from": sender, "subject": str(field(message, "subject") or ""), "body": body, "direction": direction}
+
+
+def handle_inbound_webhook(inbox_id: str, message_id: str, destination: str) -> dict | None:
+    """Fetch first, forward only for true inbound replies from known leads."""
+    full = fetch_message(inbox_id, message_id)
+    if (full.get("direction") or "").strip().lower() in OUTBOUND_STATES:
+        return None
+    sender = (full.get("from") or "").strip().lower()
+    if not sender or not is_valid_email(sender):
+        return None
+    if sender == (destination or "").strip().lower():
+        return None
+    if not store.get_lead_by_email(sender):
+        return None
+    if store.find_message_by_provider(message_id):
+        return None
+    forward_reply(inbox_id, message_id, destination)
+    try:
+        record_inbound(inbox_id, message_id, sender, full.get("subject") or "", full.get("body") or "")
+    except Exception:
+        pass
+    return {"from": sender, "subject": full.get("subject") or ""}
 
 
 def register_webhook(url: str, inbox_ids: list[str]) -> dict:
