@@ -1,3 +1,4 @@
+import os
 import requests
 import time
 from typing import Dict, Any, List, Optional
@@ -93,23 +94,51 @@ class MultiPlatformPublisher:
                     "error": str(e)
                 }
 
-        # 2. INSTAGRAM
+        # 2. INSTAGRAM (Direct Meta Graph API Container & Publish)
         if "instagram" in target_platforms:
-            # When Instagram Business Account is linked to the Meta Page, Meta publishes through the same token
             try:
-                # If separate IG account is linked, publish or report connected status
-                fb_res = FacebookService.publish_post(
-                    page_id=page_id,
-                    access_token=access_token,
-                    message=text,
-                    image_url=media_url
+                ig_user_id = os.getenv("IG_BUSINESS_ACCOUNT_ID", CONFIG.IG_BUSINESS_ACCOUNT_ID or "17841415311653642")
+                clean_img_url = media_url or "https://images.unsplash.com/photo-1621905251189-08b45d6a269e?w=1080&auto=format&fit=crop&q=80"
+                
+                # Step 1: Create Instagram media container
+                c_res = requests.post(
+                    f"https://graph.facebook.com/v21.0/{ig_user_id}/media",
+                    data={
+                        "image_url": clean_img_url,
+                        "caption": text,
+                        "access_token": access_token
+                    },
+                    timeout=25
                 )
+                c_json = c_res.json()
+                if "id" not in c_json:
+                    err_msg = c_json.get("error", {}).get("message", "Could not create Instagram container")
+                    raise Exception(err_msg)
+                
+                creation_id = c_json["id"]
+                time.sleep(3)
+                
+                # Step 2: Publish Instagram media container
+                p_res = requests.post(
+                    f"https://graph.facebook.com/v21.0/{ig_user_id}/media_publish",
+                    data={
+                        "creation_id": creation_id,
+                        "access_token": access_token
+                    },
+                    timeout=25
+                )
+                p_json = p_res.json()
+                if "id" not in p_json:
+                    err_msg = p_json.get("error", {}).get("message", "Could not publish Instagram container")
+                    raise Exception(err_msg)
+                
+                ig_post_id = p_json["id"]
                 results["instagram"] = {
                     "status": "success",
                     "platform": "Instagram",
-                    "id": f"ig_{fb_res.get('postId') or fb_res.get('id')}",
-                    "url": f"https://www.instagram.com/",
-                    "message": "Published live to Instagram feed"
+                    "id": ig_post_id,
+                    "url": f"https://www.instagram.com/_mytestpage_/",
+                    "message": "Published live to Instagram feed (@_mytestpage_)"
                 }
             except Exception as e:
                 results["instagram"] = {
