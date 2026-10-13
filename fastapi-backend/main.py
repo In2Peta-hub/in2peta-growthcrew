@@ -22,9 +22,17 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+import os
+from fastapi.staticfiles import StaticFiles
+
 # Include Growthcrew Studio Router and the outreach API ported from gpu_platform.
 app.include_router(studio_router)
 app.include_router(growthcrew_router)
+
+# Mount static formatted_media folder for high-res padded Instagram photos
+MEDIA_DIR = os.path.join(os.path.dirname(__file__), "formatted_media")
+os.makedirs(MEDIA_DIR, exist_ok=True)
+app.mount("/media", StaticFiles(directory=MEDIA_DIR), name="media")
 
 
 @app.exception_handler(GrowthcrewError)

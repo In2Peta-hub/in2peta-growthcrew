@@ -54,8 +54,9 @@ class MultiPlatformPublisher:
     def format_image_for_instagram(cls, media_url: str) -> str:
         """
         Meta Graph API requires Instagram images to have an aspect ratio
-        between 4:5 (0.80) and 1.91:1 (1.91). If an image is too tall (e.g. mobile screenshots),
-        automatically pad it into a 4:5 canvas and re-upload to S3 so Instagram never rejects it.
+        between 4:5 (0.80) and 1.91:1 (1.91). If an image is too tall (e.g. mobile screenshots)
+        or too wide, automatically pad it into a 4:5 (1080x1350) canvas and re-upload to S3 or static host
+        so Instagram never rejects it.
         """
         if not media_url:
             return media_url
@@ -66,15 +67,19 @@ class MultiPlatformPublisher:
 
             resp = requests.get(media_url, timeout=15)
             if resp.status_code != 200:
+                print(f"[Instagram AspectRatio] Warning: could not download {media_url}, HTTP {resp.status_code}")
                 return media_url
 
             img = Image.open(BytesIO(resp.content)).convert("RGB")
             w, h = img.size
             ratio = w / h
+            print(f"[Instagram AspectRatio] Original image dimensions: {w}x{h}, ratio: {ratio:.3f}")
 
+            # Instagram feed requires aspect ratio strictly between 0.80 and 1.91
             if 0.80 <= ratio <= 1.91:
                 return media_url
 
+            print(f"[Instagram AspectRatio] Formatting image to 4:5 (1080x1350) canvas...")
             target_w, target_h = (1080, 1350)
             fitted = ImageOps.contain(img, (target_w, target_h))
             canvas = Image.new("RGB", (target_w, target_h), (18, 18, 18))
@@ -82,10 +87,29 @@ class MultiPlatformPublisher:
 
             buf = BytesIO()
             canvas.save(buf, format="JPEG", quality=95)
-            s3_url = S3Service.upload_media(buf.getvalue(), f"ig_fit_{int(time.time())}.jpg", "image/jpeg")
-            return s3_url or media_url
+            img_bytes = buf.getvalue()
+            filename = f"ig_fit_{int(time.time() * 1000)}.jpg"
+
+            # 1. Try S3 upload first
+            s3_url = S3Service.upload_media(img_bytes, filename, "image/jpeg")
+            if s3_url:
+                print(f"[Instagram AspectRatio] Uploaded formatted image to S3: {s3_url}")
+                return s3_url
+
+            # 2. Resilient Fallback: Save locally to static /media mount on Render backend
+            base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+            media_folder = os.path.join(base_dir, "formatted_media")
+            os.makedirs(media_folder, exist_ok=True)
+            local_file = os.path.join(media_folder, filename)
+            with open(local_file, "wb") as f:
+                f.write(img_bytes)
+
+            backend_domain = os.getenv("RENDER_EXTERNAL_URL", "https://in2peta-growthcrew-backend.onrender.com").rstrip("/")
+            fallback_url = f"{backend_domain}/media/{filename}"
+            print(f"[Instagram AspectRatio] S3 unavailable, served via backend static route: {fallback_url}")
+            return fallback_url
         except Exception as e:
-            print(f"[Instagram AspectRatio] Notice: {e}")
+            print(f"[Instagram AspectRatio] Error: {e}")
             return media_url
 
     @classmethod
