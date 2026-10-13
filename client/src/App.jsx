@@ -95,7 +95,9 @@ const ALL_PLATFORMS = [
   { id: 'discord', name: 'Discord', color: '#5865F2', icon: DiscordIcon, badgeBg: 'bg-[#5865F2]/15 text-[#818CF8] border-[#5865F2]/30' },
 ];
 
-const API_BASE = import.meta.env.VITE_API_URL ? import.meta.env.VITE_API_URL.replace(/\/$/, '') : '';
+const API_BASE = import.meta.env.VITE_API_URL
+  ? import.meta.env.VITE_API_URL.replace(/\/$/, '')
+  : 'https://in2peta-growthcrew-backend.onrender.com';
 const SCALORA_GRADIENT = 'bg-gradient-to-r from-[#FF6B4A] to-[#FFA84A]';
 const SCALORA_ROSE_GRADIENT = 'bg-gradient-to-r from-[#FF5376] to-[#A855F7]';
 const IN2PETA_EXPLORE_URL = 'https://www.in2peta.com/explore';

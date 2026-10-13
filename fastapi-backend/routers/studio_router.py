@@ -357,6 +357,15 @@ async def create_queue_post(post: CreateQueuePostRequest):
             "broadcastResult": broadcast_result
         })
 
+        if not broadcast_result.get("success", False) and broadcast_result.get("failedCount", 0) > 0 and broadcast_result.get("successfulCount", 0) == 0:
+            saved = QueueService.update_post(saved["id"], {"status": "FAILED"})
+            raise HTTPException(
+                status_code=400,
+                detail=broadcast_result.get("summary") or "Failed to publish to selected channels"
+            )
+
+        return {"success": True, "post": saved, "broadcastResult": broadcast_result}
+
     return {"success": True, "post": saved}
 
 @router.post("/publish")

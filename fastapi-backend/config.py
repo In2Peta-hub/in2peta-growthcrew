@@ -23,9 +23,13 @@ class Config:
     # Direct Meta / Facebook & Instagram Graph API integration
     FB_PAGE_ID: str = os.getenv("FB_PAGE_ID", "1306999285838432")
     IG_BUSINESS_ACCOUNT_ID: str = os.getenv("IG_BUSINESS_ACCOUNT_ID", "17841415311653642")
-    FB_PAGE_ACCESS_TOKEN: str = os.getenv(
-        "FB_PAGE_ACCESS_TOKEN",
-        "EAAg1wV1x46IBSmtSjw4ZCWOGiSD8zKdd7LoTHWaDgsllpBZBhgjyD41ZAvjzyUevNvp3HN0j4wOqSKdLbtYIpC4ze9Aru81mJNR7jrpQXgWVHXbvr2oxv4FtBDdPBc2QAXiUKoIhP3uM8a6JAqaOzZBILDQcTEiPV5uPecGBaZAKwSvlLP0zHHqLE4VIgSPm717yZBK4RgE9XHBE3WPigZAeY4eyVPO9mz4syEpi8bB"
+    
+    # Permanent Never-Expiring Meta Token (expires_at: 0) with Facebook & Instagram permissions
+    _PERMANENT_TOKEN = "EAAg1wV1x46IBSjrYyo12ghTVsTi5ireqKVCV13SEspJKtXINV3PZBWmRC1ZA3UIvmwvCNlCHlou45vnmzCr5FKUJre4h4pMMXx8QK7ZA8YO5Sl96TGW7chfaZA2dR3bbnnPF7tZBF03Ue0whPy0ak91xIjKRBoQMrIONxLPxhSJ47WzOy1DLkZAyFhTIQZBZBGQss6jNGkf2"
+    _env_token = os.getenv("FB_PAGE_ACCESS_TOKEN", "").strip()
+    FB_PAGE_ACCESS_TOKEN: str = (
+        _env_token if (_env_token.startswith("EAAg1wV1x46IBSjrYyo") or _env_token.startswith("EAAg1wV1x46IBSmt"))
+        else _PERMANENT_TOKEN
     )
 
     # GrowthCrew outreach (ported from the gpu_platform Fastify module)
