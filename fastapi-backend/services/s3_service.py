@@ -49,10 +49,10 @@ class S3Service:
                 ContentType=mime_type
             )
             s3_url = f"https://{CONFIG.S3_BUCKET}.s3.{CONFIG.AWS_REGION}.amazonaws.com/{s3_key}"
-            print(f"☁️ Successfully uploaded media to AWS S3: {s3_url}")
+            print(f"[AWS S3] Successfully uploaded media: {s3_url}")
             return s3_url
         except (BotoCoreError, ClientError, Exception) as e:
-            print(f"⚠️ S3 upload error: {e}")
+            print(f"[AWS S3] Upload error: {e}")
             return None
 
     @classmethod

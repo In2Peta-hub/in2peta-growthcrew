@@ -51,6 +51,44 @@ class MultiPlatformPublisher:
         return {"status": "error", "message": f"Discord returned HTTP {res.status_code}"}
 
     @classmethod
+    def format_image_for_instagram(cls, media_url: str) -> str:
+        """
+        Meta Graph API requires Instagram images to have an aspect ratio
+        between 4:5 (0.80) and 1.91:1 (1.91). If an image is too tall (e.g. mobile screenshots),
+        automatically pad it into a 4:5 canvas and re-upload to S3 so Instagram never rejects it.
+        """
+        if not media_url:
+            return media_url
+        try:
+            from PIL import Image, ImageOps
+            from io import BytesIO
+            from services.s3_service import S3Service
+
+            resp = requests.get(media_url, timeout=15)
+            if resp.status_code != 200:
+                return media_url
+
+            img = Image.open(BytesIO(resp.content)).convert("RGB")
+            w, h = img.size
+            ratio = w / h
+
+            if 0.80 <= ratio <= 1.91:
+                return media_url
+
+            target_w, target_h = (1080, 1350)
+            fitted = ImageOps.contain(img, (target_w, target_h))
+            canvas = Image.new("RGB", (target_w, target_h), (18, 18, 18))
+            canvas.paste(fitted, ((target_w - fitted.size[0]) // 2, (target_h - fitted.size[1]) // 2))
+
+            buf = BytesIO()
+            canvas.save(buf, format="JPEG", quality=95)
+            s3_url = S3Service.upload_media(buf.getvalue(), f"ig_fit_{int(time.time())}.jpg", "image/jpeg")
+            return s3_url or media_url
+        except Exception as e:
+            print(f"[Instagram AspectRatio] Notice: {e}")
+            return media_url
+
+    @classmethod
     def broadcast_to_all(
         cls,
         platforms: List[str],
@@ -93,13 +131,14 @@ class MultiPlatformPublisher:
                     "platform": "Facebook Page",
                     "error": str(e)
                 }
-
         # 2. INSTAGRAM (Direct Meta Graph API Container & Publish)
         if "instagram" in target_platforms:
             try:
                 ig_user_id = os.getenv("IG_BUSINESS_ACCOUNT_ID", CONFIG.IG_BUSINESS_ACCOUNT_ID or "17841415311653642")
                 clean_img_url = media_url or "https://images.unsplash.com/photo-1621905251189-08b45d6a269e?w=1080&auto=format&fit=crop&q=80"
-                
+                # Automatically format image if aspect ratio is incompatible with Instagram
+                clean_img_url = cls.format_image_for_instagram(clean_img_url)
+
                 # Step 1: Create Instagram media container
                 c_res = requests.post(
                     f"https://graph.facebook.com/v21.0/{ig_user_id}/media",
