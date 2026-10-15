@@ -30,6 +30,9 @@ yarn-error.log*
 Thumbs.db
 .vscode/
 .idea/
+
+# Local lead dataset (Parquet mirror of the MotherDuck business_leads database)
+USA Database Business Leads 9,979,021/
 fastapi-backend/data/data.json
 fastapi-backend/data/*.json
 **/__pycache__/

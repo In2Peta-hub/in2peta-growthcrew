@@ -22,6 +22,7 @@ The app is not renamed wholesale to Growthcrew. GrowthCrew is a second product m
 - **Publishing:** Postiz engine optional on `:4007`
 - **Captions:** Gemini (via `GEMINI_API_KEY`)
 - **Outreach:** CoreClaw + AgentMail + LLM keys (see `.env.example`)
+- **Lead database:** MotherDuck (`business_leads`, ~10.6M USA business leads, optional `MOTHERDUCK_TOKEN`) — GrowthCrew searches merge database leads with live CoreClaw results
 - **Location autocomplete:** local India city list; optional OpenStreetMap Nominatim — no Google Places key
 
 ## Run locally

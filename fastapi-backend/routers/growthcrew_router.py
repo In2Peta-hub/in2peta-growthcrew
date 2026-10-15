@@ -213,6 +213,11 @@ def search_sync(body: SearchBody):
     return _guard(run)
 
 
+@router.get("/leads/database")
+def lead_database():
+    return _guard(service.lead_database_status)
+
+
 @router.post("/leads/upload")
 async def upload_csv(file: UploadFile | None = File(None)):
     if file is None:

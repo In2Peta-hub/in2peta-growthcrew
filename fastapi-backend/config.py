@@ -41,6 +41,18 @@ class Config:
     UNSUBSCRIBE_URL: str = os.getenv("UNSUBSCRIBE_URL", "")
     CAMPAIGN_CONCURRENCY: int = int(os.getenv("CAMPAIGN_CONCURRENCY", "10"))
     MAX_SENDS_PER_INBOX: int = int(os.getenv("MAX_SENDS_PER_INBOX", "200"))
+
+    # GrowthCrew lead database (MotherDuck: the ~10.6M USA business leads dataset).
+    # Leads found here are merged with live CoreClaw search results.
+    MOTHERDUCK_TOKEN: str = os.getenv("MOTHERDUCK_TOKEN", "")
+    MOTHERDUCK_DATABASE: str = os.getenv("MOTHERDUCK_DATABASE", "business_leads")
+
+    # GrowthCrew AI drafting (LiteLLM gateway / OpenAI-compatible endpoints)
+    LITELLM_BASE_URL: str = os.getenv("LITELLM_BASE_URL", "")
+    LITELLM_MASTER_KEY: str = os.getenv("LITELLM_MASTER_KEY", "")
+    OPENAI_API_KEY: str = os.getenv("OPENAI_API_KEY", "")
+    OPENAI_API_BASE: str = os.getenv("OPENAI_API_BASE", "")
+    API_KEY_ENCRYPTION_KEY: str = os.getenv("API_KEY_ENCRYPTION_KEY", "")
     # In2Peta AI Inference API (DeepSeek-Flash)
     IN2PETA_API_KEY: str = os.getenv("IN2PETA_API_KEY", os.getenv("LITELLM_MASTER_KEY", "sk-in2peta-litellm-dev-master"))
     IN2PETA_API_URL: str = os.getenv("IN2PETA_API_URL", "https://code.in2peta.com/v1")
