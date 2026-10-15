@@ -46,5 +46,8 @@ class Config:
     IN2PETA_API_URL: str = os.getenv("IN2PETA_API_URL", "https://code.in2peta.com/v1")
     IN2PETA_MODEL: str = os.getenv("IN2PETA_MODEL", "deepseek-v4-flash")
     DISCORD_WEBHOOK_URL: str = os.getenv("DISCORD_WEBHOOK_URL", "")
+    # MotherDuck Cloud Database (Business Leads)
+    MOTHERDUCK_TOKEN: str = os.getenv("MOTHERDUCK_TOKEN", "")
+    MOTHERDUCK_DATABASE: str = os.getenv("MOTHERDUCK_DATABASE", "business_leads")
 
 CONFIG = Config()
