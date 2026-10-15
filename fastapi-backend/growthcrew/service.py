@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import threading
 import time
+from collections import deque
 from concurrent.futures import ThreadPoolExecutor
 from typing import Any
 from urllib.parse import quote
@@ -17,7 +18,13 @@ from growthcrew.ai import generate_draft, list_gateway_models
 from growthcrew.briefing import DEFAULT_BRAND_OFFER, DEFAULT_CTA, DEFAULT_SERVICE_FOCUS
 from growthcrew.crypto import decrypt_stored_key, encrypt_string
 from growthcrew.errors import GrowthcrewError
-from growthcrew.normalize import field, is_valid_email, normalize_coreclaw_places, normalize_openai_base
+from growthcrew.normalize import (
+    company_identity_keys,
+    field,
+    is_valid_email,
+    normalize_coreclaw_places,
+    normalize_openai_base,
+)
 
 RUN_SLUG_OK = __import__("re").compile(r"^[a-zA-Z0-9][a-zA-Z0-9_.~-]*$")
 
@@ -247,7 +254,52 @@ def _coreclaw_request(path: str, method: str = "GET", body: dict | None = None) 
     return data
 
 
-def start_search(query: str, location: str, max_results: int) -> dict[str, str]:
+# ---------------------------------------------------------------------------
+# Lead search
+#
+# Searches combine two sources and merge the results:
+#   1. The MotherDuck lead database (~10.6M pre-collected USA business leads).
+#   2. Live CoreClaw Google Maps search (the original GrowthCrew method).
+# ---------------------------------------------------------------------------
+
+_RUNS: dict[str, dict[str, Any]] = {}
+_RUNS_ORDER: deque[str] = deque()
+_RUNS_LOCK = threading.Lock()
+_MAX_TRACKED_RUNS = 100
+
+
+def _store_run(result: dict[str, Any]) -> None:
+    with _RUNS_LOCK:
+        _RUNS[result["runSlug"]] = result
+        _RUNS_ORDER.append(result["runSlug"])
+        while len(_RUNS_ORDER) > _MAX_TRACKED_RUNS:
+            _RUNS.pop(_RUNS_ORDER.popleft(), None)
+
+
+def _coreclaw_configured() -> bool:
+    return bool(CONFIG.CORECLAW_API_KEY)
+
+
+def _database_configured() -> bool:
+    try:
+        from growthcrew import leadsdb
+
+        return leadsdb.is_configured()
+    except Exception:
+        return False
+
+
+def _require_lead_search_configured() -> None:
+    if not _coreclaw_configured() and not _database_configured():
+        raise GrowthcrewError(
+            "Lead search is not configured. Set CORECLAW_API_KEY (live search) and/or "
+            "MOTHERDUCK_TOKEN (lead database) in the server environment.",
+            503,
+            "LEADS_NOT_CONFIGURED",
+        )
+
+
+def _coreclaw_start(query: str, location: str, max_results: int) -> dict[str, str]:
     run = _coreclaw_request(
         "/workers/coreclaw~google-maps-lead-finder/runs",
         "POST",
@@ -277,9 +329,7 @@ def start_search(query: str, location: str, max_results: int) -> dict[str, str]:
     return {"runSlug": run_slug, "status": "running"}
 
 
-def get_search(run_slug: str) -> dict[str, Any]:
-    if not RUN_SLUG_OK.match(run_slug):
-        raise GrowthcrewError("Invalid lead search ID")
+def _coreclaw_poll(run_slug: str) -> dict[str, Any]:
     run_path = f"/worker-runs/{quote(run_slug, safe='')}"
     poll = _coreclaw_request(run_path)
     info = field(poll, "data") or poll
@@ -307,17 +357,155 @@ def get_search(run_slug: str) -> dict[str, Any]:
     }
 
 
-def search_leads(query: str, location: str, max_results: int) -> dict[str, Any]:
-    started = start_search(query, location, max_results)
+def _coreclaw_search_sync(query: str, location: str, max_results: int) -> dict[str, Any]:
+    started = _coreclaw_start(query, location, max_results)
     run_slug = started["runSlug"]
     for _ in range(75):
         time.sleep(4)
-        result = get_search(run_slug)
+        result = _coreclaw_poll(run_slug)
         if result["status"] == "completed":
             return {"leads": result["leads"], "totalRawExtracted": result["totalRawExtracted"], "runSlug": run_slug}
         if result["status"] == "failed":
             raise GrowthcrewError(result["error"], 502, "CORECLAW_RUN_FAILED")
     raise GrowthcrewError(f"CoreClaw run timed out after polling (run {run_slug}). Try a smaller maxResults or retry.", 504, "CORECLAW_RUN_TIMEOUT")
+
+
+def _database_search(query: str, location: str, max_results: int) -> list[dict]:
+    from growthcrew import leadsdb
+
+    if not leadsdb.is_configured():
+        return []
+    return leadsdb.search_dataset(query, location, max_results)
+
+
+def _merge_leads(groups: list[list[dict]], max_results: int) -> list[dict]:
+    """Round-robin across source groups (database + live), dropping duplicate
+    emails and duplicate companies, capped at max_results."""
+    wanted = max(int(max_results or 20), 1)
+    merged: list[dict] = []
+    seen_emails: set[str] = set()
+    seen_identity: set[str] = set()
+    longest = max((len(group) for group in groups), default=0)
+    for depth in range(longest):
+        for group in groups:
+            if depth >= len(group):
+                continue
+            lead = group[depth]
+            email = str(lead.get("email") or "").strip().lower()
+            if not is_valid_email(email) or email in seen_emails:
+                continue
+            keys = company_identity_keys(str(lead.get("company") or ""), str(lead.get("website") or ""), email)
+            if any(key in seen_identity for key in keys):
+                continue
+            seen_emails.add(email)
+            seen_identity.update(keys)
+            merged.append(lead)
+            if len(merged) >= wanted:
+                return merged
+    return merged
+
+
+def _combined_search(query: str, location: str, max_results: int) -> dict[str, Any]:
+    warnings: list[str] = []
+    groups: list[list[dict]] = []
+    database_count = 0
+    live_count = 0
+
+    if _database_configured():
+        try:
+            found = _database_search(query, location, max_results)
+            database_count = len(found)
+            groups.append(found)
+        except Exception as error:
+            warnings.append(f"Lead database search failed: {error}")
+
+    if _coreclaw_configured():
+        try:
+            result = _coreclaw_search_sync(query, location, max_results)
+            live = [{**lead, "source": lead.get("source") or "live-search"} for lead in result["leads"]]
+            live_count = len(live)
+            groups.append(live)
+        except GrowthcrewError as error:
+            warnings.append(str(error))
+
+    leads = _merge_leads(groups, max_results)
+    if not leads and warnings and not groups:
+        raise GrowthcrewError(warnings[0], 502, "LEAD_SEARCH_FAILED")
+    return {
+        "status": "completed",
+        "leads": leads,
+        "totalRawExtracted": database_count + live_count,
+        "count": len(leads),
+        "verifiedEmails": len(leads),
+        "sources": {"database": database_count, "live": live_count},
+        "warnings": warnings,
+    }
+
+
+def _combined_search_worker(run_slug: str, query: str, location: str, max_results: int) -> None:
+    try:
+        result = _combined_search(query, location, max_results)
+        _store_run({**result, "runSlug": run_slug})
+    except GrowthcrewError as error:
+        _store_run({"runSlug": run_slug, "status": "failed", "error": str(error), "code": error.code})
+    except Exception as error:
+        _store_run({"runSlug": run_slug, "status": "failed", "error": str(error) or "Lead search failed"})
+
+
+def start_search(query: str, location: str, max_results: int) -> dict[str, str]:
+    """Kick off a combined (database + live) search in the background."""
+    _require_lead_search_configured()
+    run_slug = f"gc-{int(time.time() * 1000)}"
+    _store_run({"runSlug": run_slug, "status": "running"})
+    threading.Thread(
+        target=_combined_search_worker,
+        args=(run_slug, query, location, max_results),
+        daemon=True,
+    ).start()
+    return {"runSlug": run_slug, "status": "running"}
+
+
+def get_search(run_slug: str) -> dict[str, Any]:
+    if not RUN_SLUG_OK.match(run_slug):
+        raise GrowthcrewError("Invalid lead search ID")
+    with _RUNS_LOCK:
+        cached = _RUNS.get(run_slug)
+    if cached is not None:
+        return cached
+    # Older runs (or searches started elsewhere) poll CoreClaw directly.
+    if not _coreclaw_configured():
+        raise GrowthcrewError("Lead search is not configured", 503, "LEADS_NOT_CONFIGURED")
+    return _coreclaw_poll(run_slug)
+
+
+def search_leads(query: str, location: str, max_results: int) -> dict[str, Any]:
+    """Synchronous combined search (database + live)."""
+    _require_lead_search_configured()
+    result = _combined_search(query, location, max_results)
+    return {
+        "leads": result["leads"],
+        "totalRawExtracted": result["totalRawExtracted"],
+        "sources": result["sources"],
+        "warnings": result["warnings"],
+    }
+
+
+def lead_database_status() -> dict[str, Any]:
+    """Health/summary for the MotherDuck lead database."""
+    from growthcrew import leadsdb
+
+    if not leadsdb.is_configured():
+        return {"configured": False, "database": CONFIG.MOTHERDUCK_DATABASE, "tables": {}, "totalRows": 0}
+    try:
+        return leadsdb.dataset_summary()
+    except Exception as error:
+        return {
+            "configured": True,
+            "database": CONFIG.MOTHERDUCK_DATABASE,
+            "error": str(error),
+            "tables": {},
+            "totalRows": 0,
+        }
 
 
 def list_inboxes() -> dict:

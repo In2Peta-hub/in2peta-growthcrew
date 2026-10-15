@@ -428,7 +428,7 @@ export default function OutreachPanel() {
         method: 'POST',
         body: JSON.stringify({ query, location, maxResults: Number(maxResults) }),
       });
-      for (let attempt = 0; attempt < 40; attempt += 1) {
+      for (let attempt = 0; attempt < 150; attempt += 1) {
         await new Promise((resolve) => setTimeout(resolve, 2000));
         const status = await outreach(`/leads/search/${encodeURIComponent(started.runSlug)}`);
         if (status.status === 'running') continue;
@@ -436,7 +436,10 @@ export default function OutreachPanel() {
         setFound(status.leads || []);
         setSelected(Object.fromEntries((status.leads || []).map((lead) => [lead.email, true])));
         const count = status.count || (status.leads || []).length;
-        if (count) say(`${count} lead${count === 1 ? '' : 's'} ready to draft.`, 'success');
+        const fromDb = status.sources?.database || 0;
+        const fromLive = status.sources?.live || 0;
+        const breakdown = fromDb && fromLive ? ` (${fromDb} from your lead database, ${fromLive} live)` : '';
+        if (count) say(`${count} lead${count === 1 ? '' : 's'} ready to draft${breakdown}.`, 'success');
         else say('No emails found. Try a broader search or upload a CSV.', 'info');
         return;
       }
@@ -782,7 +785,7 @@ export default function OutreachPanel() {
                 <StepBadge n={1} tone="emerald" />
                 <div className="min-w-0">
                   <h3 className="text-sm font-extrabold text-white tracking-tight">Find leads</h3>
-                  <p className="text-[11px] text-slate-400">Search by niche or upload a CSV</p>
+                  <p className="text-[11px] text-slate-400">Your lead database + live web search, or upload a CSV</p>
                 </div>
               </div>
             </div>
@@ -905,6 +908,7 @@ export default function OutreachPanel() {
                         <span className="block text-[11px] text-slate-400 truncate">
                           {lead.email}
                           {lead.city ? ` · ${lead.city}` : ''}
+                          {lead.source === 'lead-database' ? ' · DB' : lead.source === 'live-search' ? ' · Live' : ''}
                         </span>
                       </span>
                     </label>
