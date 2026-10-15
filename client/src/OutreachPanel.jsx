@@ -308,7 +308,7 @@ export default function OutreachPanel() {
   const [inboxLoadError, setInboxLoadError] = useState('');
   const [inboxId, setInboxId] = useState('');
   const [query, setQuery] = useState('AI startups and software companies');
-  const [location, setLocation] = useState('Bengaluru, Karnataka, India');
+  const [location, setLocation] = useState('');
   const [maxResults, setMaxResults] = useState(10);
   const [found, setFound] = useState([]);
   const [searchAttempted, setSearchAttempted] = useState(false);

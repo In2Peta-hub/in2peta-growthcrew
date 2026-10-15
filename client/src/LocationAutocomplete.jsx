@@ -5,8 +5,9 @@ const FIELD =
   'w-full bg-[#07080b] border border-white/10 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder:text-slate-600 focus:outline-none focus:border-[#FF6B4A]/60 focus:ring-2 focus:ring-[#FF6B4A]/15 transition-all disabled:opacity-50';
 
 /**
- * Local-first India location autocomplete. Optional Nominatim fallback when
- * local matches are thin (no API key). Search payload still uses the chosen string.
+ * Location autocomplete for GrowthCrew outreach. Curated India locations show
+ * instantly (offline); worldwide suggestions always come from OSM Nominatim
+ * (no API key). The chosen string is what the search payload uses.
  */
 export default function LocationAutocomplete({
   id,
@@ -14,7 +15,7 @@ export default function LocationAutocomplete({
   onChange,
   disabled = false,
   className = FIELD,
-  placeholder = 'City, state, India',
+  placeholder = 'City, state/region, country',
 }) {
   const listId = useId();
   const wrapRef = useRef(null);
@@ -47,13 +48,14 @@ export default function LocationAutocomplete({
     setRemoteItems([]);
     setRemoteNote(false);
 
-    // Secondary OSM Nominatim only when local coverage is thin
-    if (q.length < 3 || local.length >= 3) return undefined;
+    // Worldwide OSM Nominatim suggestions (debounced); the curated India
+    // locations above are instant and offline.
+    if (q.length < 3) return undefined;
 
     debounceRef.current = window.setTimeout(async () => {
       try {
         const url =
-          `https://nominatim.openstreetmap.org/search?format=json&addressdetails=1&limit=5&countrycodes=in&q=${encodeURIComponent(q)}`;
+          `https://nominatim.openstreetmap.org/search?format=json&addressdetails=1&limit=8&accept-language=en&q=${encodeURIComponent(q)}`;
         const response = await fetch(url, {
           headers: { Accept: 'application/json' },
         });
@@ -180,12 +182,15 @@ function formatNominatim(hit) {
     address.city ||
     address.town ||
     address.village ||
+    address.municipality ||
     address.suburb ||
     address.county ||
     hit?.name ||
     '';
   const state = address.state || '';
+  const country = address.country || '';
   if (!city) return '';
-  if (state) return `${city}, ${state}, India`;
-  return `${city}, India`;
+  if (state && country) return `${city}, ${state}, ${country}`;
+  if (country) return `${city}, ${country}`;
+  return city;
 }
