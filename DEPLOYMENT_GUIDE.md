@@ -30,6 +30,8 @@ This guide walks you through deploying **GrowthCrew** to production:
    | `AWS_SECRET_ACCESS_KEY` | Your AWS Secret Key |
    | `FB_PAGE_ID` | `61594485176950` (Your Facebook Page ID) |
    | `FB_PAGE_ACCESS_TOKEN` | Your Meta Page Access Token (see Section 3 below) |
+   | `MOTHERDUCK_TOKEN` | MotherDuck access token ([app.motherduck.com](https://app.motherduck.com) → Settings → Access Tokens) — enables the ~10.6M-lead database in GrowthCrew search. Optional: without it, searches run live-only. |
+   | `MOTHERDUCK_DATABASE` | `business_leads` (default — only set if you renamed the database) |
 
 6. Click **Deploy Web Service**.
 7. Once deployed, copy your Render backend URL (e.g., `https://growthcrew-backend.onrender.com`).

@@ -28,3 +28,7 @@ services:
         value: http://127.0.0.1:4007/api/public/v1
       - key: POSTIZ_API_KEY
         sync: false
+      - key: MOTHERDUCK_TOKEN
+        sync: false
+      - key: MOTHERDUCK_DATABASE
+        value: business_leads
