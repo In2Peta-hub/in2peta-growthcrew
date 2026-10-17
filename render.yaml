@@ -32,3 +32,29 @@ services:
         sync: false
       - key: MOTHERDUCK_DATABASE
         value: business_leads
+      # GrowthCrew Outreach (lead generation)
+      - key: CORECLAW_API_KEY
+        sync: false
+      - key: AGENTMAIL_API_KEY
+        sync: false
+      - key: AGENTMAIL_WEBHOOK_SECRET
+        sync: false
+      - key: CENTRAL_INBOX
+        value: in2peta@gmail.com
+      - key: PHYSICAL_ADDRESS
+        sync: false
+      - key: UNSUBSCRIBE_URL
+        sync: false
+      # AI drafting (shared by both surfaces)
+      - key: IN2PETA_API_URL
+        value: https://code.in2peta.com/v1
+      - key: IN2PETA_MODEL
+        value: deepseek-v4-flash
+      - key: IN2PETA_API_KEY
+        sync: false
+      - key: LITELLM_BASE_URL
+        value: https://code.in2peta.com/v1
+      - key: LITELLM_MASTER_KEY
+        sync: false
+      - key: API_KEY_ENCRYPTION_KEY
+        sync: false

@@ -17,5 +17,5 @@ echo ========================================================
 echo  Frontend:  http://localhost:5173
 echo  Backend:   http://localhost:3005
 echo  API docs:  http://localhost:3005/docs
-echo  Toggle PostPulse / GrowthCrew in the app header.
+echo  Switch Social Studio / Lead Gen in the app header.
 echo ========================================================

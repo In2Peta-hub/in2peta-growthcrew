@@ -7,12 +7,8 @@ node_modules/
 client/dist/
 dist/
 
-# Local media uploads (preserve directory with .gitkeep)
-server/uploads/*
-!server/uploads/.gitkeep
-server/data/tunnel.txt
-server/data/data.json
-fastapi-backend/data/outreach.json
+# Local runtime data (JSON stores under fastapi-backend/data/)
+fastapi-backend/data/*.json
 
 # Environment variables & secrets
 .env
@@ -31,9 +27,10 @@ Thumbs.db
 .vscode/
 .idea/
 
-# Local lead dataset (Parquet mirror of the MotherDuck business_leads database)
-USA Database Business Leads 9,979,021/
-fastapi-backend/data/data.json
-fastapi-backend/data/*.json
+# Python
 **/__pycache__/
 *.py[cod]
+
+# Local lead dataset — Parquet mirror of the MotherDuck business_leads database.
+# The ~10.6M rows live in MotherDuck; this ~700 MB folder must never be committed.
+USA Database Business Leads 9,979,021/

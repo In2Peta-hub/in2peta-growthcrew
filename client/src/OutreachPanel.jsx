@@ -18,8 +18,7 @@ import {
   Plus,
 } from 'lucide-react';
 import LocationAutocomplete from './LocationAutocomplete';
-
-const API_BASE = import.meta.env.VITE_API_URL ? import.meta.env.VITE_API_URL.replace(/\/$/, '') : '';
+import { outreachApi } from './api';
 
 const FIELD =
   'w-full bg-[#07080b] border border-white/10 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder:text-slate-600 focus:outline-none focus:border-[#FF6B4A]/60 focus:ring-2 focus:ring-[#FF6B4A]/15 transition-all disabled:opacity-50';
@@ -41,19 +40,9 @@ const STATUS_META = {
   PENDING_REPLY: { label: 'Awaiting reply', tone: 'border-amber-500/30 bg-amber-500/10 text-amber-300' },
 };
 
-async function outreach(path, init = {}) {
-  const headers = new Headers(init.headers || {});
-  const isForm = typeof FormData !== 'undefined' && init.body instanceof FormData;
-  if (init.body && !isForm && !headers.has('Content-Type')) {
-    headers.set('Content-Type', 'application/json');
-  }
-  const response = await fetch(`${API_BASE}/api/growthcrew${path}`, { ...init, headers });
-  const payload = await response.json().catch(() => ({}));
-  if (!response.ok) {
-    throw new Error(payload.error || `Request failed (${response.status})`);
-  }
-  return payload;
-}
+// All outreach requests go through the shared API client: one base URL and one
+// error shape for the whole app, same as the social studio.
+const outreach = (path, init) => outreachApi(path, init);
 
 function inboxOptions(payload) {
   const list = payload?.inboxes || payload?.data || payload;
