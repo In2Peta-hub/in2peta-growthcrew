@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import {
   Sparkles,
-  Zap,
   CheckCircle2,
   XCircle,
   Edit3,
@@ -11,11 +10,8 @@ import {
   RefreshCw,
   Layers,
   Calendar,
-  Image as ImageIcon,
   Info,
   Check,
-  Globe,
-  Film,
   ArrowRight,
   HelpCircle,
   Heart,
@@ -23,81 +19,79 @@ import {
   Bookmark,
   MoreHorizontal,
   Upload,
-  Link as LinkIcon,
-  Play,
   Share2,
   Clock,
-  ShieldCheck,
   CloudUpload,
-  Sliders,
-  ChevronRight,
-  Compass,
   LogOut,
-  User,
-  Mail
+  Mail,
+  X,
+  ChevronDown,
+  ThumbsUp,
+  Repeat2,
+  BarChart3,
+  ArrowBigUp,
+  ArrowBigDown
 } from 'lucide-react';
 import LoginPage from './LoginPage';
 import OutreachPanel from './OutreachPanel';
 import LandingPage from './LandingPage';
 import { API_BASE } from './api';
+import Segmented from './ui/Segmented';
 
 // Custom SVG Icons for Multi-Platform Social Channels
-const InstagramIcon = ({ className = 'w-4 h-4' }) => (
-  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+const InstagramIcon = ({ className = 'w-4 h-4', ...props }) => (
+  <svg {...props} aria-hidden="true" className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <rect width="20" height="20" x="2" y="2" rx="5" ry="5" />
     <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
     <line x1="17.5" x2="17.51" y1="6.5" y2="6.5" />
   </svg>
 );
 
-const FacebookIcon = ({ className = 'w-4 h-4' }) => (
-  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+const FacebookIcon = ({ className = 'w-4 h-4', ...props }) => (
+  <svg {...props} aria-hidden="true" className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
   </svg>
 );
 
-const LinkedInIcon = ({ className = 'w-4 h-4' }) => (
-  <svg className={className} viewBox="0 0 24 24" fill="currentColor">
+const LinkedInIcon = ({ className = 'w-4 h-4', ...props }) => (
+  <svg {...props} aria-hidden="true" className={className} viewBox="0 0 24 24" fill="currentColor">
     <path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.28 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.75M6.46 10.9v8.37h2.79V10.9H6.46M7.86 6.54a1.63 1.63 0 1 0 0 3.26 1.63 1.63 0 0 0 0-3.26z" />
   </svg>
 );
 
-const XIcon = ({ className = 'w-4 h-4' }) => (
-  <svg className={className} viewBox="0 0 24 24" fill="currentColor">
+const XIcon = ({ className = 'w-4 h-4', ...props }) => (
+  <svg {...props} aria-hidden="true" className={className} viewBox="0 0 24 24" fill="currentColor">
     <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
   </svg>
 );
 
-const RedditIcon = ({ className = 'w-4 h-4' }) => (
-  <svg className={className} viewBox="0 0 24 24" fill="currentColor">
+const RedditIcon = ({ className = 'w-4 h-4', ...props }) => (
+  <svg {...props} aria-hidden="true" className={className} viewBox="0 0 24 24" fill="currentColor">
     <path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2zm6.2 12.3c.1.3.1.5.1.7 0 2.4-2.8 4.3-6.3 4.3s-6.3-1.9-6.3-4.3c0-.2 0-.5.1-.7-.6-.4-1-.9-1-1.6 0-1.1.9-2 2-2 .5 0 1 .2 1.3.6 1-.7 2.4-1.2 3.9-1.3l.8-3.7 2.6.6c.1-.6.7-1 1.4-1 1.1 0 2 .9 2 2s-.9 2-2 2c-.6 0-1.1-.3-1.4-.8l-2-.5-.6 2.8c1.5.1 2.8.6 3.8 1.3.4-.4.8-.6 1.4-.6 1.1 0 2 .9 2 2 0 .7-.4 1.2-1 1.6z" />
   </svg>
 );
 
-const YouTubeIcon = ({ className = 'w-4 h-4' }) => (
-  <svg className={className} viewBox="0 0 24 24" fill="currentColor">
+const YouTubeIcon = ({ className = 'w-4 h-4', ...props }) => (
+  <svg {...props} aria-hidden="true" className={className} viewBox="0 0 24 24" fill="currentColor">
     <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.5 12 3.5 12 3.5s-7.505 0-9.377.55a3.016 3.016 0 0 0-2.122 2.136C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.55 9.376.55 9.376.55s7.505 0 9.377-.55a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
   </svg>
 );
 
-const DiscordIcon = ({ className = 'w-4 h-4' }) => (
-  <svg className={className} viewBox="0 0 24 24" fill="currentColor">
+const DiscordIcon = ({ className = 'w-4 h-4', ...props }) => (
+  <svg {...props} aria-hidden="true" className={className} viewBox="0 0 24 24" fill="currentColor">
     <path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994.021-.041.001-.09-.041-.106a13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.929 1.793 8.18 1.793 12.061 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.894.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.028zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z" />
   </svg>
 );
 
 const ALL_PLATFORMS = [
-  { id: 'facebook', name: 'Facebook Page', color: '#1877F2', icon: FacebookIcon, badgeBg: 'bg-[#1877F2]/15 text-[#38BDF8] border-[#1877F2]/30' },
-  { id: 'instagram', name: 'Instagram', color: '#E1306C', icon: InstagramIcon, badgeBg: 'bg-[#E1306C]/15 text-[#FF5376] border-[#E1306C]/30' },
-  { id: 'linkedin', name: 'LinkedIn', color: '#0A66C2', icon: LinkedInIcon, badgeBg: 'bg-[#0A66C2]/15 text-[#38BDF8] border-[#0A66C2]/30' },
-  { id: 'x', name: 'X (Twitter)', color: '#FFFFFF', icon: XIcon, badgeBg: 'bg-white/10 text-white border-white/20' },
-  { id: 'reddit', name: 'Reddit', color: '#FF4500', icon: RedditIcon, badgeBg: 'bg-[#FF4500]/15 text-[#FF6B4A] border-[#FF4500]/30' },
-  { id: 'youtube', name: 'YouTube', color: '#FF0000', icon: YouTubeIcon, badgeBg: 'bg-[#FF0000]/15 text-rose-400 border-[#FF0000]/30' },
-  { id: 'discord', name: 'Discord', color: '#5865F2', icon: DiscordIcon, badgeBg: 'bg-[#5865F2]/15 text-[#818CF8] border-[#5865F2]/30' },
+  { id: 'facebook', name: 'Facebook Page', color: '#1877F2', icon: FacebookIcon },
+  { id: 'instagram', name: 'Instagram', color: '#E1306C', icon: InstagramIcon },
+  { id: 'linkedin', name: 'LinkedIn', color: '#0A66C2', icon: LinkedInIcon },
+  { id: 'x', name: 'X (Twitter)', color: '#FFFFFF', icon: XIcon },
+  { id: 'reddit', name: 'Reddit', color: '#FF4500', icon: RedditIcon },
+  { id: 'youtube', name: 'YouTube', color: '#FF0000', icon: YouTubeIcon },
+  { id: 'discord', name: 'Discord', color: '#5865F2', icon: DiscordIcon },
 ];
-
-const SCALORA_GRADIENT = 'bg-gradient-to-r from-[#FF6B4A] to-[#FFA84A]';
-const SCALORA_ROSE_GRADIENT = 'bg-gradient-to-r from-[#FF5376] to-[#A855F7]';
 const IN2PETA_EXPLORE_URL = 'https://www.in2peta.com/explore';
 
 // Pre-curated inspiration topics for instant captions
@@ -153,16 +147,9 @@ export default function App({ defaultTab = 'studio', apiUrl } = {}) {
     }
   });
 
-  // View mode: 'login' | 'landing' (Scalora Dashboard) | 'app' (Studio / Outreach)
-  // When opening the app, the first screen is login
-  const [viewMode, setViewMode] = useState(() => {
-    try {
-      const saved = localStorage.getItem('growthcrew_auth');
-      return saved ? 'landing' : 'login';
-    } catch {
-      return 'login';
-    }
-  });
+  // The public landing page introduces both products before sign-in.
+  const [viewMode, setViewMode] = useState('landing');
+  const [pendingProduct, setPendingProduct] = useState(null);
 
   const handleLogin = (user) => {
     const activeUser = {
@@ -173,14 +160,21 @@ export default function App({ defaultTab = 'studio', apiUrl } = {}) {
     };
     setCurrentUser(activeUser);
     localStorage.setItem('growthcrew_auth', JSON.stringify(activeUser));
-    setViewMode('landing'); // After login, immediately open the dashboard!
+    if (pendingProduct) {
+      setProductMode(pendingProduct === 'leadgen' ? 'growthcrew' : 'social');
+      setPendingProduct(null);
+      setViewMode('app');
+    } else {
+      setViewMode('landing');
+    }
     showToast(`Welcome back, ${activeUser.name}!`, 'success');
   };
 
   const handleLogout = () => {
     setCurrentUser(null);
     localStorage.removeItem('growthcrew_auth');
-    setViewMode('login'); // On logout, go directly to login page
+    setPendingProduct(null);
+    setViewMode('landing');
     showToast('Signed out successfully.', 'info');
   };
 
@@ -188,7 +182,28 @@ export default function App({ defaultTab = 'studio', apiUrl } = {}) {
   const [productMode, setProductMode] = useState(defaultTab === 'outreach' ? 'growthcrew' : 'social');
   const [activeTab, setActiveTab] = useState(defaultTab === 'outreach' ? 'studio' : defaultTab); // 'studio' | 'queue' | 'history'
   const [showBeginnerGuide, setShowBeginnerGuide] = useState(true);
+  const [accountMenuOpen, setAccountMenuOpen] = useState(false);
+  const accountMenuRef = useRef(null);
   const isGrowthcrew = productMode === 'growthcrew';
+
+  useEffect(() => {
+    if (!accountMenuOpen) return undefined;
+    const closeOnEscape = (event) => {
+      if (event.key === 'Escape') {
+        setAccountMenuOpen(false);
+        accountMenuRef.current?.querySelector('button')?.focus();
+      }
+    };
+    const closeOnOutside = (event) => {
+      if (!accountMenuRef.current?.contains(event.target)) setAccountMenuOpen(false);
+    };
+    document.addEventListener('keydown', closeOnEscape);
+    document.addEventListener('pointerdown', closeOnOutside);
+    return () => {
+      document.removeEventListener('keydown', closeOnEscape);
+      document.removeEventListener('pointerdown', closeOnOutside);
+    };
+  }, [accountMenuOpen]);
 
   const switchProductMode = (mode) => {
     setProductMode(mode);
@@ -314,10 +329,11 @@ export default function App({ defaultTab = 'studio', apiUrl } = {}) {
   };
 
   useEffect(() => {
+    if (viewMode !== 'app' || !currentUser) return;
     fetchData();
     const interval = setInterval(fetchData, 12000);
     return () => clearInterval(interval);
-  }, []);
+  }, [viewMode, currentUser]);
 
   // Handle Connecting Custom Channel & Credentials
   const handleConnectInstagram = async (e) => {
@@ -533,7 +549,7 @@ export default function App({ defaultTab = 'studio', apiUrl } = {}) {
       });
 
       if (!res.ok) throw new Error('Could not schedule post');
-      showToast(`📅 Post scheduled for ${new Date(scheduledDate).toLocaleString()}!`, 'success');
+      showToast(`Post scheduled for ${new Date(scheduledDate).toLocaleString()}.`, 'success');
       fetchData();
       setActiveTab('queue');
     } catch {
@@ -594,7 +610,7 @@ export default function App({ defaultTab = 'studio', apiUrl } = {}) {
       if (!res.ok) throw new Error(data.detail || data.error || 'Publish failed');
       if (data.broadcastResult) {
         setBroadcastModalData(data.broadcastResult);
-        showToast(`🚀 Published to ${selectedPlatforms.length} platforms!`, 'success');
+        showToast('Publishing results are ready.', 'success');
       } else {
         showToast('Published successfully.', 'success');
       }
@@ -650,12 +666,12 @@ export default function App({ defaultTab = 'studio', apiUrl } = {}) {
     }
   };
 
-  // 1. If not authenticated or in login mode, render Login Page first
-  if (!currentUser || viewMode === 'login') {
+  if (viewMode === 'login' || (viewMode === 'app' && !currentUser)) {
     return (
       <LoginPage
-        onLogin={(user) => {
-          handleLogin(user);
+        onLogin={handleLogin}
+        onBack={() => {
+          setPendingProduct(null);
           setViewMode('landing');
         }}
       />
@@ -669,6 +685,11 @@ export default function App({ defaultTab = 'studio', apiUrl } = {}) {
         currentUser={currentUser}
         onLogout={handleLogout}
         onNavigate={(mode) => {
+          if (!currentUser) {
+            setPendingProduct(mode);
+            setViewMode('login');
+            return;
+          }
           switchProductMode(mode === 'leadgen' ? 'growthcrew' : 'social');
           setViewMode('app');
         }}
@@ -685,320 +706,125 @@ export default function App({ defaultTab = 'studio', apiUrl } = {}) {
       : queueList.filter((p) => p.status === queueFilter);
 
   return (
-    <div className="min-h-screen bg-[#07080a] text-slate-100 flex flex-col font-sans antialiased selection:bg-[#FF6B4A]/30 selection:text-[#FFA84A] scalora-mesh-bg">
-      {/* Toast Notification */}
+    <div className="min-h-screen bg-[var(--ui-bg)] text-[var(--ui-ink)] flex flex-col font-sans antialiased">
       {toast && (
-        <div
-          className={`fixed bottom-6 right-6 z-50 flex items-center gap-3 px-5 py-3 rounded-2xl shadow-2xl backdrop-blur-2xl border transition-all animate-in fade-in slide-in-from-bottom-5 ${
-            toast.type === 'error'
-              ? 'bg-rose-950/90 text-rose-200 border-rose-800/60 shadow-rose-950/50'
-              : toast.type === 'info'
-              ? 'bg-[#101522]/95 text-sky-200 border-sky-800/50 shadow-sky-950/50'
-              : 'bg-[#0e1713]/95 text-emerald-200 border-emerald-700/50 shadow-emerald-950/50'
-          }`}
-        >
-          {toast.type === 'error' ? (
-            <XCircle className="w-5 h-5 text-rose-400 shrink-0" />
-          ) : toast.type === 'info' ? (
-            <Info className="w-5 h-5 text-sky-400 shrink-0" />
-          ) : (
-            <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0" />
-          )}
-          <span className="text-xs font-semibold">{toast.message}</span>
+        <div role="status" className="ui-toast fixed end-4 [inset-block-end:1rem] z-50 flex items-center gap-3 px-4 py-3 max-w-[min(25rem,calc(100vw-2rem))]">
+          {toast.type === 'error' ? <XCircle className="w-5 h-5 text-[var(--ui-bad)] shrink-0" /> : toast.type === 'info' ? <Info className="w-5 h-5 text-[var(--ui-lavender)] shrink-0" /> : <CheckCircle2 className="w-5 h-5 text-[var(--ui-good)] shrink-0" />}
+          <span className="text-sm">{toast.message}</span>
         </div>
       )}
 
-      <header className="border-b border-white/[0.07] bg-[#07080a]/85 backdrop-blur-2xl sticky top-0 z-40">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-18 flex items-center justify-between gap-4">
-          <div className="flex items-center gap-3.5 min-w-0">
-            {/* Scalora Logo - clicking takes user back to Dashboard */}
-            <div
-              onClick={() => setViewMode('landing')}
-              className="w-10 h-10 rounded-2xl p-[1.5px] bg-gradient-to-tr from-[#FF6B4A] via-[#FF5376] to-[#FFA84A] shadow-lg shadow-[#FF6B4A]/25 shrink-0 cursor-pointer hover:scale-105 transition-transform"
-              title="Return to Dashboard"
-            >
-              <div className="w-full h-full bg-[#0a0c10] rounded-[14px] flex items-center justify-center">
-                {isGrowthcrew ? (
-                  <Mail className="w-5 h-5 text-[#FF5376]" />
-                ) : (
-                  <Sparkles className="w-5 h-5 text-[#FFA84A]" />
-                )}
-              </div>
-            </div>
-
-            <div className="min-w-0 flex items-center gap-3">
-              <h1 className="font-extrabold text-lg tracking-tight text-white flex items-center gap-1.5 truncate">
-                {isGrowthcrew ? (
-                  <>
-                    GrowthCrew <span className="font-serif-accent font-normal italic text-[#FF5376] text-xl">Lead Gen & Outreach</span>
-                  </>
-                ) : (
-                  <>
-                    GrowthCrew <span className="font-serif-accent font-normal italic text-[#FFA84A] text-xl">Social Media Studio</span>
-                  </>
-                )}
-              </h1>
-
-              {/* Clear 'Back to Dashboard' Button */}
-              <button
-                type="button"
-                onClick={() => setViewMode('landing')}
-                className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/[0.06] hover:bg-white/[0.12] border border-white/10 text-xs font-semibold text-slate-200 hover:text-white transition-all cursor-pointer shadow-sm group ml-2"
-                title="Go back to Dashboard"
-              >
-                <ArrowRight className="w-3.5 h-3.5 text-[#FFA84A] rotate-180 group-hover:-translate-x-0.5 transition-transform" />
-                <span>Back to Dashboard</span>
-              </button>
-            </div>
+      <div className="sticky [inset-block-start:0] z-40 bg-[var(--ui-surface)]">
+      <header>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 min-h-18 flex flex-wrap items-center justify-between gap-3 py-3">
+          <div className="flex items-center gap-3 min-w-0">
+            <button type="button" onClick={() => setViewMode('landing')} className="ui-btn ui-btn-ghost ui-btn-icon shrink-0" aria-label="GrowthCrew home">
+              <img className="brand-logo" src="/brand/in2peta-logo.png" alt="" width="40" height="40" />
+            </button>
+            <h1 className="ui-panel-title truncate text-base sm:text-lg">GrowthCrew <span className="hidden sm:inline text-[var(--ui-muted)] font-normal">/ {isGrowthcrew ? 'Lead Gen' : 'Social Studio'}</span></h1>
+            <button type="button" onClick={() => setViewMode('landing')} className="ui-btn ui-btn-ghost ui-btn-sm hidden sm:inline-flex">
+              <ArrowRight className="rotate-180" aria-hidden="true" /> Back to home
+            </button>
           </div>
-
-          <div className="flex items-center gap-3 shrink-0">
+          <div className="flex items-center gap-2 shrink-0 max-sm:ms-auto">
             {!isGrowthcrew && (
               <>
-
-                <a
-                  href={IN2PETA_EXPLORE_URL}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-white/[0.04] hover:bg-white/[0.08] border border-white/10 text-xs font-semibold text-slate-300 hover:text-white transition-all cursor-pointer shadow-sm"
-                  title="Browse image and video models"
-                >
-                  <span>Explore models</span>
-                  <ExternalLink className="w-3.5 h-3.5 text-slate-400" />
+                <a href={IN2PETA_EXPLORE_URL} target="_blank" rel="noopener noreferrer" className="ui-link text-[13px] hidden sm:inline-flex items-center gap-1.5">
+                  Explore models <ExternalLink className="w-3.5 h-3.5" aria-hidden="true" />
                 </a>
-
-                <div
-                  onClick={() => setShowConnectModal(true)}
-                  className="flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-white/[0.04] hover:bg-white/[0.08] border border-white/10 transition-all cursor-pointer group"
-                  title="Switch channel"
-                >
-                  <div className="w-7 h-7 rounded-full p-[1.5px] bg-gradient-to-tr from-[#FF6B4A] to-[#FF5376] shrink-0">
-                    <img
-                      src={activeChannel?.avatar || SAMPLE_IN2PETA_MEDIA[0].url}
-                      alt="avatar"
-                      className="w-full h-full rounded-full object-cover bg-slate-800"
-                    />
-                  </div>
-                  <div className="flex flex-col text-left">
-                    <span className="text-xs font-semibold text-white group-hover:text-[#FFA84A] transition-colors flex items-center gap-1">
-                      {activeChannel?.handle || '@mytestpage'}
-                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block" />
-                    </span>
-                    <span className="text-[10px] text-slate-400 capitalize">{activeChannel?.platform || 'Meta'} Connected</span>
-                  </div>
-                </div>
-
-                <div className="hidden md:flex items-center gap-2 pl-2 border-l border-white/10">
-                  <div className="text-right">
-                    <span className="text-[9px] uppercase tracking-wider font-bold text-slate-400 block">Auto-Publish</span>
-                    <span className={`text-[11px] font-extrabold ${settings.autoApprove ? 'text-emerald-400' : 'text-[#FFA84A]'}`}>
-                      {settings.autoApprove ? 'Instant' : 'Review First'}
-                    </span>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={handleToggleAutoApprove}
-                    className={`relative inline-flex h-7 w-12 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
-                      settings.autoApprove ? 'bg-emerald-500' : 'bg-slate-800 border border-white/10'
-                    }`}
-                  >
-                    <span
-                      className={`pointer-events-none inline-block h-6 w-6 transform rounded-full bg-white shadow-md ring-0 transition duration-200 ease-in-out flex items-center justify-center text-slate-900 ${
-                        settings.autoApprove ? 'translate-x-5' : 'translate-x-0'
-                      }`}
-                    >
-                      <Zap className="w-3 h-3 text-[#FF6B4A]" />
-                    </span>
-                  </button>
-                </div>
+                <button type="button" onClick={() => setShowConnectModal(true)} className="ui-btn ui-btn-ghost ui-btn-sm" aria-label="Switch channel">
+                  <img src={activeChannel?.avatar || SAMPLE_IN2PETA_MEDIA[0].url} alt="" className="w-6 h-6 rounded-full object-cover" />
+                  <span className="hidden sm:inline max-w-28 truncate">{activeChannel?.handle || '@mytestpage'}</span>
+                  <ChevronDown aria-hidden="true" />
+                </button>
+                <button type="button" onClick={handleToggleAutoApprove} role="switch" aria-label="Auto-publish" aria-checked={!!settings.autoApprove} className="ui-btn ui-btn-ghost ui-btn-sm max-sm:!w-10 max-sm:!px-0" title={settings.autoApprove ? 'Auto-publish on' : 'Review before publish'}>
+                  <span className={`ui-dot ${settings.autoApprove ? 'text-[var(--ui-good)]' : 'text-[var(--ui-faint)]'}`} />
+                  <span className="hidden md:inline">{settings.autoApprove ? 'Auto-publish on' : 'Review before publish'}</span>
+                  <span className="hidden sm:inline md:hidden">Auto-publish</span>
+                </button>
               </>
             )}
-
-            {/* Google-style 'A' Avatar Profile */}
-            <div className="relative group ml-1">
-              <button
-                type="button"
-                title={`Google Account: ${currentUser?.name || 'Aarya'} (${currentUser?.email || 'aarya@in2peta.com'})`}
-                className="w-9 h-9 rounded-full bg-gradient-to-tr from-[#FF6B4A] via-[#FF5376] to-[#FFA84A] p-[1.5px] shrink-0 shadow-md hover:ring-2 hover:ring-[#FFA84A]/40 transition-all cursor-pointer flex items-center justify-center group/avatar"
-              >
-                <div className="w-full h-full bg-[#0d0f17] group-hover/avatar:bg-[#161a26] rounded-full flex items-center justify-center font-extrabold text-[#FFA84A] text-xs tracking-tight transition-colors">
-                  {currentUser?.initial || 'A'}
-                </div>
+            <div className="relative" ref={accountMenuRef}>
+              <button type="button" onClick={() => setAccountMenuOpen((open) => !open)} aria-expanded={accountMenuOpen} aria-haspopup="menu" aria-label={`Account menu for ${currentUser?.name || 'Aarya'}`} className="ui-btn ui-btn-ghost ui-btn-icon rounded-full bg-[var(--ui-raised)]">
+                {currentUser?.initial || 'A'}
               </button>
-
-              {/* Dropdown Menu (Google Account card) */}
-              <div className="absolute right-0 top-full mt-2 w-60 rounded-2xl bg-[#0c0e15] border border-white/10 shadow-2xl p-3.5 opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto transition-all z-50">
-                <div className="flex flex-col items-center text-center pb-3 border-b border-white/[0.08] mb-2.5">
-                  <div className="w-12 h-12 rounded-full bg-gradient-to-tr from-[#FF6B4A] via-[#FF5376] to-[#FFA84A] p-[2px] shadow-lg mb-2">
-                    <div className="w-full h-full bg-[#0d0f17] rounded-full flex items-center justify-center font-extrabold text-white text-base">
-                      {currentUser?.initial || 'A'}
-                    </div>
+              {accountMenuOpen && (
+                <div role="menu" className="ui-menu absolute end-0 [inset-block-start:100%] mt-2 w-60 z-50" style={{ '--ui-origin': 'top right' }}>
+                  <div className="px-3 py-2">
+                    <p className="text-sm font-semibold truncate">{currentUser?.name || 'Aarya'}</p>
+                    <p className="ui-hint truncate">{currentUser?.email || 'aarya@in2peta.com'}</p>
+                    <span className="ui-badge mt-2">Admin</span>
                   </div>
-                  <div className="text-xs font-bold text-white truncate max-w-full">{currentUser?.name || 'Aarya'}</div>
-                  <div className="text-[11px] text-slate-400 truncate max-w-full">{currentUser?.email || 'aarya@in2peta.com'}</div>
-                  <div className="mt-1 text-[9px] font-semibold uppercase tracking-wider text-[#FFA84A] bg-[#FFA84A]/10 border border-[#FFA84A]/25 px-2 py-0.5 rounded-full">
-                    Admin Workspace
-                  </div>
+                  <button type="button" role="menuitem" onClick={() => { setAccountMenuOpen(false); handleLogout(); }} className="ui-menu-item">
+                    <LogOut aria-hidden="true" className="w-4 h-4" /> Sign out
+                  </button>
                 </div>
-                <button
-                  type="button"
-                  onClick={handleLogout}
-                  className="w-full text-center py-2 px-3 text-xs font-semibold text-rose-300 hover:text-rose-200 bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/20 rounded-xl transition-all flex items-center justify-center gap-2 cursor-pointer"
-                >
-                  <LogOut className="w-3.5 h-3.5" />
-                  <span>Sign out</span>
-                </button>
-              </div>
+              )}
             </div>
           </div>
         </div>
       </header>
 
-      <nav className="border-b border-white/[0.06] bg-[#07080a]/90 backdrop-blur-2xl px-4 sm:px-8 sticky top-18 z-30">
-        <div className="max-w-7xl mx-auto flex items-center justify-between gap-3 py-2">
-          <div className="flex items-center gap-1.5 bg-[#0d0f15] p-1 rounded-2xl border border-white/[0.07] overflow-x-auto">
-            {/* Product switcher — Social Studio and Lead Gen are one app, one nav */}
-            <button
-              type="button"
-              onClick={() => switchProductMode('social')}
-              className={`flex items-center gap-2 py-2 px-4 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-                !isGrowthcrew
-                  ? 'scalora-pill-tab-active'
-                  : 'text-slate-400 hover:text-slate-200 hover:bg-white/[0.04]'
-              }`}
-            >
-              <Sparkles className="w-3.5 h-3.5" />
-              <span>Social Studio</span>
+      <nav className="px-4 sm:px-8" aria-label="Workspace">
+        <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-2 py-2">
+          <div className="ui-tabs">
+            <button type="button" onClick={() => switchProductMode('social')} className="ui-tab" aria-selected={!isGrowthcrew}>
+              <Sparkles aria-hidden="true" /> Social Studio
             </button>
-
-            <button
-              type="button"
-              onClick={() => switchProductMode('growthcrew')}
-              className={`flex items-center gap-2 py-2 px-4 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-                isGrowthcrew
-                  ? 'scalora-pill-tab-active'
-                  : 'text-slate-400 hover:text-slate-200 hover:bg-white/[0.04]'
-              }`}
-            >
-              <Mail className="w-3.5 h-3.5" />
-              <span>Lead Gen</span>
+            <button type="button" onClick={() => switchProductMode('growthcrew')} className="ui-tab" aria-selected={isGrowthcrew}>
+              <Mail aria-hidden="true" /> Lead Gen
             </button>
-
-            {!isGrowthcrew && (
-              <>
-                <span className="w-px h-5 bg-white/10 mx-1" aria-hidden="true" />
-
-                <button
-                  type="button"
-                  onClick={() => setActiveTab('studio')}
-                  className={`flex items-center gap-2 py-2 px-4 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-                    activeTab === 'studio'
-                      ? 'scalora-pill-tab-active'
-                      : 'text-slate-400 hover:text-slate-200 hover:bg-white/[0.04]'
-                  }`}
-                >
-                  <Sparkles className="w-3.5 h-3.5" />
-                  <span>Create Post</span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => setActiveTab('queue')}
-                  className={`flex items-center gap-2 py-2 px-4 rounded-xl text-xs font-bold transition-all cursor-pointer relative ${
-                    activeTab === 'queue'
-                      ? 'scalora-pill-tab-active'
-                      : 'text-slate-400 hover:text-slate-200 hover:bg-white/[0.04]'
-                  }`}
-                >
-                  <Layers className="w-3.5 h-3.5" />
-                  <span>Review & Scheduled Queue</span>
-                  {pendingCount > 0 && (
-                    <span className="ml-1 px-2 py-0.2 rounded-full text-[10px] font-extrabold bg-[#FF6B4A] text-white">
-                      {pendingCount}
-                    </span>
-                  )}
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => setActiveTab('history')}
-                  className={`flex items-center gap-2 py-2 px-4 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-                    activeTab === 'history'
-                      ? 'scalora-pill-tab-active'
-                      : 'text-slate-400 hover:text-slate-200 hover:bg-white/[0.04]'
-                  }`}
-                >
-                  <CheckCircle2 className="w-3.5 h-3.5" />
-                  <span>Published Posts</span>
-                  <span className="text-[10px] px-2 py-0.2 rounded-full bg-white/5 text-slate-400 font-semibold">
-                    {publishedPosts.length}
-                  </span>
-                </button>
-              </>
-            )}
           </div>
-
           {!isGrowthcrew && (
-            <button
-              type="button"
-              onClick={() => setShowBeginnerGuide(!showBeginnerGuide)}
-              className="hidden md:flex items-center gap-1.5 text-xs font-semibold text-slate-400 hover:text-white transition-colors cursor-pointer py-1.5 px-3 rounded-xl bg-white/[0.03] hover:bg-white/[0.06] border border-white/5 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#FFA84A]/40"
-            >
-              <HelpCircle className="w-3.5 h-3.5 text-[#FFA84A]" />
-              <span>{showBeginnerGuide ? 'Hide Guide' : 'Workflow Guide'}</span>
-            </button>
+            <div className="ui-tabs max-w-full" aria-label="Social Studio views">
+              <button type="button" onClick={() => setActiveTab('studio')} className="ui-tab" aria-selected={activeTab === 'studio'}><Sparkles aria-hidden="true" /> Create post</button>
+              <button type="button" onClick={() => setActiveTab('queue')} className="ui-tab" aria-selected={activeTab === 'queue'}><Layers aria-hidden="true" /> Review & queue {pendingCount > 0 && <span className="ui-badge">{pendingCount}</span>}</button>
+              <button type="button" onClick={() => setActiveTab('history')} className="ui-tab" aria-selected={activeTab === 'history'}><CheckCircle2 aria-hidden="true" /> Published posts <span className="ui-badge">{publishedPosts.length}</span></button>
+            </div>
           )}
+          {!isGrowthcrew && <button type="button" onClick={() => setShowBeginnerGuide(!showBeginnerGuide)} className="ui-btn ui-btn-ghost ui-btn-sm hidden lg:inline-flex"><HelpCircle aria-hidden="true" />{showBeginnerGuide ? 'Hide guide' : 'Workflow guide'}</button>}
         </div>
       </nav>
+      </div>
 
       {/* Main Workspace */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1 w-full space-y-8">
-        {/* Beginner Step Cards — Scalora Ambient Glass Card */}
+        {/* Workflow guide */}
         {showBeginnerGuide && !isGrowthcrew && (
-          <div className="scalora-card-glow rounded-3xl p-6 relative overflow-hidden">
+          <div className="ui-panel space-y-4">
             <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-2.5">
-                <div className="w-7 h-7 rounded-xl bg-[#FF6B4A]/20 text-[#FFA84A] flex items-center justify-center font-bold text-xs border border-[#FF6B4A]/30">
-                  ★
-                </div>
-                <h3 className="font-extrabold text-sm text-white tracking-tight">
-                  How it works
-                </h3>
-              </div>
+              <h2 className="ui-panel-title">How it works</h2>
               <button
                 type="button"
                 onClick={() => setShowBeginnerGuide(false)}
-                className="text-xs font-semibold text-slate-400 hover:text-white cursor-pointer px-2.5 py-1 rounded-lg hover:bg-white/5"
+                className="ui-btn ui-btn-ghost ui-btn-sm"
               >
-                Dismiss ✕
+                Dismiss <X aria-hidden="true" />
               </button>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {/* Step 1 */}
-              <div className="p-4 rounded-2xl bg-[#090b10]/60 border border-white/[0.06] space-y-1.5">
-                <span className="text-[10px] font-extrabold uppercase tracking-wider text-[#34D399]">Step 1</span>
-                <h4 className="text-sm font-bold text-white">Add media</h4>
-                <p className="text-xs text-slate-400 leading-relaxed">
+              <div className="ui-panel-inset space-y-1.5">
+                <h3 className="text-sm font-semibold">1. Add media</h3>
+                <p className="text-[13px] text-[var(--ui-muted)] leading-relaxed">
                   Upload an image or video, or pick a preset.
                 </p>
               </div>
 
               {/* Step 2 */}
-              <div className="p-4 rounded-2xl bg-[#090b10]/60 border border-white/[0.06] space-y-1.5">
-                <span className="text-[10px] font-extrabold uppercase tracking-wider text-[#A855F7]">Step 2</span>
-                <h4 className="text-sm font-bold text-white">Write the caption</h4>
-                <p className="text-xs text-slate-400 leading-relaxed">
+              <div className="ui-panel-inset space-y-1.5">
+                <h3 className="text-sm font-semibold">2. Write the caption</h3>
+                <p className="text-[13px] text-[var(--ui-muted)] leading-relaxed">
                   Enter a topic and generate a caption.
                 </p>
               </div>
 
               {/* Step 3 */}
-              <div className="p-4 rounded-2xl bg-[#090b10]/60 border border-white/[0.06] space-y-1.5">
-                <span className="text-[10px] font-extrabold uppercase tracking-wider text-[#FFA84A]">Step 3</span>
-                <h4 className="text-sm font-bold text-white">Publish</h4>
-                <p className="text-xs text-slate-400 leading-relaxed">
-                  Preview, then schedule or post to Instagram and Facebook.
+              <div className="ui-panel-inset space-y-1.5">
+                <h3 className="text-sm font-semibold">3. Publish</h3>
+                <p className="text-[13px] text-[var(--ui-muted)] leading-relaxed">
+                  Preview, then schedule or publish to the selected channels.
                 </p>
               </div>
             </div>
@@ -1012,78 +838,58 @@ export default function App({ defaultTab = 'studio', apiUrl } = {}) {
         )}
 
         {!isGrowthcrew && activeTab === 'studio' && (
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-            {/* Left Column: STEP 1 (Media Hub) + STEP 2 (AI Caption Studio) */}
+          <div className="ui-view grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+            {/* Left Column: STEP 1 (Media Hub) + STEP 2 (Caption studio) */}
             <div className="lg:col-span-7 space-y-6">
               {/* STEP 1: Media Hub Card */}
-              <div className="scalora-card-glow rounded-3xl p-6 shadow-2xl space-y-5 relative overflow-hidden">
-                <div className="flex items-center justify-between border-b border-white/[0.06] pb-3.5">
-                  <div className="flex items-center gap-2.5">
-                    <span className="w-6 h-6 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-extrabold text-xs border border-emerald-500/30">
-                      1
-                    </span>
-                    <div>
-                      <h2 className="text-sm font-extrabold text-white tracking-tight">Media</h2>
-                      <p className="text-[11px] text-slate-400">Upload or pick a preset</p>
-                    </div>
+              <div className="ui-panel space-y-5">
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                  <div>
+                    <h2 className="ui-panel-title">1. Media</h2>
+                    <p className="ui-sub">Upload or pick a preset</p>
                   </div>
 
-                  <div className="flex items-center gap-1.5 text-xs">
-                    <button
-                      type="button"
-                      onClick={() => setMediaSourceType('sample')}
-                      className={`px-3 py-1 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
-                        mediaSourceType === 'sample'
-                          ? 'bg-[#FF6B4A]/20 text-[#FFA84A] border border-[#FF6B4A]/40'
-                          : 'bg-white/[0.03] text-slate-400 hover:text-white border border-white/5'
-                      }`}
-                    >
-                      Presets
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => fileInputRef.current?.click()}
-                      className={`px-3 py-1 rounded-xl text-xs font-semibold transition-all cursor-pointer flex items-center gap-1 ${
-                        mediaSourceType === 'upload'
-                          ? 'bg-[#FF6B4A]/20 text-[#FFA84A] border border-[#FF6B4A]/40'
-                          : 'bg-white/[0.03] text-slate-400 hover:text-white border border-white/5'
-                      }`}
-                    >
-                      <Upload className="w-3 h-3" />
-                      <span>Upload</span>
-                    </button>
+                  <div onClickCapture={(event) => {
+                    const option = event.target.closest('label')?.querySelector('input');
+                    if (option?.value === 'upload') {
+                      event.preventDefault();
+                      fileInputRef.current?.click();
+                    }
+                  }}>
+                    <Segmented
+                      name="media-source"
+                      label="Media source"
+                      value={mediaSourceType}
+                      options={[{ value: 'sample', label: 'Presets' }, { value: 'upload', label: 'Upload', icon: Upload }]}
+                      onChange={(value) => value === 'sample' ? setMediaSourceType('sample') : fileInputRef.current?.click()}
+                    />
                   </div>
                 </div>
 
                 {/* Upload & Preset Options */}
                 {mediaSourceType === 'sample' && (
                   <div className="space-y-2">
-                    <label className="text-xs font-bold text-slate-300 block">Presets</label>
+                    <p className="ui-label">Presets</p>
                     <div className="grid grid-cols-3 gap-3">
                       {SAMPLE_IN2PETA_MEDIA.map((item, idx) => (
-                        <div
+                        <button
+                          type="button"
                           key={idx}
                           onClick={() => {
                             setAttachedMediaUrl(item.url);
                             setAttachedMediaId(null);
                             setAttachedMediaType(item.type);
                           }}
-                          className={`relative rounded-2xl overflow-hidden aspect-[4/3] cursor-pointer border-2 transition-all group ${
-                            attachedMediaUrl === item.url
-                              ? 'border-[#FF6B4A] shadow-lg shadow-[#FF6B4A]/20 scale-[1.02]'
-                              : 'border-white/10 hover:border-white/30'
-                          }`}
+                          className="ui-chip !p-0 relative overflow-hidden aspect-[4/3] w-full"
+                          aria-pressed={attachedMediaUrl === item.url}
+                          aria-label={`Use ${item.name} preset`}
                         >
-                          <img src={item.url} alt={item.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
-                          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex items-end p-2">
-                            <span className="text-[10px] font-bold text-white truncate">{item.name}</span>
-                          </div>
+                          <img src={item.url} alt="" className="w-full h-full object-cover" />
+                          <span className="absolute start-1 end-1 [inset-block-end:0.25rem] bg-[var(--ui-surface)] rounded-md px-2 py-1 text-[13px] truncate">{item.name}</span>
                           {attachedMediaUrl === item.url && (
-                            <div className="absolute top-2 right-2 w-5 h-5 rounded-full bg-[#FF6B4A] flex items-center justify-center shadow-md">
-                              <Check className="w-3 h-3 text-white" />
-                            </div>
+                            <Check className="absolute end-2 [inset-block-start:0.5rem] w-5 h-5 text-[var(--ui-ink)] bg-[var(--ui-accent)] rounded-full p-1" />
                           )}
-                        </div>
+                        </button>
                       ))}
                     </div>
                   </div>
@@ -1098,38 +904,40 @@ export default function App({ defaultTab = 'studio', apiUrl } = {}) {
                   className="hidden"
                 />
 
-                {/* Drag & Drop Upload Zone */}
-                <div
+                {/* File upload */}
+                <button
+                  type="button"
                   onClick={() => fileInputRef.current?.click()}
-                  className="border-2 border-dashed border-white/15 hover:border-[#FF6B4A]/60 bg-[#07080b]/50 hover:bg-[#FF6B4A]/5 rounded-2xl p-4 flex flex-col items-center justify-center gap-2 cursor-pointer transition-all group"
+                  className="ui-btn ui-btn-ghost ui-btn-block !h-auto ui-panel-inset flex flex-col items-center gap-2 py-5"
                 >
-                  <div className="w-10 h-10 rounded-2xl bg-white/[0.04] group-hover:bg-[#FF6B4A]/20 flex items-center justify-center transition-colors">
+                  <div className="w-10 h-10 rounded-lg bg-[var(--ui-raised)] flex items-center justify-center transition-colors">
                     {isUploading ? (
-                      <RefreshCw className="w-5 h-5 text-[#FFA84A] animate-spin" />
+                      <RefreshCw className="w-5 h-5 text-[var(--ui-lavender)] ui-spin" />
                     ) : (
-                      <CloudUpload className="w-5 h-5 text-slate-400 group-hover:text-[#FFA84A] transition-colors" />
+                      <CloudUpload className="w-5 h-5 text-[var(--ui-muted)]" />
                     )}
                   </div>
                   <div className="text-center">
-                    <p className="text-xs font-bold text-white group-hover:text-[#FFA84A] transition-colors">
-                      {isUploading ? 'Uploading…' : 'Click or drag to upload'}
+                    <p className="text-sm font-semibold text-[var(--ui-ink)]">
+                      {isUploading ? 'Uploading…' : 'Choose an image or video'}
                     </p>
-                    <p className="text-[10px] text-slate-500">Supports JPG, PNG, WEBP, MP4 & MOV</p>
+                    <p className="text-[13px] text-[var(--ui-faint)]">Supports JPG, PNG, WEBP, MP4 & MOV</p>
                   </div>
-                </div>
+                </button>
 
                 {/* Direct URL Input */}
                 <form onSubmit={handlePasteUrlSubmit} className="flex gap-2">
                   <input
                     type="url"
-                    placeholder="Or paste any direct image / video HTTPS URL..."
+                    aria-label="Image or video URL"
+                    placeholder="Paste an image or video URL"
                     value={pastedUrlInput}
                     onChange={(e) => setPastedUrlInput(e.target.value)}
-                    className="flex-1 bg-[#07080b] border border-white/10 rounded-xl px-3.5 py-2 text-xs text-white placeholder:text-slate-600 focus:outline-none focus:border-[#FF6B4A]/60"
+                    className="ui-input"
                   />
                   <button
                     type="submit"
-                    className="px-4 py-2 rounded-xl bg-white/[0.04] hover:bg-white/[0.08] text-xs font-bold text-slate-300 hover:text-white border border-white/10 transition-all cursor-pointer"
+                    className="ui-btn ui-btn-ghost"
                   >
                     Attach
                   </button>
@@ -1137,27 +945,15 @@ export default function App({ defaultTab = 'studio', apiUrl } = {}) {
               </div>
 
               {/* STEP 2: AI Caption Generator Card */}
-              <div className="scalora-card-glow rounded-3xl p-6 shadow-2xl space-y-5 relative overflow-hidden">
-                <div className="flex items-center justify-between border-b border-white/[0.06] pb-3.5">
-                  <div className="flex items-center gap-2.5">
-                    <span className="w-6 h-6 rounded-lg bg-[#FF6B4A]/20 text-[#FFA84A] flex items-center justify-center font-extrabold text-xs border border-[#FF6B4A]/30">
-                      2
-                    </span>
-                    <div>
-                      <h2 className="text-sm font-extrabold text-white tracking-tight">AI Caption Studio</h2>
-                      <p className="text-[11px] text-slate-400">Generate high-converting multi-platform posts</p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-[10px] font-bold">
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                    <span>In2Peta DeepSeek-Flash</span>
-                  </div>
+              <div className="ui-panel space-y-5">
+                <div>
+                  <h2 className="ui-panel-title">2. Caption studio</h2>
+                  <p className="ui-sub">Draft a caption for your selected channels</p>
                 </div>
 
                 {/* Inspiration Idea Chips */}
                 <div className="space-y-2">
-                  <label className="text-xs font-bold text-slate-300 block">Ideas</label>
+                  <p className="ui-label">Ideas</p>
                   <div className="flex flex-wrap gap-2">
                     {INSPIRATION_CHIPS.map((chip, i) => (
                       <button
@@ -1167,7 +963,8 @@ export default function App({ defaultTab = 'studio', apiUrl } = {}) {
                           setTopic(chip);
                           handleGenerateCaption(chip);
                         }}
-                        className="px-3 py-1.5 rounded-xl bg-white/[0.03] hover:bg-[#FF6B4A]/10 text-slate-300 hover:text-[#FFA84A] border border-white/[0.06] hover:border-[#FF6B4A]/40 text-xs font-medium transition-all cursor-pointer"
+                        className="ui-chip whitespace-normal py-2"
+                        aria-pressed={topic === chip}
                       >
                         {chip}
                       </button>
@@ -1177,25 +974,26 @@ export default function App({ defaultTab = 'studio', apiUrl } = {}) {
 
                 {/* Topic Input Field */}
                 <div className="space-y-1.5">
-                  <label className="text-xs font-bold text-slate-300 block">Topic / Concept</label>
+                  <label htmlFor="post-topic" className="ui-label">Topic</label>
                   <textarea
+                    id="post-topic"
                     rows={3}
                     placeholder="What is this post about? (e.g. 20% off summer HVAC service, energy saving tips, product showcase)"
                     value={topic}
                     onChange={(e) => setTopic(e.target.value)}
-                    className="w-full bg-[#07080b] border border-white/10 rounded-2xl p-3.5 text-xs text-white placeholder:text-slate-600 focus:outline-none focus:border-[#FF6B4A]/60 focus:ring-2 focus:ring-[#FF6B4A]/15 leading-relaxed resize-none"
+                    className="ui-textarea resize-none"
                   />
                 </div>
 
                 {/* Target Channels Multi-Selector (All 7 Supported Platforms) */}
                 <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <label className="text-xs font-bold text-slate-300 flex items-center gap-1.5">
-                      <span>Publishing Channels</span>
-                      <span className="text-[10px] font-normal text-slate-400">
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <p className="ui-label !mb-0">
+                      <span>Publishing channels </span>
+                      <span className="text-[13px] font-normal text-[var(--ui-muted)]">
                         ({selectedPlatforms.length} / {ALL_PLATFORMS.length} selected)
                       </span>
-                    </label>
+                    </p>
                     <button
                       type="button"
                       onClick={() => {
@@ -1205,9 +1003,9 @@ export default function App({ defaultTab = 'studio', apiUrl } = {}) {
                           setSelectedPlatforms(ALL_PLATFORMS.map((p) => p.id));
                         }
                       }}
-                      className="text-[11px] text-[#FFA84A] hover:underline font-bold cursor-pointer"
+                      className="ui-link text-[13px]"
                     >
-                      {selectedPlatforms.length === ALL_PLATFORMS.length ? 'Reset to Meta' : 'Select All 7 Channels'}
+                      {selectedPlatforms.length === ALL_PLATFORMS.length ? 'Reset to Meta' : 'Select all channels'}
                     </button>
                   </div>
 
@@ -1230,14 +1028,11 @@ export default function App({ defaultTab = 'studio', apiUrl } = {}) {
                               setSelectedPlatforms([...selectedPlatforms, plat.id]);
                             }
                           }}
-                          className={`flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-medium border transition-all cursor-pointer ${
-                            isSelected
-                              ? `${plat.badgeBg} shadow-md font-bold`
-                              : 'bg-white/[0.02] text-slate-400 border-white/5 hover:border-white/20'
-                          }`}
+                          className="ui-chip min-w-0"
+                          aria-pressed={isSelected}
                         >
                           <div className="w-4 h-4 shrink-0 flex items-center justify-center">
-                            <Icon className="w-3.5 h-3.5" />
+                            <Icon className="w-3.5 h-3.5" style={{ color: plat.color }} />
                           </div>
                           <span className="truncate">{plat.name}</span>
                           {isSelected && <Check className="w-3 h-3 ml-auto shrink-0" />}
@@ -1250,46 +1045,48 @@ export default function App({ defaultTab = 'studio', apiUrl } = {}) {
                 {/* Tone & CTA Options */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="space-y-1.5">
-                    <label className="text-xs font-bold text-slate-300 block">Tone of Voice:</label>
+                    <label htmlFor="post-tone" className="ui-label">Tone of voice</label>
                     <select
+                    id="post-tone"
                       value={tone}
                       onChange={(e) => setTone(e.target.value)}
-                      className="w-full bg-[#07080b] border border-white/10 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-[#FF6B4A]/60"
+                      className="ui-select"
                     >
-                      <option value="Warm & Engaging">Warm & Engaging</option>
-                      <option value="High-Energy & Promotional">High-Energy & Promotional</option>
-                      <option value="Luxury & Exclusive">Luxury & Exclusive</option>
-                      <option value="Informative & Educational">Informative & Educational</option>
-                      <option value="Playful & Humorous">Playful & Humorous</option>
+                      <option value="Warm & Engaging">Warm and engaging</option>
+                      <option value="High-Energy & Promotional">Energetic and promotional</option>
+                      <option value="Luxury & Exclusive">Luxury and exclusive</option>
+                      <option value="Informative & Educational">Informative and educational</option>
+                      <option value="Playful & Humorous">Playful and humorous</option>
                     </select>
                   </div>
 
                   <div className="space-y-1.5">
-                    <label className="text-xs font-bold text-slate-300 block">Call to Action (CTA):</label>
+                    <label htmlFor="post-cta" className="ui-label">Call to action</label>
                     <input
+                    id="post-cta"
                       type="text"
                       value={callToAction}
                       onChange={(e) => setCallToAction(e.target.value)}
-                      className="w-full bg-[#07080b] border border-white/10 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-[#FF6B4A]/60"
+                      className="ui-input"
                     />
                   </div>
                 </div>
 
-                {/* Generate Button with Scalora Gradient */}
+                {/* Generate caption */}
                 <button
                   type="button"
                   onClick={() => handleGenerateCaption()}
                   disabled={isGenerating}
-                  className="w-full py-3.5 px-6 rounded-2xl scalora-btn-primary font-bold text-xs uppercase tracking-wider text-slate-950 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 shadow-xl"
+                  className="ui-btn ui-btn-light ui-btn-lg ui-btn-block"
                 >
                   {isGenerating ? (
                     <>
-                      <RefreshCw className="w-4 h-4 animate-spin text-slate-950" />
+                      <RefreshCw className="w-4 h-4 ui-spin" />
                       <span>Generating…</span>
                     </>
                   ) : (
                     <>
-                      <Sparkles className="w-4 h-4 text-slate-950" />
+                      <Sparkles className="w-4 h-4" />
                       <span>Generate caption</span>
                     </>
                   )}
@@ -1300,42 +1097,14 @@ export default function App({ defaultTab = 'studio', apiUrl } = {}) {
             {/* Right Column: Live Instagram / Facebook Simulator & Publishing Controls */}
             <div className="lg:col-span-5 space-y-6">
               {/* Instagram iPhone Simulator Card */}
-              <div className="scalora-card-glow rounded-3xl p-6 shadow-2xl space-y-5">
-                <div className="flex items-center justify-between border-b border-white/[0.06] pb-3">
-                  <div className="flex items-center gap-2">
-                    <span className="w-6 h-6 rounded-lg bg-[#FFA84A]/20 text-[#FFA84A] flex items-center justify-center font-extrabold text-xs border border-[#FFA84A]/30">
-                      3
-                    </span>
-                    <h3 className="text-sm font-extrabold text-white">Live Channel Preview</h3>
-                  </div>
-
-                  {/* Aspect Ratio Selector */}
-                  <div className="flex items-center bg-black/50 p-1 rounded-xl border border-white/10">
-                    <button
-                      onClick={() => setAspectRatio('square')}
-                      className={`px-2.5 py-1 rounded-lg text-[10px] font-bold cursor-pointer transition-all ${
-                        aspectRatio === 'square' ? 'bg-white/15 text-white' : 'text-slate-500 hover:text-slate-300'
-                      }`}
-                    >
-                      1:1
-                    </button>
-                    <button
-                      onClick={() => setAspectRatio('portrait')}
-                      className={`px-2.5 py-1 rounded-lg text-[10px] font-bold cursor-pointer transition-all ${
-                        aspectRatio === 'portrait' ? 'bg-white/15 text-white' : 'text-slate-500 hover:text-slate-300'
-                      }`}
-                    >
-                      4:5
-                    </button>
-                    <button
-                      onClick={() => setAspectRatio('reel')}
-                      className={`px-2.5 py-1 rounded-lg text-[10px] font-bold cursor-pointer transition-all ${
-                        aspectRatio === 'reel' ? 'bg-white/15 text-white' : 'text-slate-500 hover:text-slate-300'
-                      }`}
-                    >
-                      9:16
-                    </button>
-                  </div>
+              <div className="ui-panel space-y-5">
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                  <h2 className="ui-panel-title">3. Channel preview</h2>
+                  <Segmented name="aspect-ratio" label="Preview aspect ratio" value={aspectRatio} onChange={setAspectRatio} options={[
+                    { value: 'square', label: '1:1' },
+                    { value: 'portrait', label: '4:5' },
+                    { value: 'reel', label: '9:16' },
+                  ]} />
                 </div>
 
                 {/* Multi-Platform Preview Selector Tabs */}
@@ -1349,54 +1118,51 @@ export default function App({ defaultTab = 'studio', apiUrl } = {}) {
                         key={plat.id}
                         type="button"
                         onClick={() => setActivePreviewPlatform(plat.id)}
-                        className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-[11px] font-bold whitespace-nowrap border transition-all cursor-pointer ${
-                          isActive
-                            ? `${plat.badgeBg} shadow-md`
-                            : 'bg-white/[0.02] text-slate-400 border-white/5 hover:text-white'
-                        }`}
+                        className="ui-tab"
+                        aria-selected={isActive}
                       >
-                        <Icon className="w-3.5 h-3.5" />
+                        <Icon className="w-3.5 h-3.5" style={{ color: plat.color }} />
                         <span>{plat.name.split(' ')[0]}</span>
-                        {isTarget && <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />}
+                        {isTarget && <span className="ui-dot text-[var(--ui-good)]" aria-label="Selected for publishing" />}
                       </button>
                     );
                   })}
                 </div>
 
                 {/* Dynamic Multi-Platform Preview Mockup */}
-                <div className="bg-[#000000] border-4 border-slate-800 rounded-[32px] overflow-hidden shadow-2xl max-w-[370px] mx-auto text-left">
+                <div className="ui-panel-inset overflow-hidden max-w-[370px] mx-auto text-left !p-0">
                   {/* FACEBOOK MOCKUP */}
                   {activePreviewPlatform === 'facebook' && (
-                    <div className="p-4 space-y-3 bg-[#18191a] text-slate-100">
+                    <div className="p-4 space-y-3 bg-[var(--ui-bg)] text-[var(--ui-ink)]">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2.5">
                           <img
                             src={activeChannel?.avatar || SAMPLE_IN2PETA_MEDIA[0].url}
                             alt="Facebook avatar"
-                            className="w-9 h-9 rounded-full object-cover border border-white/10"
+                            className="w-9 h-9 rounded-full object-cover"
                           />
                           <div>
                             <div className="flex items-center gap-1">
-                              <span className="text-xs font-bold text-white">{activeChannel?.name || 'Mytestpage'}</span>
-                              <CheckCircle2 className="w-3.5 h-3.5 text-[#1877F2] fill-[#1877F2]" />
+                              <span className="text-[13px] font-bold text-[var(--ui-ink)]">{activeChannel?.name || 'Mytestpage'}</span>
+                              <CheckCircle2 className="w-3.5 h-3.5 text-[var(--ui-muted)]" />
                             </div>
-                            <span className="text-[10px] text-slate-400">Just now · 🌎</span>
+                            <span className="text-[13px] text-[var(--ui-muted)]">Just now</span>
                           </div>
                         </div>
-                        <MoreHorizontal className="w-4 h-4 text-slate-400" />
+                        <MoreHorizontal className="w-4 h-4 text-[var(--ui-muted)]" />
                       </div>
 
                       {/* Hook & Caption */}
-                      <div className="text-xs space-y-1.5">
-                        {editHook && <p className="font-bold text-white">{editHook}</p>}
-                        <p className="text-slate-300 text-[11px] leading-relaxed whitespace-pre-line line-clamp-3">
+                      <div className="text-sm space-y-1.5">
+                        {editHook && <p className="font-bold text-[var(--ui-ink)]">{editHook}</p>}
+                        <p className="text-[var(--ui-muted)] text-sm leading-relaxed whitespace-pre-line line-clamp-3">
                           {editCaption || 'Your generated post caption will appear here.'}
                         </p>
-                        {editHashtags && <p className="text-[#38BDF8] text-[11px]">{editHashtags}</p>}
+                        {editHashtags && <p className="text-[var(--ui-lavender)] text-[13px]">{editHashtags}</p>}
                       </div>
 
                       {/* Media */}
-                      <div className="rounded-xl overflow-hidden aspect-[16/9] bg-slate-950">
+                      <div className="rounded-lg overflow-hidden aspect-[16/9] bg-[var(--ui-bg)]">
                         {attachedMediaType === 'video' ? (
                           <video src={attachedMediaUrl} controls autoPlay loop muted className="w-full h-full object-cover" />
                         ) : (
@@ -1405,15 +1171,15 @@ export default function App({ defaultTab = 'studio', apiUrl } = {}) {
                       </div>
 
                       {/* Facebook Reaction Bar */}
-                      <div className="pt-2 border-t border-white/10 flex items-center justify-around text-slate-400 text-xs font-semibold">
-                        <div className="flex items-center gap-1.5 hover:text-[#1877F2] cursor-pointer">
-                          <span>👍</span> <span>Like</span>
+                      <div className="pt-2 flex items-center justify-around text-[var(--ui-muted)] text-[13px] font-semibold">
+                        <div className="flex items-center gap-1.5">
+                          <ThumbsUp className="w-4 h-4" /> <span>Like</span>
                         </div>
-                        <div className="flex items-center gap-1.5 hover:text-white cursor-pointer">
-                          <span>💬</span> <span>Comment</span>
+                        <div className="flex items-center gap-1.5">
+                          <MessageCircle className="w-4 h-4" /> <span>Comment</span>
                         </div>
-                        <div className="flex items-center gap-1.5 hover:text-white cursor-pointer">
-                          <span>↗️</span> <span>Share</span>
+                        <div className="flex items-center gap-1.5">
+                          <Share2 className="w-4 h-4" /> <span>Share</span>
                         </div>
                       </div>
                     </div>
@@ -1421,49 +1187,49 @@ export default function App({ defaultTab = 'studio', apiUrl } = {}) {
 
                   {/* LINKEDIN MOCKUP */}
                   {activePreviewPlatform === 'linkedin' && (
-                    <div className="p-4 space-y-3 bg-[#1b1f23] text-slate-100">
+                    <div className="p-4 space-y-3 bg-[var(--ui-bg)] text-[var(--ui-ink)]">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2.5">
                           <img
                             src={activeChannel?.avatar || SAMPLE_IN2PETA_MEDIA[0].url}
                             alt="LinkedIn avatar"
-                            className="w-10 h-10 rounded-full object-cover border border-[#0A66C2]/40"
+                            className="w-10 h-10 rounded-full object-cover"
                           />
                           <div>
-                            <span className="text-xs font-bold text-white block">In2Peta Growthcrew</span>
-                            <span className="text-[10px] text-slate-400 block truncate max-w-[190px]">
+                            <span className="text-[13px] font-bold text-[var(--ui-ink)] block">In2Peta Growthcrew</span>
+                            <span className="text-[13px] text-[var(--ui-muted)] block truncate max-w-[190px]">
                               AI Automation & Growth Specialist • 1st
                             </span>
-                            <span className="text-[9px] text-slate-500">1m • Edited • 🌐</span>
+                            <span className="text-[13px] text-[var(--ui-faint)]">1m · Edited</span>
                           </div>
                         </div>
-                        <span className="text-[11px] text-[#0A66C2] font-bold cursor-pointer">+ Follow</span>
+                        <span className="text-[13px] text-[var(--ui-lavender)] font-bold cursor-pointer">+ Follow</span>
                       </div>
 
-                      <div className="text-xs space-y-1.5">
-                        {editHook && <p className="font-bold text-white">{editHook}</p>}
-                        <p className="text-slate-300 text-[11px] leading-relaxed whitespace-pre-line line-clamp-3">
+                      <div className="text-sm space-y-1.5">
+                        {editHook && <p className="font-bold text-[var(--ui-ink)]">{editHook}</p>}
+                        <p className="text-[var(--ui-muted)] text-sm leading-relaxed whitespace-pre-line line-clamp-3">
                           {editCaption || 'Your professional business post caption will appear here.'}
                         </p>
-                        {editHashtags && <p className="text-[#0A66C2] text-[11px]">{editHashtags}</p>}
+                        {editHashtags && <p className="text-[var(--ui-lavender)] text-[13px]">{editHashtags}</p>}
                       </div>
 
-                      <div className="rounded-xl overflow-hidden aspect-[16/9] bg-slate-950">
+                      <div className="rounded-lg overflow-hidden aspect-[16/9] bg-[var(--ui-bg)]">
                         <img src={attachedMediaUrl} alt="LinkedIn media" className="w-full h-full object-cover" />
                       </div>
 
-                      <div className="pt-2 border-t border-white/10 flex items-center justify-between text-slate-400 text-[11px] font-semibold px-2">
-                        <span>👏 Like</span>
-                        <span>💬 Comment</span>
-                        <span>🔄 Repost</span>
-                        <span>✈️ Send</span>
+                      <div className="pt-2 flex items-center justify-between text-[var(--ui-muted)] text-[13px] font-semibold px-2">
+                        <span className="flex items-center gap-1"><ThumbsUp className="w-4 h-4" /> Like</span>
+                        <span className="flex items-center gap-1"><MessageCircle className="w-4 h-4" /> Comment</span>
+                        <span className="flex items-center gap-1"><Repeat2 className="w-4 h-4" /> Repost</span>
+                        <span className="flex items-center gap-1"><Send className="w-4 h-4" /> Send</span>
                       </div>
                     </div>
                   )}
 
                   {/* X / TWITTER MOCKUP */}
                   {activePreviewPlatform === 'x' && (
-                    <div className="p-4 space-y-3 bg-[#000000] text-slate-100">
+                    <div className="p-4 space-y-3 bg-[var(--ui-bg)] text-[var(--ui-ink)]">
                       <div className="flex items-start gap-3">
                         <img
                           src={activeChannel?.avatar || SAMPLE_IN2PETA_MEDIA[0].url}
@@ -1472,27 +1238,27 @@ export default function App({ defaultTab = 'studio', apiUrl } = {}) {
                         />
                         <div className="flex-1 space-y-2">
                           <div className="flex items-center gap-1.5">
-                            <span className="text-xs font-bold text-white">{activeChannel?.name || 'Mytestpage'}</span>
-                            <span className="text-[11px] text-slate-500">@mytestpage · 1m</span>
+                            <span className="text-[13px] font-bold text-[var(--ui-ink)]">{activeChannel?.name || 'Mytestpage'}</span>
+                            <span className="text-[13px] text-[var(--ui-faint)]">@mytestpage · 1m</span>
                           </div>
 
-                          <div className="text-xs space-y-1">
-                            {editHook && <p className="font-semibold text-white">{editHook}</p>}
-                            <p className="text-slate-200 text-xs leading-relaxed whitespace-pre-line line-clamp-4">
+                          <div className="text-sm space-y-1">
+                            {editHook && <p className="font-semibold text-[var(--ui-ink)]">{editHook}</p>}
+                            <p className="text-[var(--ui-ink)] text-sm leading-relaxed whitespace-pre-line line-clamp-4">
                               {editCaption || 'Your tweet text will appear here.'}
                             </p>
-                            {editHashtags && <p className="text-[#1D9BF0] text-xs">{editHashtags}</p>}
+                            {editHashtags && <p className="text-[var(--ui-lavender)] text-[13px]">{editHashtags}</p>}
                           </div>
 
-                          <div className="rounded-2xl overflow-hidden aspect-[16/9] bg-slate-950 border border-white/10">
+                          <div className="rounded-lg overflow-hidden aspect-[16/9] bg-[var(--ui-bg)]">
                             <img src={attachedMediaUrl} alt="X media" className="w-full h-full object-cover" />
                           </div>
 
-                          <div className="flex items-center justify-between text-slate-500 text-xs pt-1 px-1">
-                            <span>💬 24</span>
-                            <span>🔁 12</span>
-                            <span>❤️ 98</span>
-                            <span>📊 1.4K</span>
+                          <div className="flex items-center justify-between text-[var(--ui-faint)] text-[13px] pt-1 px-1">
+                            <span className="flex items-center gap-1"><MessageCircle className="w-4 h-4" /> 24</span>
+                            <span className="flex items-center gap-1"><Repeat2 className="w-4 h-4" /> 12</span>
+                            <span className="flex items-center gap-1"><Heart className="w-4 h-4" /> 98</span>
+                            <span className="flex items-center gap-1"><BarChart3 className="w-4 h-4" /> 1.4K</span>
                           </div>
                         </div>
                       </div>
@@ -1501,27 +1267,27 @@ export default function App({ defaultTab = 'studio', apiUrl } = {}) {
 
                   {/* REDDIT MOCKUP */}
                   {activePreviewPlatform === 'reddit' && (
-                    <div className="p-4 space-y-2.5 bg-[#0e1113] text-slate-100 border border-white/5">
-                      <div className="flex items-center gap-2 text-[11px] text-slate-400">
-                        <span className="font-bold text-white">r/GrowthHacking</span>
+                    <div className="p-4 space-y-2.5 bg-[var(--ui-bg)] text-[var(--ui-ink)]">
+                      <div className="flex items-center gap-2 text-[13px] text-[var(--ui-muted)]">
+                        <span className="font-bold text-[var(--ui-ink)]">r/GrowthHacking</span>
                         <span>•</span>
                         <span>Posted by u/aarya 2m ago</span>
                       </div>
-                      <h4 className="text-xs font-bold text-white leading-snug">
+                      <h4 className="text-sm font-semibold leading-snug">
                         {editHook || topic || 'Exciting update on our growth stack!'}
                       </h4>
-                      <p className="text-[11px] text-slate-300 leading-relaxed line-clamp-3">
+                      <p className="text-sm text-[var(--ui-muted)] leading-relaxed line-clamp-3">
                         {editCaption || 'Community post discussion body.'}
                       </p>
-                      <div className="rounded-xl overflow-hidden aspect-[16/9] bg-black">
+                      <div className="rounded-lg overflow-hidden aspect-[16/9] bg-[var(--ui-bg)]">
                         <img src={attachedMediaUrl} alt="Reddit media" className="w-full h-full object-cover" />
                       </div>
-                      <div className="flex items-center gap-4 text-xs font-bold text-slate-400 pt-1">
-                        <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/5">
-                          <span>⬆️</span> <span>42</span> <span>⬇️</span>
+                      <div className="flex items-center gap-4 text-[13px] font-bold text-[var(--ui-muted)] pt-1">
+                        <div className="flex items-center gap-1.5 ui-badge">
+                          <ArrowBigUp className="w-4 h-4" /> <span>42</span> <ArrowBigDown className="w-4 h-4" />
                         </div>
-                        <div className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-white/5">
-                          <span>💬</span> <span>18 comments</span>
+                        <div className="flex items-center gap-1 ui-badge">
+                          <MessageCircle className="w-4 h-4" /> <span>18 comments</span>
                         </div>
                       </div>
                     </div>
@@ -1529,7 +1295,7 @@ export default function App({ defaultTab = 'studio', apiUrl } = {}) {
 
                   {/* YOUTUBE COMMUNITY MOCKUP */}
                   {activePreviewPlatform === 'youtube' && (
-                    <div className="p-4 space-y-3 bg-[#0f0f0f] text-slate-100">
+                    <div className="p-4 space-y-3 bg-[var(--ui-bg)] text-[var(--ui-ink)]">
                       <div className="flex items-center gap-2.5">
                         <img
                           src={activeChannel?.avatar || SAMPLE_IN2PETA_MEDIA[0].url}
@@ -1538,90 +1304,89 @@ export default function App({ defaultTab = 'studio', apiUrl } = {}) {
                         />
                         <div>
                           <div className="flex items-center gap-1">
-                            <span className="text-xs font-bold text-white">GrowthCrew Official</span>
-                            <span className="text-[10px] text-slate-400">✓</span>
+                            <span className="text-[13px] font-bold text-[var(--ui-ink)]">GrowthCrew Official</span>
+                            <CheckCircle2 className="w-3.5 h-3.5 text-[var(--ui-muted)]" />
                           </div>
-                          <span className="text-[10px] text-slate-500">12 minutes ago</span>
+                          <span className="text-[13px] text-[var(--ui-faint)]">12 minutes ago</span>
                         </div>
                       </div>
 
-                      <p className="text-xs text-slate-200 leading-relaxed whitespace-pre-line line-clamp-3">
+                      <p className="text-[13px] text-[var(--ui-ink)] leading-relaxed whitespace-pre-line line-clamp-3">
                         {editHook ? `${editHook}\n\n` : ''}
                         {editCaption || 'YouTube Community update post.'}
                       </p>
 
-                      <div className="rounded-xl overflow-hidden aspect-[16/9] bg-black">
+                      <div className="rounded-lg overflow-hidden aspect-[16/9] bg-[var(--ui-bg)]">
                         <img src={attachedMediaUrl} alt="YouTube community" className="w-full h-full object-cover" />
                       </div>
 
-                      <div className="flex items-center gap-4 text-xs text-slate-400 pt-1">
-                        <span>👍 156</span>
-                        <span>👎</span>
-                        <span>💬 32</span>
+                      <div className="flex items-center gap-4 text-[13px] text-[var(--ui-muted)] pt-1">
+                        <span className="flex items-center gap-1"><ThumbsUp className="w-4 h-4" /> 156</span>
+                        <span className="flex items-center gap-1"><MessageCircle className="w-4 h-4" /> 32</span>
                       </div>
                     </div>
                   )}
 
                   {/* DISCORD WEBHOOK MOCKUP */}
                   {activePreviewPlatform === 'discord' && (
-                    <div className="p-4 space-y-2 bg-[#313338] text-slate-100">
+                    <div className="p-4 space-y-2 bg-[var(--ui-bg)] text-[var(--ui-ink)]">
                       <div className="flex items-center gap-2">
-                        <div className="w-8 h-8 rounded-full bg-[#5865F2] flex items-center justify-center font-bold text-white text-xs">
+                        <div className="w-8 h-8 rounded-full bg-[var(--ui-bg)] flex items-center justify-center font-bold text-[var(--ui-ink)] text-[13px]">
                           GC
                         </div>
                         <div>
                           <div className="flex items-center gap-1.5">
-                            <span className="text-xs font-bold text-white">GrowthCrew Bot</span>
-                            <span className="text-[9px] bg-[#5865F2] text-white px-1.5 rounded uppercase font-bold">
-                              APP
+                            <span className="text-[13px] font-bold text-[var(--ui-ink)]">GrowthCrew Bot</span>
+                            <span className="ui-badge">
+                              App
                             </span>
                           </div>
-                          <span className="text-[10px] text-slate-400">Today at 12:00 PM</span>
+                          <span className="text-[13px] text-[var(--ui-muted)]">Today at 12:00 PM</span>
                         </div>
                       </div>
 
                       {/* Discord Embed */}
-                      <div className="border-l-4 border-[#5865F2] bg-[#2b2d31] p-3 rounded-r-xl space-y-2">
-                        <span className="text-[10px] font-bold text-[#FFA84A] block">⚡ IN2PETA BROADCAST</span>
-                        <h4 className="text-xs font-bold text-white">{editHook || topic || 'New Community Post'}</h4>
-                        <p className="text-[11px] text-slate-300 whitespace-pre-line line-clamp-3">
+                      <div className="ui-panel-raised space-y-2">
+                        <span className="text-[13px] font-bold text-[var(--ui-lavender)] block">GrowthCrew post</span>
+                        <h4 className="text-[13px] font-bold text-[var(--ui-ink)]">{editHook || topic || 'New community post'}</h4>
+                        <p className="text-sm text-[var(--ui-muted)] whitespace-pre-line line-clamp-3">
                           {editCaption || 'Formatted rich embed dispatch for Discord subscribers.'}
                         </p>
-                        <div className="rounded-lg overflow-hidden aspect-[16/9] bg-black/50">
+                        <div className="rounded-lg overflow-hidden aspect-[16/9] bg-[var(--ui-bg)]">
                           <img src={attachedMediaUrl} alt="Discord embed media" className="w-full h-full object-cover" />
                         </div>
-                        <span className="text-[9px] text-slate-500 block">GrowthCrew AI • Multi-Platform Engine</span>
+                        <span className="text-[13px] text-[var(--ui-faint)] block">GrowthCrew AI • Channel preview</span>
                       </div>
                     </div>
                   )}
 
                   {/* INSTAGRAM MOCKUP (DEFAULT) */}
                   {activePreviewPlatform === 'instagram' && (
-                    <div className="bg-[#000000]">
+                    <div className="bg-[var(--ui-bg)]">
                       {/* Phone Header / Profile Bar */}
-                      <div className="px-4 py-3 flex items-center justify-between border-b border-white/5">
+                      <div className="px-4 py-3 flex items-center justify-between">
                         <div className="flex items-center gap-2.5">
-                          <div className="w-8 h-8 rounded-full p-[1.5px] bg-gradient-to-tr from-[#FF6B4A] via-[#FF5376] to-[#FFA84A]">
+                          <div className="w-8 h-8 rounded-full p-[1.5px] bg-[var(--ui-raised)]">
                             <img
                               src={activeChannel?.avatar || SAMPLE_IN2PETA_MEDIA[0].url}
                               alt="profile"
-                              className="w-full h-full rounded-full object-cover bg-slate-900"
+                              className="w-full h-full rounded-full object-cover bg-[var(--ui-bg)]"
                             />
                           </div>
                           <div>
                             <div className="flex items-center gap-1">
-                              <span className="text-xs font-bold text-white">{activeChannel?.name || 'Mytestpage'}</span>
-                              <CheckCircle2 className="w-3 h-3 text-[#38BDF8] fill-[#38BDF8]/20" />
+                              <span className="text-[13px] font-bold text-[var(--ui-ink)]">{activeChannel?.name || 'Mytestpage'}</span>
+                              <CheckCircle2 className="w-3 h-3 text-[var(--ui-muted)]" />
                             </div>
-                            <span className="text-[10px] text-slate-400">{activeChannel?.handle || '@mytestpage'}</span>
+                            <span className="text-[13px] text-[var(--ui-muted)]">{activeChannel?.handle || '@mytestpage'}</span>
                           </div>
                         </div>
-                        <MoreHorizontal className="w-4 h-4 text-slate-400" />
+                        <MoreHorizontal className="w-4 h-4 text-[var(--ui-muted)]" />
                       </div>
 
                       {/* Media Display */}
                       <div
-                        className={`relative w-full bg-slate-950 overflow-hidden ${
+                        className={`relative w-full bg-[var(--ui-bg)] overflow-hidden ${
                           aspectRatio === 'square'
                             ? 'aspect-square'
                             : aspectRatio === 'reel'
@@ -1651,24 +1416,24 @@ export default function App({ defaultTab = 'studio', apiUrl } = {}) {
                       <div className="p-3.5 space-y-2.5">
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-3.5">
-                            <Heart className="w-5 h-5 text-slate-300 hover:text-rose-500 cursor-pointer transition-colors" />
-                            <MessageCircle className="w-5 h-5 text-slate-300 hover:text-white cursor-pointer transition-colors" />
-                            <Share2 className="w-5 h-5 text-slate-300 hover:text-white cursor-pointer transition-colors" />
+                            <Heart className="w-5 h-5 text-[var(--ui-muted)]" />
+                            <MessageCircle className="w-5 h-5 text-[var(--ui-muted)]" />
+                            <Share2 className="w-5 h-5 text-[var(--ui-muted)]" />
                           </div>
-                          <Bookmark className="w-5 h-5 text-slate-300 hover:text-[#FFA84A] cursor-pointer transition-colors" />
+                          <Bookmark className="w-5 h-5 text-[var(--ui-muted)]" />
                         </div>
 
                         {/* Caption Preview */}
-                        <div className="text-xs space-y-1.5">
+                        <div className="text-sm space-y-1.5">
                           {editHook && (
-                            <p className="font-extrabold text-white text-xs leading-snug">
+                            <p className="font-semibold text-[var(--ui-ink)] text-[13px] leading-snug">
                               {editHook}
                             </p>
                           )}
 
-                          <p className={`text-slate-300 text-[11px] leading-relaxed whitespace-pre-line ${expandedCaption ? '' : 'line-clamp-3'}`}>
+                          <p className={`text-[var(--ui-muted)] text-sm leading-relaxed whitespace-pre-line ${expandedCaption ? '' : 'line-clamp-3'}`}>
                             {editCaption || (
-                              <span className="text-slate-600 italic">
+                              <span className="text-[var(--ui-faint)] italic">
                                 Caption preview
                               </span>
                             )}
@@ -1678,14 +1443,14 @@ export default function App({ defaultTab = 'studio', apiUrl } = {}) {
                             <button
                               type="button"
                               onClick={() => setExpandedCaption(!expandedCaption)}
-                              className="text-[10px] text-slate-500 hover:text-slate-300 font-bold block cursor-pointer"
+                              className="ui-link text-[13px]"
                             >
-                              {expandedCaption ? 'show less' : '...more'}
+                              {expandedCaption ? 'Show less' : 'Show more'}
                             </button>
                           )}
 
                           {editHashtags && (
-                            <p className="text-[11px] text-[#FFA84A]/80 font-medium">
+                            <p className="text-[13px] text-[var(--ui-lavender)] font-medium">
                               {editHashtags}
                             </p>
                           )}
@@ -1698,35 +1463,36 @@ export default function App({ defaultTab = 'studio', apiUrl } = {}) {
                 {/* Scheduling & Publish Actions */}
                 <div className="space-y-3 pt-2">
                   <div className="flex items-center gap-2">
-                    <Calendar className="w-4 h-4 text-[#FFA84A]" />
-                    <label className="text-xs font-bold text-slate-300">Schedule Date & Time:</label>
+                    <Calendar className="w-4 h-4 text-[var(--ui-lavender)]" />
+                    <label htmlFor="post-date" className="ui-label">Schedule date and time</label>
                   </div>
                   <input
+                    id="post-date"
                     type="datetime-local"
                     value={scheduledDate}
                     onChange={(e) => setScheduledDate(e.target.value)}
-                    className="w-full bg-[#07080b] border border-white/10 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-[#FF6B4A]/60"
+                    className="ui-input"
                   />
 
-                  <div className="grid grid-cols-2 gap-3 pt-2">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2 gap-3 pt-2">
                     <button
                       type="button"
                       onClick={handleSchedulePost}
                       disabled={actionLoading === 'schedule'}
-                      className="py-3 px-4 rounded-xl bg-white/[0.05] hover:bg-white/[0.09] text-white border border-white/10 text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50"
+                      className="ui-btn ui-btn-ghost ui-btn-block"
                     >
-                      <Clock className="w-3.5 h-3.5 text-[#FFA84A]" />
-                      <span>Add to Queue</span>
+                      <Clock className="w-3.5 h-3.5 text-[var(--ui-lavender)]" />
+                      <span>Add to queue</span>
                     </button>
 
                     <button
                       type="button"
                       onClick={() => handleInstantPublish(generatedDraft?.id || 'new')}
                       disabled={actionLoading?.startsWith('pub_')}
-                      className="py-3 px-4 rounded-xl scalora-btn-primary text-slate-950 text-xs font-extrabold uppercase tracking-wider transition-all flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50 shadow-lg"
+                      className="ui-btn ui-btn-primary ui-btn-block"
                     >
-                      <Send className="w-3.5 h-3.5 text-slate-950" />
-                      <span>Publish to {selectedPlatforms.length} Channels Now 🚀</span>
+                      <Send className="w-3.5 h-3.5 text-[var(--ui-ink)]" />
+                      <span>Publish to {selectedPlatforms.length} channels</span>
                     </button>
                   </div>
                 </div>
@@ -1737,49 +1503,42 @@ export default function App({ defaultTab = 'studio', apiUrl } = {}) {
 
         {/* TAB 2: REVIEW & SCHEDULED QUEUE */}
         {!isGrowthcrew && activeTab === 'queue' && (
-          <div className="space-y-6">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-white/[0.06]">
+          <div className="ui-view space-y-6">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2">
               <div>
-                <h2 className="text-lg font-extrabold text-white flex items-center gap-2">
-                  Review & Scheduled Queue
-                  <span className="text-xs px-2.5 py-0.5 rounded-full bg-[#FF6B4A]/15 text-[#FFA84A] border border-[#FF6B4A]/30">
-                    {queueList.length} Total
+                <h2 className="ui-title flex flex-wrap items-center gap-2">
+                  Review & scheduled queue
+                  <span className="ui-badge">
+                    {queueList.length} total
                   </span>
                 </h2>
-                <p className="text-xs text-slate-400">Pending and scheduled posts</p>
+                <p className="text-[13px] text-[var(--ui-muted)]">Pending and scheduled posts</p>
               </div>
 
               {/* Filter Tabs */}
-              <div className="flex items-center gap-1.5 bg-[#0d0f15] p-1 rounded-xl border border-white/[0.07]">
-                {['ALL', 'PENDING_REVIEW', 'SCHEDULED', 'PUBLISHED'].map((filter) => (
-                  <button
-                    key={filter}
-                    onClick={() => setQueueFilter(filter)}
-                    className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
-                      queueFilter === filter
-                        ? 'bg-[#FF6B4A]/20 text-[#FFA84A] border border-[#FF6B4A]/30 font-bold'
-                        : 'text-slate-400 hover:text-white'
-                    }`}
-                  >
-                    {filter === 'PENDING_REVIEW' ? 'Pending Review' : filter === 'ALL' ? 'All Posts' : filter}
-                  </button>
-                ))}
+              <div className="max-w-full overflow-x-auto">
+                <Segmented name="queue-filter" label="Queue status filter" value={queueFilter} onChange={setQueueFilter} options={[
+                  { value: 'ALL', label: 'All' },
+                  { value: 'PENDING_REVIEW', label: 'Review' },
+                  { value: 'SCHEDULED', label: 'Scheduled' },
+                  { value: 'PUBLISHED', label: 'Published' },
+                ]} />
               </div>
             </div>
 
             {/* Queue List */}
             {filteredQueue.length === 0 ? (
-              <div className="scalora-card-glow rounded-3xl p-12 text-center space-y-3">
-                <Layers className="w-8 h-8 text-slate-600 mx-auto" />
-                <h3 className="font-bold text-sm text-white">No Posts in This Queue View</h3>
-                <p className="text-xs text-slate-400 max-w-sm mx-auto">
-                  Create high-performing posts in the Studio tab to schedule or review them here.
+              <div className="ui-panel text-center space-y-3 py-12">
+                <Layers className="w-8 h-8 text-[var(--ui-faint)] mx-auto" />
+                <h3 className="font-bold text-sm text-[var(--ui-ink)]">No posts in this view</h3>
+                <p className="text-[13px] text-[var(--ui-muted)] max-w-sm mx-auto">
+                  Create a post in the studio to add it to your queue.
                 </p>
                 <button
                   onClick={() => setActiveTab('studio')}
-                  className="px-4 py-2 rounded-xl scalora-btn-primary text-slate-950 text-xs font-bold cursor-pointer"
+                  className="ui-btn ui-btn-primary"
                 >
-                  Go to Studio
+                  Go to studio
                 </button>
               </div>
             ) : (
@@ -1787,35 +1546,35 @@ export default function App({ defaultTab = 'studio', apiUrl } = {}) {
                 {filteredQueue.map((post) => (
                   <div
                     key={post.id}
-                    className="scalora-card-glow rounded-3xl p-5 shadow-xl flex flex-col justify-between space-y-4 relative group"
+                    className="ui-panel flex flex-col justify-between space-y-4 ui-arrive"
                   >
                     <div className="space-y-3">
                       {/* Post Status & Scheduled Date */}
                       <div className="flex items-center justify-between">
                         <span
-                          className={`text-[10px] font-extrabold uppercase tracking-wider px-2.5 py-0.5 rounded-full border ${
+                          className={`ui-badge ${
                             post.status === 'PUBLISHED'
-                              ? 'bg-emerald-500/10 text-emerald-300 border-emerald-500/30'
+                              ? 'ui-badge-good'
                               : post.status === 'PENDING_REVIEW'
-                              ? 'bg-[#FF6B4A]/15 text-[#FFA84A] border-[#FF6B4A]/30'
-                              : 'bg-sky-500/10 text-sky-300 border-sky-500/30'
+                              ? 'ui-badge-warn'
+                              : ''
                           }`}
                         >
-                          {post.status === 'PENDING_REVIEW' ? 'Review Required' : post.status}
+                          {post.status === 'PENDING_REVIEW' ? 'Review required' : post.status === 'PUBLISHED' ? 'Published' : post.status === 'SCHEDULED' ? 'Scheduled' : post.status}
                         </span>
 
-                        <span className="text-[11px] text-slate-400 flex items-center gap-1">
-                          <Calendar className="w-3 h-3 text-slate-500" />
+                        <span className="text-[13px] text-[var(--ui-muted)] flex items-center gap-1">
+                          <Calendar className="w-3 h-3 text-[var(--ui-faint)]" />
                           {new Date(post.scheduledDate).toLocaleDateString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
                         </span>
                       </div>
 
                       {/* Attached Media Thumbnail */}
                       {post.mediaUrl && (
-                        <div className="rounded-2xl overflow-hidden aspect-video bg-black/60 relative">
+                        <div className="rounded-lg overflow-hidden aspect-video bg-[var(--ui-bg)] relative">
                           <img src={post.mediaUrl} alt="post asset" className="w-full h-full object-cover" />
-                          <span className="absolute top-2 left-2 px-2 py-0.5 rounded-md bg-black/70 text-[9px] font-bold text-white">
-                            {post.mediaType === 'video' ? '🎬 Reel' : '📸 Image'}
+                          <span className="ui-badge absolute [inset-block-start:0.5rem] start-2">
+                            {post.mediaType === 'video' ? 'Video' : 'Image'}
                           </span>
                         </div>
                       )}
@@ -1823,29 +1582,29 @@ export default function App({ defaultTab = 'studio', apiUrl } = {}) {
                       {/* Hook & Caption */}
                       <div>
                         {post.hook && (
-                          <p className="font-bold text-xs text-white line-clamp-1 mb-1">
+                          <p className="font-semibold text-sm text-[var(--ui-ink)] line-clamp-1 mb-1">
                             {post.hook}
                           </p>
                         )}
-                        <p className="text-xs text-slate-300 line-clamp-3 leading-relaxed">
+                        <p className="text-sm text-[var(--ui-muted)] line-clamp-3 leading-relaxed">
                           {post.caption}
                         </p>
                       </div>
                     </div>
 
                     {/* Action Bar */}
-                    <div className="flex items-center justify-between pt-3 border-t border-white/[0.06]">
+                    <div className="flex flex-wrap items-center justify-between gap-3 pt-3">
                       <div className="flex items-center gap-2">
                         <button
                           onClick={() => setEditingPost(post)}
-                          className="p-1.5 rounded-lg bg-white/[0.04] hover:bg-white/[0.08] text-slate-400 hover:text-white transition-all cursor-pointer"
+                          className="ui-btn ui-btn-ghost ui-btn-icon ui-btn-sm"
                           title="Edit Post"
                         >
                           <Edit3 className="w-3.5 h-3.5" />
                         </button>
                         <button
                           onClick={() => handleDeletePost(post.id)}
-                          className="p-1.5 rounded-lg bg-white/[0.04] hover:bg-rose-500/20 text-slate-400 hover:text-rose-400 transition-all cursor-pointer"
+                          className="ui-btn ui-btn-danger ui-btn-icon ui-btn-sm"
                           title="Delete Post"
                         >
                           <Trash2 className="w-3.5 h-3.5" />
@@ -1856,16 +1615,16 @@ export default function App({ defaultTab = 'studio', apiUrl } = {}) {
                         {post.status === 'PENDING_REVIEW' && (
                           <button
                             onClick={() => handleApprovePost(post.id)}
-                            className="px-3 py-1.5 rounded-xl bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-300 border border-emerald-500/30 text-xs font-bold transition-all cursor-pointer"
+                            className="ui-btn ui-btn-ghost ui-btn-sm"
                           >
                             Approve
                           </button>
                         )}
                         <button
                           onClick={() => handleInstantPublish(post.id)}
-                          className="px-3 py-1.5 rounded-xl scalora-btn-primary text-slate-950 text-xs font-extrabold uppercase tracking-wider transition-all cursor-pointer"
+                          className="ui-btn ui-btn-light ui-btn-sm"
                         >
-                          Publish Now
+                          Publish now
                         </button>
                       </div>
                     </div>
@@ -1883,35 +1642,35 @@ export default function App({ defaultTab = 'studio', apiUrl } = {}) {
             : (queueData.queue || []).filter((p) => p.status === 'PUBLISHED');
 
           return (
-            <div className="space-y-6">
-              <div className="pb-2 border-b border-white/[0.06] flex items-center justify-between">
+            <div className="ui-view space-y-6">
+              <div className="pb-2 flex items-center justify-between">
                 <div>
-                  <h2 className="text-lg font-extrabold text-white flex items-center gap-2">
-                    Published History
-                    <span className="text-xs px-2.5 py-0.5 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">
-                      {allPublished.length} Live
+                  <h2 className="ui-title flex flex-wrap items-center gap-2">
+                    Published posts
+                    <span className="ui-badge ui-badge-good">
+                      {allPublished.length} published
                     </span>
                   </h2>
-                  <p className="text-xs text-slate-400">Posts that went live</p>
+                  <p className="text-[13px] text-[var(--ui-muted)]">Posts that went live</p>
                 </div>
                 <a
                   href="https://facebook.com/profile.php?id=61594485176950&sk=photos"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-white/[0.04] hover:bg-white/[0.08] border border-white/10 text-xs font-bold text-[#FFA84A] transition-all cursor-pointer"
+                  className="ui-btn ui-btn-ghost hidden sm:inline-flex"
                 >
                   <FacebookIcon className="w-3.5 h-3.5 text-[#38BDF8]" />
-                  <span>Open Facebook Photos</span>
+                  <span>Open Facebook photos</span>
                   <ExternalLink className="w-3 h-3" />
                 </a>
               </div>
 
               {allPublished.length === 0 ? (
-                <div className="scalora-card-glow rounded-3xl p-12 text-center space-y-3">
-                  <CheckCircle2 className="w-8 h-8 text-slate-600 mx-auto" />
-                  <h3 className="font-bold text-sm text-white">No Published Posts Yet</h3>
-                  <p className="text-xs text-slate-400 max-w-sm mx-auto">
-                    Publish posts from the Studio or Queue to see live published releases here.
+                <div className="ui-panel text-center space-y-3 py-12">
+                  <CheckCircle2 className="w-8 h-8 text-[var(--ui-faint)] mx-auto" />
+                  <h3 className="font-bold text-sm text-[var(--ui-ink)]">No published posts yet</h3>
+                  <p className="text-[13px] text-[var(--ui-muted)] max-w-sm mx-auto">
+                    Published posts will appear here.
                   </p>
                 </div>
               ) : (
@@ -1924,15 +1683,15 @@ export default function App({ defaultTab = 'studio', apiUrl } = {}) {
                     return (
                       <div
                         key={post.id || idx}
-                        className="scalora-card-glow rounded-3xl p-5 shadow-xl flex flex-col justify-between space-y-4 hover:border-white/20 transition-all"
+                        className="ui-panel flex flex-col justify-between space-y-4"
                       >
                         <div className="space-y-3">
                           <div className="flex items-center justify-between">
-                            <span className="text-[10px] font-extrabold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 flex items-center gap-1">
-                              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block" />
-                              Published Live
+                            <span className="ui-badge ui-badge-good flex items-center gap-1">
+                              <span className="ui-dot" />
+                              Published
                             </span>
-                            <span className="text-[11px] text-slate-400">
+                            <span className="text-[13px] text-[var(--ui-muted)]">
                               {new Date(postDate).toLocaleDateString([], {
                                 month: 'short',
                                 day: 'numeric',
@@ -1943,15 +1702,15 @@ export default function App({ defaultTab = 'studio', apiUrl } = {}) {
                           </div>
 
                           {postImg && (
-                            <div className="rounded-2xl overflow-hidden aspect-video bg-black/60 border border-white/10 relative group">
+                            <div className="rounded-lg overflow-hidden aspect-video bg-[var(--ui-bg)] relative group">
                               <img src={postImg} alt="media" className="w-full h-full object-cover" />
                               <div className="absolute top-2 right-2 flex gap-1">
                                 {(post.platforms || ['facebook']).map((p, i) => (
-                                  <span key={i} className="p-1 rounded-lg bg-black/70 backdrop-blur-md border border-white/15">
+                                  <span key={i} className="ui-badge">
                                     {p === 'facebook' ? (
                                       <FacebookIcon className="w-3 h-3 text-[#38BDF8]" />
                                     ) : (
-                                      <InstagramIcon className="w-3 h-3 text-[#FF5376]" />
+                                      <InstagramIcon className="w-3 h-3 text-[var(--ui-lavender)]" />
                                     )}
                                   </span>
                                 ))}
@@ -1961,27 +1720,27 @@ export default function App({ defaultTab = 'studio', apiUrl } = {}) {
 
                           <div className="space-y-1">
                             {post.topic && (
-                              <h4 className="text-xs font-bold text-white line-clamp-1">{post.topic}</h4>
+                              <h4 className="text-sm font-semibold line-clamp-1">{post.topic}</h4>
                             )}
                             <div
-                              className="text-xs text-slate-300 leading-relaxed line-clamp-4 whitespace-pre-line"
+                              className="text-sm text-[var(--ui-muted)] leading-relaxed line-clamp-4 whitespace-pre-line"
                               dangerouslySetInnerHTML={{ __html: postText.replace(/\n/g, '<br/>') }}
                             />
                           </div>
                         </div>
 
-                        <div className="flex items-center justify-between pt-3 border-t border-white/[0.06]">
-                          <span className="text-[10px] text-slate-500 font-semibold flex items-center gap-1">
-                            <CheckCircle2 className="w-3 h-3 text-emerald-400" />
+                        <div className="flex flex-wrap items-center justify-between gap-3 pt-3">
+                          <span className="ui-badge ui-badge-good flex items-center gap-1">
+                            <CheckCircle2 className="w-3 h-3" />
                             Published
                           </span>
                           <a
                             href="https://facebook.com/profile.php?id=61594485176950&sk=photos"
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/[0.04] hover:bg-white/[0.08] text-xs font-bold text-[#FFA84A] border border-white/10 transition-all cursor-pointer"
+                            className="ui-btn ui-btn-ghost ui-btn-sm"
                           >
-                            <span>View Live Photos</span>
+                            <span>View Facebook photos</span>
                             <ExternalLink className="w-3 h-3" />
                           </a>
                         </div>
@@ -1997,79 +1756,72 @@ export default function App({ defaultTab = 'studio', apiUrl } = {}) {
 
       {/* Connect / Switch Channel Modal (Instagram & Facebook) */}
       {showConnectModal && (
-        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
-          <div className="bg-[#0e1118] border border-white/15 rounded-3xl max-w-md w-full p-6 shadow-2xl space-y-5 animate-in fade-in zoom-in-95">
-            <div className="flex items-center justify-between border-b border-white/[0.06] pb-3">
-              <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-full p-[1.5px] bg-gradient-to-tr from-[#FF6B4A] to-[#FF5376]">
-                  <div className="w-full h-full bg-[#0e1118] rounded-full flex items-center justify-center">
-                    <Sparkles className="w-4 h-4 text-[#FFA84A]" />
-                  </div>
-                </div>
-                <h3 className="font-extrabold text-sm text-white">Select Connected Channel</h3>
-              </div>
+        <div className="ui-scrim">
+          <div role="dialog" aria-modal="true" aria-labelledby="channel-dialog-title" className="ui-dialog max-w-md space-y-5">
+            <div className="flex items-center justify-between pb-3">
+              <h2 id="channel-dialog-title" className="ui-panel-title">Select a channel</h2>
               <button
                 type="button"
                 onClick={() => setShowConnectModal(false)}
-                className="text-slate-400 hover:text-white cursor-pointer px-2 py-1"
+                className="ui-btn ui-btn-ghost ui-btn-icon ui-btn-sm"
+                aria-label="Close channel dialog"
               >
-                ✕
+                <X aria-hidden="true" />
               </button>
             </div>
 
             {/* Available Channels List */}
             <div className="space-y-2">
-              <label className="text-xs font-bold text-slate-300 block">Available Connected Channels:</label>
+              <p className="ui-label">Connected channels</p>
               <div className="space-y-2">
                 {channels.map((chan) => (
-                  <div
+                  <button
+                    type="button"
                     key={chan.id}
                     onClick={() => {
                       setActiveChannel(chan);
                       setShowConnectModal(false);
                       showToast(`Active channel set to ${chan.name}!`, 'success');
                     }}
-                    className={`flex items-center justify-between p-3 rounded-2xl border cursor-pointer transition-all ${
-                      activeChannel?.id === chan.id
-                        ? 'bg-[#FF6B4A]/15 border-[#FF6B4A]/50 shadow-md shadow-[#FF6B4A]/10'
-                        : 'bg-white/[0.03] border-white/5 hover:bg-white/[0.06]'
-                    }`}
+                    className="ui-chip w-full justify-between !h-auto !py-2"
+                    aria-pressed={activeChannel?.id === chan.id}
                   >
                     <div className="flex items-center gap-3">
-                      <div className="w-9 h-9 rounded-full p-[1.5px] bg-gradient-to-tr from-[#FF6B4A] to-[#FF5376]">
+                      <div className="w-9 h-9 rounded-full">
                         <img src={chan.avatar} alt="avatar" className="w-full h-full rounded-full object-cover" />
                       </div>
                       <div>
-                        <span className="text-xs font-bold text-white block">{chan.name}</span>
-                        <span className="text-[10px] text-slate-400 flex items-center gap-1.5">
+                        <span className="text-[13px] font-bold text-[var(--ui-ink)] block">{chan.name}</span>
+                        <span className="text-[13px] text-[var(--ui-muted)] flex items-center gap-1.5">
                           {chan.platform === 'facebook' ? (
                             <FacebookIcon className="w-3 h-3 text-[#38BDF8]" />
                           ) : (
-                            <InstagramIcon className="w-3 h-3 text-[#FF5376]" />
+                            <InstagramIcon className="w-3 h-3 text-[var(--ui-lavender)]" />
                           )}
                           <span>{chan.handle}</span>
                         </span>
                       </div>
                     </div>
                     {activeChannel?.id === chan.id && (
-                      <CheckCircle2 className="w-4 h-4 text-[#FFA84A]" />
+                      <CheckCircle2 className="w-4 h-4 text-[var(--ui-lavender)]" />
                     )}
-                  </div>
+                  </button>
                 ))}
               </div>
             </div>
 
             {/* Add Custom Handle & Credentials */}
-            <form onSubmit={handleConnectInstagram} className="space-y-3 pt-3 border-t border-white/[0.06]">
-              <label className="text-xs font-bold text-slate-300 block">Connect Your Account / Channel:</label>
+            <form onSubmit={handleConnectInstagram} className="space-y-3 pt-3">
+              <h3 className="ui-panel-title">Connect a channel</h3>
               
               <div className="grid grid-cols-2 gap-2">
                 <div>
-                  <label className="text-[10px] text-slate-400 block mb-1">Platform</label>
+                  <label htmlFor="connect-platform" className="ui-label">Platform</label>
                   <select
+                    id="connect-platform"
                     value={customPlatform}
                     onChange={(e) => setCustomPlatform(e.target.value)}
-                    className="w-full bg-[#07080b] border border-white/10 rounded-xl px-2.5 py-2 text-xs text-white focus:outline-none focus:border-[#FF6B4A]/60"
+                    className="ui-select"
                   >
                     {ALL_PLATFORMS.map((p) => (
                       <option key={p.id} value={p.id}>
@@ -2080,59 +1832,63 @@ export default function App({ defaultTab = 'studio', apiUrl } = {}) {
                 </div>
 
                 <div>
-                  <label className="text-[10px] text-slate-400 block mb-1">Username / Handle</label>
+                  <label htmlFor="connect-handle" className="ui-label">Username or handle</label>
                   <div className="relative">
-                    <span className="absolute left-3 top-2 text-slate-500 text-xs">@</span>
+                    <span className="absolute left-3 top-2 text-[var(--ui-faint)] text-[13px]">@</span>
                     <input
+                      id="connect-handle"
                       type="text"
                       placeholder="handle_or_name"
                       value={customHandleInput}
                       onChange={(e) => setCustomHandleInput(e.target.value)}
-                      className="w-full bg-[#07080b] border border-white/10 rounded-xl pl-7 pr-3 py-2 text-xs text-white focus:outline-none focus:border-[#FF6B4A]/60"
+                      className="ui-input !ps-7"
                     />
                   </div>
                 </div>
               </div>
 
               {(customPlatform === 'facebook' || customPlatform === 'instagram') && (
-                <div className="space-y-2 p-3 rounded-2xl bg-white/[0.02] border border-white/10">
-                  <p className="text-[10px] text-[#FFA84A] font-semibold">Meta Graph API Credentials (Optional for Custom Page):</p>
+                <div className="ui-panel-raised space-y-2">
+                  <p className="ui-label">Meta Graph API credentials (optional)</p>
                   <div>
                     <input
                       type="text"
-                      placeholder="Facebook Page ID (e.g. 1306999285838432)"
+                      aria-label="Facebook Page ID"
+                      placeholder="Facebook Page ID"
                       value={customFbPageId}
                       onChange={(e) => setCustomFbPageId(e.target.value)}
-                      className="w-full bg-[#07080b] border border-white/10 rounded-xl px-3 py-2 text-xs text-white placeholder:text-slate-600 focus:outline-none focus:border-[#FF6B4A]/60"
+                      className="ui-input"
                     />
                   </div>
                   <div>
                     <input
                       type="password"
-                      placeholder="Meta Page Access Token (Permanent / System User Token)"
+                      aria-label="Meta Page access token"
+                      placeholder="Meta Page access token"
                       value={customFbToken}
                       onChange={(e) => setCustomFbToken(e.target.value)}
-                      className="w-full bg-[#07080b] border border-white/10 rounded-xl px-3 py-2 text-xs text-white placeholder:text-slate-600 focus:outline-none focus:border-[#FF6B4A]/60"
+                      className="ui-input"
                     />
                   </div>
-                  <p className="text-[9px] text-slate-500">
+                  <p className="text-[13px] text-[var(--ui-faint)]">
                     Leave blank to use pre-configured system token, or paste your own Page ID & Token.
                   </p>
                 </div>
               )}
 
               {customPlatform === 'discord' && (
-                <div className="space-y-1.5 p-3 rounded-2xl bg-white/[0.02] border border-white/10">
-                  <label className="text-[10px] text-[#818CF8] font-semibold block">Discord Channel Webhook URL:</label>
+                <div className="ui-panel-raised space-y-1.5">
+                  <label htmlFor="discord-webhook" className="ui-label">Discord channel webhook URL</label>
                   <input
+                    id="discord-webhook"
                     type="url"
                     placeholder="https://discord.com/api/webhooks/..."
                     value={customDiscordWebhook}
                     onChange={(e) => setCustomDiscordWebhook(e.target.value)}
-                    className="w-full bg-[#07080b] border border-white/10 rounded-xl px-3 py-2 text-xs text-white placeholder:text-slate-600 focus:outline-none focus:border-[#FF6B4A]/60"
+                    className="ui-input"
                   />
-                  <p className="text-[9px] text-slate-500">
-                    Instant rich embed notification directly to your Discord server channel.
+                  <p className="text-[13px] text-[var(--ui-faint)]">
+                    Uses the webhook URL you provide for this channel.
                   </p>
                 </div>
               )}
@@ -2141,15 +1897,15 @@ export default function App({ defaultTab = 'studio', apiUrl } = {}) {
                 <button
                   type="button"
                   onClick={() => setShowConnectModal(false)}
-                  className="px-4 py-2 rounded-xl text-xs font-semibold bg-white/5 text-slate-300 hover:text-white cursor-pointer"
+                  className="ui-btn ui-btn-ghost"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2 rounded-xl text-xs font-extrabold uppercase tracking-wider text-slate-950 scalora-btn-primary shadow-lg cursor-pointer"
+                  className="ui-btn ui-btn-primary"
                 >
-                  Save & Connect
+                  Save channel
                 </button>
               </div>
             </form>
@@ -2159,68 +1915,72 @@ export default function App({ defaultTab = 'studio', apiUrl } = {}) {
 
       {/* Edit Post Modal */}
       {editingPost && (
-        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
-          <div className="bg-[#0e1118] border border-white/15 rounded-3xl max-w-lg w-full p-6 shadow-2xl space-y-4 animate-in fade-in zoom-in-95">
-            <div className="flex items-center justify-between border-b border-white/[0.06] pb-3">
-              <h3 className="font-extrabold text-sm text-white flex items-center gap-2">
-                <Edit3 className="w-4 h-4 text-[#FFA84A]" />
-                Edit Post Content
-              </h3>
+        <div className="ui-scrim">
+          <div role="dialog" aria-modal="true" aria-labelledby="edit-dialog-title" className="ui-dialog max-w-lg space-y-4">
+            <div className="flex items-center justify-between pb-3">
+              <h2 id="edit-dialog-title" className="ui-panel-title flex items-center gap-2">
+                <Edit3 className="w-4 h-4 text-[var(--ui-lavender)]" />
+                Edit post
+              </h2>
               <button
                 type="button"
                 onClick={() => setEditingPost(null)}
-                className="text-slate-400 hover:text-white cursor-pointer px-2 py-1"
+                className="ui-btn ui-btn-ghost ui-btn-icon ui-btn-sm"
+                aria-label="Close edit dialog"
               >
-                ✕
+                <X aria-hidden="true" />
               </button>
             </div>
 
             <div className="space-y-3">
               <div>
-                <label className="text-xs font-bold text-slate-400 block mb-1">Hook</label>
+                <label htmlFor="edit-hook" className="ui-label">Hook</label>
                 <input
+                  id="edit-hook"
                   type="text"
                   value={editingPost.hook || ''}
                   onChange={(e) => setEditingPost({ ...editingPost, hook: e.target.value })}
-                  className="w-full bg-[#07080b] border border-white/10 rounded-xl p-2.5 text-xs text-white"
+                  className="ui-input"
                 />
               </div>
 
               <div>
-                <label className="text-xs font-bold text-slate-400 block mb-1">Caption</label>
+                <label htmlFor="edit-caption" className="ui-label">Caption</label>
                 <textarea
+                  id="edit-caption"
                   rows={4}
                   value={editingPost.caption || ''}
                   onChange={(e) => setEditingPost({ ...editingPost, caption: e.target.value })}
-                  className="w-full bg-[#07080b] border border-white/10 rounded-xl p-2.5 text-xs text-white resize-none"
+                  className="ui-textarea resize-none"
                 />
               </div>
 
               <div>
-                <label className="text-xs font-bold text-slate-400 block mb-1">Scheduled Date & Time</label>
+                <label htmlFor="edit-date" className="ui-label">Scheduled date and time</label>
                 <input
+                  id="edit-date"
                   type="datetime-local"
                   value={new Date(editingPost.scheduledDate).toISOString().slice(0, 16)}
                   onChange={(e) => setEditingPost({ ...editingPost, scheduledDate: new Date(e.target.value).toISOString() })}
-                  className="w-full bg-[#07080b] border border-white/10 rounded-xl p-2.5 text-xs text-white"
+                  className="ui-input"
                 />
               </div>
             </div>
 
-            <div className="flex items-center justify-end gap-2 pt-3 border-t border-white/[0.06]">
+            <div className="flex items-center justify-end gap-2 pt-3">
               <button
                 type="button"
                 onClick={() => setEditingPost(null)}
-                className="px-4 py-2 rounded-xl text-xs font-semibold bg-white/5 text-slate-300 hover:text-white cursor-pointer"
+                className="ui-btn ui-btn-ghost"
               >
                 Cancel
               </button>
               <button
                 type="button"
                 onClick={handleSaveEdit}
-                className="px-5 py-2 rounded-xl text-xs font-extrabold uppercase tracking-wider text-slate-950 scalora-btn-primary cursor-pointer"
+                className="ui-btn ui-btn-primary"
               >
-                Save Changes
+                Save changes
               </button>
             </div>
           </div>
@@ -2229,36 +1989,34 @@ export default function App({ defaultTab = 'studio', apiUrl } = {}) {
 
       {/* Multi-Platform Broadcast Result Modal */}
       {broadcastModalData && (
-        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
-          <div className="bg-[#0e1118] border border-white/15 rounded-3xl max-w-lg w-full p-6 shadow-2xl space-y-4 animate-in fade-in zoom-in-95">
-            <div className="flex items-center justify-between border-b border-white/[0.06] pb-3">
+        <div className="ui-scrim">
+          <div role="dialog" aria-modal="true" aria-labelledby="results-dialog-title" className="ui-dialog max-w-lg space-y-4">
+            <div className="flex items-center justify-between pb-3">
               <div className="flex items-center gap-2">
-                <span className="w-8 h-8 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold">
-                  🚀
-                </span>
                 <div>
-                  <h3 className="font-extrabold text-sm text-white">Multi-Platform Broadcast Report</h3>
-                  <p className="text-[11px] text-slate-400">Simultaneous dispatch across selected channels</p>
+                  <h2 id="results-dialog-title" className="ui-panel-title">Publishing results</h2>
+                  <p className="text-[13px] text-[var(--ui-muted)]">Results for the channels you selected</p>
                 </div>
               </div>
               <button
                 type="button"
                 onClick={() => setBroadcastModalData(null)}
-                className="text-slate-400 hover:text-white cursor-pointer px-2 py-1"
+                className="ui-btn ui-btn-ghost ui-btn-icon ui-btn-sm"
+                aria-label="Close results dialog"
               >
-                ✕
+                <X aria-hidden="true" />
               </button>
             </div>
 
-            <div className="p-3.5 rounded-2xl bg-white/[0.03] border border-white/5 space-y-2">
-              <div className="flex items-center justify-between text-xs font-bold">
-                <span className="text-white">Broadcast Status</span>
-                <span className="text-emerald-400">
+            <div className="ui-panel-raised space-y-2">
+              <div className="flex items-center justify-between text-[13px] font-bold">
+                <span>Channel status</span>
+                <span className="ui-badge">
                   {broadcastModalData.successCount || Object.keys(broadcastModalData.platforms || {}).length} /{' '}
-                  {broadcastModalData.totalTargets || Object.keys(broadcastModalData.platforms || {}).length} Platforms Ready
+                  {broadcastModalData.totalTargets || Object.keys(broadcastModalData.platforms || {}).length} channels
                 </span>
               </div>
-              <p className="text-[11px] text-slate-300">{broadcastModalData.summary}</p>
+              <p className="text-[13px] text-[var(--ui-muted)]">{broadcastModalData.summary}</p>
             </div>
 
             <div className="space-y-2 max-h-60 overflow-y-auto pr-1">
@@ -2266,26 +2024,25 @@ export default function App({ defaultTab = 'studio', apiUrl } = {}) {
                 const platMeta = ALL_PLATFORMS.find((p) => p.id === platKey) || {
                   name: platKey,
                   color: '#fff',
-                  badgeBg: 'bg-white/10 text-white',
                 };
                 return (
                   <div
                     key={platKey}
-                    className="flex items-center justify-between p-3 rounded-xl bg-[#07080b] border border-white/10 text-xs"
+                    className="ui-panel-inset flex flex-wrap items-center justify-between gap-3 text-[13px]"
                   >
                     <div className="flex items-center gap-2.5">
-                      <span className="font-bold text-white capitalize">{platMeta.name}</span>
+                      <span className="font-semibold text-[var(--ui-ink)]">{platMeta.name}</span>
                       {res.status === 'published' || res.status === 'dispatched' ? (
-                        <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
-                          {res.status === 'published' ? 'Live on Page' : 'Dispatched'}
+                        <span className="ui-badge ui-badge-good">
+                          {res.status === 'published' ? 'Published' : 'Dispatched'}
                         </span>
                       ) : (
-                        <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/15 text-amber-300 border border-amber-500/30">
-                          {res.status}
+                        <span className={`ui-badge capitalize ${res.status === 'failed' || res.status === 'error' ? 'ui-badge-bad' : 'ui-badge-warn'}`}>
+                          {res.status?.replaceAll('_', ' ')}
                         </span>
                       )}
                     </div>
-                    <div className="text-right text-[11px] text-slate-400 truncate max-w-[180px]">
+                    <div className="ui-hint min-w-0 break-all text-end">
                       {res.id ? `ID: ${res.id}` : res.message || 'Queued for channel'}
                     </div>
                   </div>
@@ -2293,13 +2050,13 @@ export default function App({ defaultTab = 'studio', apiUrl } = {}) {
               })}
             </div>
 
-            <div className="flex items-center justify-end gap-2 pt-2 border-t border-white/[0.06]">
+            <div className="flex items-center justify-end gap-2 pt-2">
               <button
                 type="button"
                 onClick={() => setBroadcastModalData(null)}
-                className="w-full py-2.5 rounded-xl text-xs font-extrabold uppercase tracking-wider text-slate-950 scalora-btn-primary shadow-lg cursor-pointer"
+                className="ui-btn ui-btn-primary ui-btn-block"
               >
-                Close & View In Published Feed
+                Close and view published posts
               </button>
             </div>
           </div>
