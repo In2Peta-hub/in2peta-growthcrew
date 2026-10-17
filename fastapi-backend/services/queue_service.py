@@ -1,14 +1,10 @@
-import json
-import os
 import time
 import random
 import string
-from pathlib import Path
 from typing import Dict, Any, List, Optional
 from datetime import datetime, timezone
 
-DATA_DIR = Path(__file__).parent.parent / "data"
-DATA_FILE = DATA_DIR / "data.json"
+from storage import JsonStore
 
 DEFAULT_DATA: Dict[str, Any] = {
     "settings": {
@@ -33,28 +29,24 @@ DEFAULT_DATA: Dict[str, Any] = {
     "queue": []
 }
 
+STORE = JsonStore("data.json", DEFAULT_DATA)
+
+
 class QueueService:
+    """Social-studio queue/channels/settings, persisted through the shared store."""
+
     @classmethod
     def init(cls):
-        DATA_DIR.mkdir(parents=True, exist_ok=True)
-        if not DATA_FILE.exists():
-            with open(DATA_FILE, "w", encoding="utf-8") as f:
-                json.dump(DEFAULT_DATA, f, indent=2)
+        if not STORE.path.exists():
+            STORE.write(DEFAULT_DATA)
 
     @classmethod
     def read_data(cls) -> Dict[str, Any]:
-        cls.init()
-        try:
-            with open(DATA_FILE, "r", encoding="utf-8") as f:
-                return json.load(f)
-        except Exception:
-            return DEFAULT_DATA
+        return STORE.read()
 
     @classmethod
     def write_data(cls, data: Dict[str, Any]):
-        cls.init()
-        with open(DATA_FILE, "w", encoding="utf-8") as f:
-            json.dump(data, f, indent=2)
+        STORE.write(data)
 
     @classmethod
     def get_settings(cls) -> Dict[str, Any]:

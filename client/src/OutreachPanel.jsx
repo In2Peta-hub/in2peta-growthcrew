@@ -18,8 +18,7 @@ import {
   Plus,
 } from 'lucide-react';
 import LocationAutocomplete from './LocationAutocomplete';
-
-const API_BASE = import.meta.env.VITE_API_URL ? import.meta.env.VITE_API_URL.replace(/\/$/, '') : '';
+import { outreachApi } from './api';
 
 const FIELD =
   'w-full bg-[#07080b] border border-white/10 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder:text-slate-600 focus:outline-none focus:border-[#FF6B4A]/60 focus:ring-2 focus:ring-[#FF6B4A]/15 transition-all disabled:opacity-50';
@@ -41,19 +40,9 @@ const STATUS_META = {
   PENDING_REPLY: { label: 'Awaiting reply', tone: 'border-amber-500/30 bg-amber-500/10 text-amber-300' },
 };
 
-async function outreach(path, init = {}) {
-  const headers = new Headers(init.headers || {});
-  const isForm = typeof FormData !== 'undefined' && init.body instanceof FormData;
-  if (init.body && !isForm && !headers.has('Content-Type')) {
-    headers.set('Content-Type', 'application/json');
-  }
-  const response = await fetch(`${API_BASE}/api/growthcrew${path}`, { ...init, headers });
-  const payload = await response.json().catch(() => ({}));
-  if (!response.ok) {
-    throw new Error(payload.error || `Request failed (${response.status})`);
-  }
-  return payload;
-}
+// All outreach requests go through the shared API client: one base URL and one
+// error shape for the whole app, same as the social studio.
+const outreach = (path, init) => outreachApi(path, init);
 
 function inboxOptions(payload) {
   const list = payload?.inboxes || payload?.data || payload;
@@ -308,7 +297,7 @@ export default function OutreachPanel() {
   const [inboxLoadError, setInboxLoadError] = useState('');
   const [inboxId, setInboxId] = useState('');
   const [query, setQuery] = useState('AI startups and software companies');
-  const [location, setLocation] = useState('Bengaluru, Karnataka, India');
+  const [location, setLocation] = useState('');
   const [maxResults, setMaxResults] = useState(10);
   const [found, setFound] = useState([]);
   const [searchAttempted, setSearchAttempted] = useState(false);
@@ -428,7 +417,7 @@ export default function OutreachPanel() {
         method: 'POST',
         body: JSON.stringify({ query, location, maxResults: Number(maxResults) }),
       });
-      for (let attempt = 0; attempt < 40; attempt += 1) {
+      for (let attempt = 0; attempt < 150; attempt += 1) {
         await new Promise((resolve) => setTimeout(resolve, 2000));
         const status = await outreach(`/leads/search/${encodeURIComponent(started.runSlug)}`);
         if (status.status === 'running') continue;
@@ -436,7 +425,10 @@ export default function OutreachPanel() {
         setFound(status.leads || []);
         setSelected(Object.fromEntries((status.leads || []).map((lead) => [lead.email, true])));
         const count = status.count || (status.leads || []).length;
-        if (count) say(`${count} lead${count === 1 ? '' : 's'} ready to draft.`, 'success');
+        const fromDb = status.sources?.database || 0;
+        const fromLive = status.sources?.live || 0;
+        const breakdown = fromDb && fromLive ? ` (${fromDb} from your lead database, ${fromLive} live)` : '';
+        if (count) say(`${count} lead${count === 1 ? '' : 's'} ready to draft${breakdown}.`, 'success');
         else say('No emails found. Try a broader search or upload a CSV.', 'info');
         return;
       }
@@ -782,7 +774,7 @@ export default function OutreachPanel() {
                 <StepBadge n={1} tone="emerald" />
                 <div className="min-w-0">
                   <h3 className="text-sm font-extrabold text-white tracking-tight">Find leads</h3>
-                  <p className="text-[11px] text-slate-400">Search by niche or upload a CSV</p>
+                  <p className="text-[11px] text-slate-400">Your lead database + live web search, or upload a CSV</p>
                 </div>
               </div>
             </div>
@@ -905,6 +897,7 @@ export default function OutreachPanel() {
                         <span className="block text-[11px] text-slate-400 truncate">
                           {lead.email}
                           {lead.city ? ` · ${lead.city}` : ''}
+                          {lead.source === 'lead-database' ? ' · DB' : lead.source === 'live-search' ? ' · Live' : ''}
                         </span>
                       </span>
                     </label>

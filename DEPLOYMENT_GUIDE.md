@@ -11,7 +11,7 @@ This guide walks you through deploying **GrowthCrew** to production:
 
 1. Go to **[Render.com](https://render.com)** and sign in with GitHub.
 2. Click **New +** $\to$ **Web Service**.
-3. Connect your GitHub repository: `https://github.com/In2Peta-hub/in2peta-postiz.git` (or your fork).
+3. Connect your GitHub repository: `https://github.com/In2Peta-hub/in2peta-growthcrew.git` (or your fork).
 4. Configure the Web Service settings:
    - **Name**: `growthcrew-backend`
    - **Root Directory**: `fastapi-backend` (or `admin-approval-portal/fastapi-backend` depending on repo root)
@@ -30,6 +30,13 @@ This guide walks you through deploying **GrowthCrew** to production:
    | `AWS_SECRET_ACCESS_KEY` | Your AWS Secret Key |
    | `FB_PAGE_ID` | `61594485176950` (Your Facebook Page ID) |
    | `FB_PAGE_ACCESS_TOKEN` | Your Meta Page Access Token (see Section 3 below) |
+   | `MOTHERDUCK_TOKEN` | MotherDuck access token ([app.motherduck.com](https://app.motherduck.com) → Settings → Access Tokens) — enables the ~10.6M-lead database in GrowthCrew search. Optional: without it, searches run live-only. |
+   | `MOTHERDUCK_DATABASE` | `business_leads` (default — only set if you renamed the database) |
+   | `CORECLAW_API_KEY` | Lead search (live Google Maps search) |
+   | `AGENTMAIL_API_KEY` | Outreach sending inboxes |
+   | `AGENTMAIL_WEBHOOK_SECRET` | Verifies inbound-reply webhooks |
+   | `CENTRAL_INBOX` | Where inbound replies are forwarded (e.g. `in2peta@gmail.com`) |
+   | `IN2PETA_API_KEY` / `IN2PETA_API_URL` / `IN2PETA_MODEL` | AI drafting (defaults to the In2Peta DeepSeek-Flash gateway) |
 
 6. Click **Deploy Web Service**.
 7. Once deployed, copy your Render backend URL (e.g., `https://growthcrew-backend.onrender.com`).

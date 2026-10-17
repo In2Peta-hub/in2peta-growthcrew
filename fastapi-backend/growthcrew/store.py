@@ -2,45 +2,31 @@
 
 from __future__ import annotations
 
-import json
-import os
 import threading
 import uuid
 from datetime import datetime, timezone
-from pathlib import Path
 from typing import Any
 
-DATA_PATH = Path(os.getenv("OUTREACH_DATA_FILE") or Path(__file__).resolve().parent.parent / "data" / "outreach.json")
+from storage import JsonStore
+
 _LOCK = threading.RLock()
+_STORE = JsonStore(
+    "outreach.json",
+    {"settings": None, "leads": [], "messages": []},
+    env_var="OUTREACH_DATA_FILE",
+)
 
 
 def _now() -> str:
     return datetime.now(timezone.utc).isoformat()
 
 
-def _empty() -> dict[str, Any]:
-    return {"settings": None, "leads": [], "messages": []}
-
-
 def _read() -> dict[str, Any]:
-    DATA_PATH.parent.mkdir(parents=True, exist_ok=True)
-    if not DATA_PATH.exists():
-        return _empty()
-    try:
-        data = json.loads(DATA_PATH.read_text(encoding="utf-8"))
-    except Exception:
-        return _empty()
-    data.setdefault("settings", None)
-    data.setdefault("leads", [])
-    data.setdefault("messages", [])
-    return data
+    return _STORE.read()
 
 
 def _write(data: dict[str, Any]) -> None:
-    DATA_PATH.parent.mkdir(parents=True, exist_ok=True)
-    tmp = DATA_PATH.with_suffix(".json.tmp")
-    tmp.write_text(json.dumps(data, indent=2), encoding="utf-8")
-    tmp.replace(DATA_PATH)
+    _STORE.write(data)
 
 
 def load() -> dict[str, Any]:

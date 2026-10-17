@@ -1,23 +1,14 @@
 {
-  "name": "admin-approval-portal",
+  "name": "in2peta-growthcrew",
   "version": "1.0.0",
-  "description": "Custom Client Admin & Post Approval Portal for Growthcrew Social Studio",
+  "private": true,
+  "description": "GrowthCrew — unified AI social publishing studio + lead-generation outreach",
   "type": "module",
   "packageManager": "bun@1.4.2",
-  "workspaces": ["client", "server"],
-  "main": "server/server.js",
+  "workspaces": ["client"],
   "scripts": {
-    "start": "bun server/server.js",
-    "build": "bun --cwd client run build",
-    "dev:server": "bun --watch server/server.js",
-    "dev:client": "bun --cwd client run dev"
-  },
-  "dependencies": {
-    "@aws-sdk/client-s3": "^3.1136.0",
-    "@aws-sdk/credential-providers": "^3.1136.0",
-    "cors": "^2.8.5",
-    "dotenv": "^16.4.7",
-    "express": "^4.21.2",
-    "multer": "^2.4.0"
+    "dev:client": "bun --cwd client run dev",
+    "dev:api": "uvicorn main:app --port 3005 --reload --app-dir fastapi-backend",
+    "build": "bun --cwd client run build"
   }
 }

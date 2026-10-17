@@ -39,6 +39,7 @@ import {
 import LoginPage from './LoginPage';
 import OutreachPanel from './OutreachPanel';
 import LandingPage from './LandingPage';
+import { API_BASE } from './api';
 
 // Custom SVG Icons for Multi-Platform Social Channels
 const InstagramIcon = ({ className = 'w-4 h-4' }) => (
@@ -95,9 +96,6 @@ const ALL_PLATFORMS = [
   { id: 'discord', name: 'Discord', color: '#5865F2', icon: DiscordIcon, badgeBg: 'bg-[#5865F2]/15 text-[#818CF8] border-[#5865F2]/30' },
 ];
 
-const API_BASE = import.meta.env.VITE_API_URL
-  ? import.meta.env.VITE_API_URL.replace(/\/$/, '')
-  : 'https://in2peta-growthcrew-backend.onrender.com';
 const SCALORA_GRADIENT = 'bg-gradient-to-r from-[#FF6B4A] to-[#FFA84A]';
 const SCALORA_ROSE_GRADIENT = 'bg-gradient-to-r from-[#FF5376] to-[#A855F7]';
 const IN2PETA_EXPLORE_URL = 'https://www.in2peta.com/explore';
@@ -856,58 +854,91 @@ export default function App({ defaultTab = 'studio', apiUrl } = {}) {
         </div>
       </header>
 
-      {!isGrowthcrew && (
-        <nav className="border-b border-white/[0.06] bg-[#07080a]/90 backdrop-blur-2xl px-4 sm:px-8 sticky top-18 z-30">
-          <div className="max-w-7xl mx-auto flex items-center justify-between py-2">
-            <div className="flex items-center gap-1.5 bg-[#0d0f15] p-1 rounded-2xl border border-white/[0.07] overflow-x-auto">
-              <button
-                type="button"
-                onClick={() => setActiveTab('studio')}
-                className={`flex items-center gap-2 py-2 px-4 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-                  activeTab === 'studio'
-                    ? 'scalora-pill-tab-active'
-                    : 'text-slate-400 hover:text-slate-200 hover:bg-white/[0.04]'
-                }`}
-              >
-                <Sparkles className="w-3.5 h-3.5" />
-                <span>Studio (Create Post)</span>
-              </button>
+      <nav className="border-b border-white/[0.06] bg-[#07080a]/90 backdrop-blur-2xl px-4 sm:px-8 sticky top-18 z-30">
+        <div className="max-w-7xl mx-auto flex items-center justify-between gap-3 py-2">
+          <div className="flex items-center gap-1.5 bg-[#0d0f15] p-1 rounded-2xl border border-white/[0.07] overflow-x-auto">
+            {/* Product switcher — Social Studio and Lead Gen are one app, one nav */}
+            <button
+              type="button"
+              onClick={() => switchProductMode('social')}
+              className={`flex items-center gap-2 py-2 px-4 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                !isGrowthcrew
+                  ? 'scalora-pill-tab-active'
+                  : 'text-slate-400 hover:text-slate-200 hover:bg-white/[0.04]'
+              }`}
+            >
+              <Sparkles className="w-3.5 h-3.5" />
+              <span>Social Studio</span>
+            </button>
 
-              <button
-                type="button"
-                onClick={() => setActiveTab('queue')}
-                className={`flex items-center gap-2 py-2 px-4 rounded-xl text-xs font-bold transition-all cursor-pointer relative ${
-                  activeTab === 'queue'
-                    ? 'scalora-pill-tab-active'
-                    : 'text-slate-400 hover:text-slate-200 hover:bg-white/[0.04]'
-                }`}
-              >
-                <Layers className="w-3.5 h-3.5" />
-                <span>Review & Scheduled Queue</span>
-                {pendingCount > 0 && (
-                  <span className="ml-1 px-2 py-0.2 rounded-full text-[10px] font-extrabold bg-[#FF6B4A] text-white">
-                    {pendingCount}
+            <button
+              type="button"
+              onClick={() => switchProductMode('growthcrew')}
+              className={`flex items-center gap-2 py-2 px-4 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                isGrowthcrew
+                  ? 'scalora-pill-tab-active'
+                  : 'text-slate-400 hover:text-slate-200 hover:bg-white/[0.04]'
+              }`}
+            >
+              <Mail className="w-3.5 h-3.5" />
+              <span>Lead Gen</span>
+            </button>
+
+            {!isGrowthcrew && (
+              <>
+                <span className="w-px h-5 bg-white/10 mx-1" aria-hidden="true" />
+
+                <button
+                  type="button"
+                  onClick={() => setActiveTab('studio')}
+                  className={`flex items-center gap-2 py-2 px-4 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                    activeTab === 'studio'
+                      ? 'scalora-pill-tab-active'
+                      : 'text-slate-400 hover:text-slate-200 hover:bg-white/[0.04]'
+                  }`}
+                >
+                  <Sparkles className="w-3.5 h-3.5" />
+                  <span>Create Post</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setActiveTab('queue')}
+                  className={`flex items-center gap-2 py-2 px-4 rounded-xl text-xs font-bold transition-all cursor-pointer relative ${
+                    activeTab === 'queue'
+                      ? 'scalora-pill-tab-active'
+                      : 'text-slate-400 hover:text-slate-200 hover:bg-white/[0.04]'
+                  }`}
+                >
+                  <Layers className="w-3.5 h-3.5" />
+                  <span>Review & Scheduled Queue</span>
+                  {pendingCount > 0 && (
+                    <span className="ml-1 px-2 py-0.2 rounded-full text-[10px] font-extrabold bg-[#FF6B4A] text-white">
+                      {pendingCount}
+                    </span>
+                  )}
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setActiveTab('history')}
+                  className={`flex items-center gap-2 py-2 px-4 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                    activeTab === 'history'
+                      ? 'scalora-pill-tab-active'
+                      : 'text-slate-400 hover:text-slate-200 hover:bg-white/[0.04]'
+                  }`}
+                >
+                  <CheckCircle2 className="w-3.5 h-3.5" />
+                  <span>Published Posts</span>
+                  <span className="text-[10px] px-2 py-0.2 rounded-full bg-white/5 text-slate-400 font-semibold">
+                    {publishedPosts.length}
                   </span>
-                )}
-              </button>
+                </button>
+              </>
+            )}
+          </div>
 
-              <button
-                type="button"
-                onClick={() => setActiveTab('history')}
-                className={`flex items-center gap-2 py-2 px-4 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-                  activeTab === 'history'
-                    ? 'scalora-pill-tab-active'
-                    : 'text-slate-400 hover:text-slate-200 hover:bg-white/[0.04]'
-                }`}
-              >
-                <CheckCircle2 className="w-3.5 h-3.5" />
-                <span>Published Posts</span>
-                <span className="text-[10px] px-2 py-0.2 rounded-full bg-white/5 text-slate-400 font-semibold">
-                  {publishedPosts.length}
-                </span>
-              </button>
-            </div>
-
+          {!isGrowthcrew && (
             <button
               type="button"
               onClick={() => setShowBeginnerGuide(!showBeginnerGuide)}
@@ -916,9 +947,9 @@ export default function App({ defaultTab = 'studio', apiUrl } = {}) {
               <HelpCircle className="w-3.5 h-3.5 text-[#FFA84A]" />
               <span>{showBeginnerGuide ? 'Hide Guide' : 'Workflow Guide'}</span>
             </button>
-          </div>
-        </nav>
-      )}
+          )}
+        </div>
+      </nav>
 
       {/* Main Workspace */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1 w-full space-y-8">

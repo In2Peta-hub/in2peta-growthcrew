@@ -1,6 +1,6 @@
-# FastAPI backend — PostPulse Studio + GrowthCrew
+# FastAPI backend — GrowthCrew (Social Studio + Outreach)
 
-Python API for social studio (`/api/*`) and GrowthCrew outreach (`/api/growthcrew/*`).
+One Python API for the social studio (`/api/*`) and lead-gen outreach (`/api/growthcrew/*`).
 
 ## Install & run
 
@@ -23,15 +23,18 @@ See `fastapi-backend/.env.example` (placeholders only — never commit real secr
 | Media | `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_REGION`, `S3_BUCKET` |
 | Publish (optional) | `POSTIZ_API_URL`, `POSTIZ_API_KEY` (engine often on `:4007`) |
 | Outreach | `CORECLAW_API_KEY`, `AGENTMAIL_API_KEY`, `AGENTMAIL_WEBHOOK_SECRET`, `CENTRAL_INBOX`, `LITELLM_*` / `OPENAI_*` |
+| Lead database (optional) | `MOTHERDUCK_TOKEN`, `MOTHERDUCK_DATABASE` |
 
 Missing S3/Postiz → JSON fallback under `data/`. Missing outreach keys → studio still runs; GrowthCrew calls fail until configured.
 
 ## Storage
 
-No Postgres. Files in `fastapi-backend/data/`:
+No Postgres. Both surfaces persist through the shared `storage.py` data layer
+(`JsonStore`), which owns the locking and atomic writes. Files in
+`fastapi-backend/data/`:
 
-- `data.json` — queue / studio state  
-- `outreach.json` — GrowthCrew leads, threads, settings  
+- `data.json` — studio queue / channels / settings
+- `outreach.json` — GrowthCrew leads, threads, settings
 
 ## Mount routers
 
@@ -65,6 +68,16 @@ To embed in another FastAPI app, import those routers the same way (adjust packa
 
 All under `/api/growthcrew/` — settings, inboxes, lead search/upload, draft/send, threads, reply relay. See `/docs` for the live schema.
 
+## Error shape
+
+Every surface answers errors with the same envelope, so one client helper can
+read either router:
+
+```json
+{ "error": "human message", "code": "MACHINE_CODE", "detail": "original detail" }
+```
+
 ## Product naming
 
-API title strings may still say “Growthcrew” in places; the **product UI** is **PostPulse Studio** with a **GrowthCrew** outreach mode. Prefer PostPulse when writing user-facing docs.
+The single product is **GrowthCrew**, with two surfaces: **Social Studio**
+(publishing) and **Lead Gen & Outreach**.

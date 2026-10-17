@@ -1,28 +1,27 @@
-# PostPulse Studio
+# GrowthCrew
 
-React + FastAPI app for social publishing, with an optional **GrowthCrew** mode for email outreach.
+One React app and one FastAPI backend for two surfaces that share the same
+shell, navigation and storage layer:
 
-## Product modes
+| Surface | What it does |
+| --- | --- |
+| **Social Studio** | AI captions, S3 media and multi-channel publishing (Instagram, Facebook, X, LinkedIn, …) |
+| **Lead Gen & Outreach** | Lead search (MotherDuck dataset + live CoreClaw) and cold email (AgentMail) |
 
-Header toggle: **PostPulse** ↔ **GrowthCrew**
-
-| Mode | Branding | UI |
-| --- | --- | --- |
-| **PostPulse** | PostPulse Studio | Studio (create) · Review & queue · Published |
-| **GrowthCrew** | GrowthCrew Outreach | Lead search, draft/send email, replies |
-
-The app is not renamed wholesale to Growthcrew. GrowthCrew is a second product mode.
+Switch surfaces from the header nav — both talk to the same API base, the same
+error envelope, and the same persistence layer. There is no separate "app" per
+feature.
 
 ## Stack
 
 - **Frontend:** React + Vite + Tailwind (`client/`)
-- **Backend:** FastAPI (`fastapi-backend/`) on port `3005`
-- **Storage:** JSON files under `fastapi-backend/data/` (queue + outreach) — no Postgres
-- **Media:** AWS S3 uploads (optional; falls back without credentials)
-- **Publishing:** Postiz engine optional on `:4007`
-- **Captions:** Gemini (via `GEMINI_API_KEY`)
-- **Outreach:** CoreClaw + AgentMail + LLM keys (see `.env.example`)
-- **Location autocomplete:** local India city list; optional OpenStreetMap Nominatim — no Google Places key
+- **Backend:** FastAPI (`fastapi-backend/`) on port `3005` — the single API for both surfaces
+- **Storage:** JSON files under `fastapi-backend/data/` through one shared data layer (`fastapi-backend/storage.py`) — no Postgres
+- **Media:** AWS S3 uploads (optional; JSON fallback without credentials)
+- **Publishing:** Meta Graph API directly; Postiz engine optional on `:4007`
+- **AI:** In2Peta DeepSeek-Flash (`IN2PETA_*`), Gemini fallback
+- **Outreach:** CoreClaw + AgentMail + MotherDuck lead database
+- **Location autocomplete:** local India list plus OpenStreetMap Nominatim — no Google Places key
 
 ## Run locally
 
@@ -39,35 +38,41 @@ bun install
 bun run dev
 ```
 
-- App: http://localhost:5173  
-- API docs: http://localhost:3005/docs  
+- App: http://localhost:5173
+- API docs: http://localhost:3005/docs
 
-Set `VITE_API_URL=http://localhost:3005` in `client/.env` if the Vite proxy is not used.
+The Vite dev server proxies `/api/*` to the backend, so no `VITE_API_URL` is
+needed locally. Set `VITE_API_URL=http://localhost:3005` in `client/.env` only
+if you bypass the proxy.
 
 **Windows:** `start-local.bat` starts FastAPI on `:3005` and the Vite client on `:5173`.
 
-Prefer `cd client && bun run …` over root scripts that use `bun --cwd` (not reliable on all Bun builds).
+## Env
 
-## GrowthCrew env
+Copy keys from `fastapi-backend/.env.example` (placeholders only). Studio-only
+use can leave the outreach keys blank, and vice versa.
 
-Copy keys from `fastapi-backend/.env.example`. Outreach needs some of:
-
-- `CORECLAW_API_KEY` — lead search  
-- `AGENTMAIL_API_KEY` — sending inboxes / mail  
-- `LITELLM_MASTER_KEY` / `OPENAI_API_KEY` / `GEMINI_API_KEY` — draft generation  
-
-Studio-only use can leave outreach keys blank.
+| Area | Keys |
+| --- | --- |
+| Studio captions | `IN2PETA_*`, `GEMINI_API_KEY`, `GEMINI_MODEL` |
+| Studio media | `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_REGION`, `S3_BUCKET` |
+| Studio publishing | `FB_PAGE_ID`, `FB_PAGE_ACCESS_TOKEN`, `POSTIZ_*` |
+| Outreach email | `CORECLAW_API_KEY`, `AGENTMAIL_API_KEY`, `AGENTMAIL_WEBHOOK_SECRET`, `CENTRAL_INBOX` |
+| Lead database | `MOTHERDUCK_TOKEN`, `MOTHERDUCK_DATABASE` |
 
 ## Layout
 
 ```
-client/                 React app (PostPulse + GrowthCrew UI)
-fastapi-backend/        FastAPI (studio + /api/growthcrew/*)
-fastapi-backend/data/   data.json (queue), outreach.json (leads/threads)
-server/                 Legacy Express (optional; FastAPI is the primary API)
+client/                      React app (Social Studio + Lead Gen UI, shared api.js)
+fastapi-backend/             FastAPI: studio under /api, outreach under /api/growthcrew
+fastapi-backend/storage.py   shared JSON data layer for both surfaces
+fastapi-backend/data/        data.json (studio queue), outreach.json (leads/messages)
 ```
+
+The legacy Express `server/` app has been retired — FastAPI is the only backend.
 
 ## Related guides
 
-- [REACT_INTEGRATION_GUIDE.md](./REACT_INTEGRATION_GUIDE.md) — embed the React client  
-- [FASTAPI_INTEGRATION_GUIDE.md](./FASTAPI_INTEGRATION_GUIDE.md) — mount the FastAPI routers  
+- [DEPLOYMENT_GUIDE.md](./DEPLOYMENT_GUIDE.md) — Render (backend) + Vercel (frontend)
+- [REACT_INTEGRATION_GUIDE.md](./REACT_INTEGRATION_GUIDE.md) — run or embed the React client
+- [FASTAPI_INTEGRATION_GUIDE.md](./FASTAPI_INTEGRATION_GUIDE.md) — mount the FastAPI routers
