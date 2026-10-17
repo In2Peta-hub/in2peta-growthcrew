@@ -45,7 +45,24 @@ The Vite dev server proxies `/api/*` to the backend, so no `VITE_API_URL` is
 needed locally. Set `VITE_API_URL=http://localhost:3005` in `client/.env` only
 if you bypass the proxy.
 
-**Windows:** `start-local.bat` starts FastAPI on `:3005` and the Vite client on `:5173`.
+After installing the backend dependencies above, run both services from one
+terminal with the cross-platform launcher:
+
+```bash
+# Linux or macOS
+python3 start-local.py
+```
+
+On Windows, run `py -3 start-local.py` or double-click `start-local.bat`.
+Python and Bun must be installed, with Bun on `PATH`. The launcher uses
+`fastapi-backend/.venv`, then the root `.venv`, or the active Python interpreter.
+Install the backend dependencies into that environment.
+
+The launcher installs frontend dependencies with the existing lockfile, starts
+FastAPI on `:3005` and Vite on `:5173`, and stops both services on Ctrl+C or when
+either exits. If a port is occupied, startup fails instead of choosing another
+port. Use `--skip-install` to skip the frontend dependency install. Paths resolve
+relative to the launcher, so it also works from another directory.
 
 ## Env
 
