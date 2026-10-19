@@ -468,8 +468,23 @@ class CustomChannelConnectRequest(BaseModel):
 @router.post("/channels/custom-connect")
 async def custom_connect_channel(req: CustomChannelConnectRequest):
     if req.platform in ("facebook", "instagram") and req.fbPageId and req.fbAccessToken:
-        CONFIG.FB_PAGE_ID = req.fbPageId.strip()
-        CONFIG.FB_PAGE_ACCESS_TOKEN = req.fbAccessToken.strip()
+        clean_page_id = req.fbPageId.strip()
+        clean_token = req.fbAccessToken.strip()
+        CONFIG.FB_PAGE_ID = clean_page_id
+        CONFIG.FB_PAGE_ACCESS_TOKEN = clean_token
+
+        # Automatically look up linked Instagram Business Account ID from Facebook Page
+        try:
+            lookup = requests.get(
+                f"https://graph.facebook.com/v21.0/{clean_page_id}?fields=instagram_business_account,name&access_token={clean_token}",
+                timeout=10
+            ).json()
+            if "instagram_business_account" in lookup and "id" in lookup["instagram_business_account"]:
+                CONFIG.IG_BUSINESS_ACCOUNT_ID = lookup["instagram_business_account"]["id"]
+                print(f"[Custom Connect] Auto-detected Instagram Business ID: {CONFIG.IG_BUSINESS_ACCOUNT_ID}")
+        except Exception as e:
+            print(f"[Custom Connect] Instagram lookup notice: {e}")
+
     if req.platform == "discord" and req.discordWebhookUrl:
         CONFIG.DISCORD_WEBHOOK_URL = req.discordWebhookUrl.strip()
 
@@ -478,7 +493,7 @@ async def custom_connect_channel(req: CustomChannelConnectRequest):
         "name": req.name or f"Connected ({req.platform.title()})",
         "handle": req.handle or f"@{req.platform.lower()}",
         "platform": req.platform.lower(),
-        "platforms": [req.platform.lower()],
+        "platforms": ["instagram", "facebook"] if req.platform in ("instagram", "facebook") else [req.platform.lower()],
         "avatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop&q=80",
         "connected": True,
         "provider": "Custom Auth"
