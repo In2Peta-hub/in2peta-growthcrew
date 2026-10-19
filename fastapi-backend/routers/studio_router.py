@@ -140,11 +140,17 @@ async def get_channels():
                 p for p in queue
                 if p.get("integrationId") == ch.get("id") or (p.get("platforms") and ch.get("platform") in p.get("platforms"))
             ])
-            mapped.append({**ch, "postsCount": p_count, "connected": True})
+            safe_ch = {**ch, "postsCount": p_count, "connected": True}
+            if safe_ch.get("fbAccessToken"):
+                safe_ch["fbAccessToken"] = "***"
+            mapped.append(safe_ch)
         return mapped
     except Exception as e:
         print(f"Error fetching channels: {e}")
-        return QueueService.get_channels()
+        return [
+            {**c, "fbAccessToken": "***" if c.get("fbAccessToken") else None}
+            for c in QueueService.get_channels()
+        ]
 
 @router.post("/channels")
 async def add_channel(channel: Dict[str, Any] = Body(...)):
@@ -343,10 +349,26 @@ async def create_queue_post(post: CreateQueuePostRequest):
         target_platforms = data.get("platforms") or ["facebook", "instagram", "linkedin", "x", "reddit", "youtube", "discord"]
         clean_text = data.get("fullPostText") or data.get("caption") or ""
         media_url = data.get("visualUrl") or data.get("mediaUrl")
+
+        # Resolve channel-specific credentials for multi-client isolation
+        channel = QueueService.get_channel_by_id(data.get("integrationId"))
+        if not channel and channels:
+            channel = channels[0]
+        channel = channel or {}
+
+        ch_fb_page_id = channel.get("fbPageId")
+        ch_fb_token = channel.get("fbAccessToken")
+        ch_ig_id = channel.get("igBusinessAccountId")
+        ch_discord_url = channel.get("discordWebhookUrl")
+
         broadcast_result = MultiPlatformPublisher.broadcast_to_all(
             platforms=target_platforms,
             text=clean_text,
-            media_url=media_url
+            media_url=media_url,
+            fb_page_id=ch_fb_page_id,
+            fb_access_token=ch_fb_token,
+            ig_business_account_id=ch_ig_id,
+            discord_webhook_url=ch_discord_url
         )
         final_post_id = None
         if "facebook" in broadcast_result.get("platforms", {}):
@@ -429,11 +451,27 @@ async def publish_now(post_id: str):
     media_url = post.get("visualUrl") or post.get("mediaUrl")
     target_platforms = post.get("platforms") or ["facebook", "instagram", "linkedin", "x", "reddit", "youtube", "discord"]
 
-    # Multi-platform simultaneous broadcasting: same post to all selected channels!
+    # Resolve channel-specific credentials for multi-client isolation
+    channel = QueueService.get_channel_by_id(post.get("integrationId"))
+    if not channel:
+        channels = QueueService.get_channels()
+        channel = channels[0] if channels else {}
+    channel = channel or {}
+
+    ch_fb_page_id = channel.get("fbPageId")
+    ch_fb_token = channel.get("fbAccessToken")
+    ch_ig_id = channel.get("igBusinessAccountId")
+    ch_discord_url = channel.get("discordWebhookUrl")
+
+    # Multi-platform simultaneous broadcasting using channel's dedicated credentials
     broadcast_result = MultiPlatformPublisher.broadcast_to_all(
         platforms=target_platforms,
         text=clean_text,
-        media_url=media_url
+        media_url=media_url,
+        fb_page_id=ch_fb_page_id,
+        fb_access_token=ch_fb_token,
+        ig_business_account_id=ch_ig_id,
+        discord_webhook_url=ch_discord_url
     )
 
     final_post_id = None
@@ -467,12 +505,12 @@ class CustomChannelConnectRequest(BaseModel):
 
 @router.post("/channels/custom-connect")
 async def custom_connect_channel(req: CustomChannelConnectRequest):
-    if req.platform in ("facebook", "instagram") and req.fbPageId and req.fbAccessToken:
-        clean_page_id = req.fbPageId.strip()
-        clean_token = req.fbAccessToken.strip()
-        CONFIG.FB_PAGE_ID = clean_page_id
-        CONFIG.FB_PAGE_ACCESS_TOKEN = clean_token
+    clean_page_id = req.fbPageId.strip() if req.fbPageId else None
+    clean_token = req.fbAccessToken.strip() if req.fbAccessToken else None
+    clean_discord = req.discordWebhookUrl.strip() if req.discordWebhookUrl else None
+    ig_id = None
 
+    if req.platform in ("facebook", "instagram") and clean_page_id and clean_token:
         # Automatically look up linked Instagram Business Account ID from Facebook Page
         try:
             lookup = requests.get(
@@ -480,13 +518,10 @@ async def custom_connect_channel(req: CustomChannelConnectRequest):
                 timeout=10
             ).json()
             if "instagram_business_account" in lookup and "id" in lookup["instagram_business_account"]:
-                CONFIG.IG_BUSINESS_ACCOUNT_ID = lookup["instagram_business_account"]["id"]
-                print(f"[Custom Connect] Auto-detected Instagram Business ID: {CONFIG.IG_BUSINESS_ACCOUNT_ID}")
+                ig_id = lookup["instagram_business_account"]["id"]
+                print(f"[Custom Connect] Auto-detected Instagram Business ID: {ig_id}")
         except Exception as e:
             print(f"[Custom Connect] Instagram lookup notice: {e}")
-
-    if req.platform == "discord" and req.discordWebhookUrl:
-        CONFIG.DISCORD_WEBHOOK_URL = req.discordWebhookUrl.strip()
 
     channel_obj = {
         "id": f"chan_{int(time.time() * 1000)}",
@@ -496,10 +531,21 @@ async def custom_connect_channel(req: CustomChannelConnectRequest):
         "platforms": ["instagram", "facebook"] if req.platform in ("instagram", "facebook") else [req.platform.lower()],
         "avatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop&q=80",
         "connected": True,
-        "provider": "Custom Auth"
+        "provider": "Custom Auth",
+        "fbPageId": clean_page_id,
+        "fbAccessToken": clean_token,
+        "igBusinessAccountId": ig_id,
+        "discordWebhookUrl": clean_discord
     }
     updated = QueueService.add_channel(channel_obj)
-    return {"success": True, "channel": channel_obj, "channels": updated}
+
+    # Return safe sanitized channel info to the client
+    safe_channel = {**channel_obj, "fbAccessToken": "***" if clean_token else None}
+    safe_channels = [
+        {**c, "fbAccessToken": "***" if c.get("fbAccessToken") else None}
+        for c in updated
+    ]
+    return {"success": True, "channel": safe_channel, "channels": safe_channels}
 
 @router.get("/facebook/status")
 async def get_facebook_status():

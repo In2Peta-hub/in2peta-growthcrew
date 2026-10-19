@@ -23,7 +23,11 @@ DEFAULT_DATA: Dict[str, Any] = {
             "platforms": ["instagram", "facebook"],
             "avatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop&q=80",
             "connected": True,
-            "provider": "Meta Graph API"
+            "provider": "Meta Graph API",
+            "fbPageId": "1306999285838432",
+            "fbAccessToken": None,
+            "igBusinessAccountId": "17841415311653642",
+            "discordWebhookUrl": None
         }
     ],
     "queue": []
@@ -181,7 +185,11 @@ class QueueService:
             "platforms": channel.get("platforms", ["instagram", "facebook"]),
             "avatar": channel.get("avatar", "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop&q=80"),
             "connected": True,
-            "provider": "Meta Graph API"
+            "provider": channel.get("provider", "Custom Auth"),
+            "fbPageId": channel.get("fbPageId"),
+            "fbAccessToken": channel.get("fbAccessToken"),
+            "igBusinessAccountId": channel.get("igBusinessAccountId"),
+            "discordWebhookUrl": channel.get("discordWebhookUrl"),
         }
 
         existing_index = next((i for i, c in enumerate(channels) if c.get("id") == ch_id or c.get("name", "").lower() == ch_name.lower()), -1)
@@ -193,3 +201,13 @@ class QueueService:
         data["channels"] = channels
         cls.write_data(data)
         return channels
+
+    @classmethod
+    def get_channel_by_id(cls, channel_id: Optional[str]) -> Optional[Dict[str, Any]]:
+        if not channel_id:
+            return None
+        channels = cls.get_channels()
+        for c in channels:
+            if c.get("id") == channel_id:
+                return c
+        return None
