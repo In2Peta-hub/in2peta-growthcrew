@@ -314,6 +314,22 @@ export default function App({ defaultTab = 'studio', apiUrl } = {}) {
   };
 
   useEffect(() => {
+    // Check Meta 1-Click OAuth callback parameters
+    try {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('oauth_success') === 'true') {
+        const chanName = params.get('channel_name') || 'Meta Account';
+        showToast(`🎉 Connected ${chanName} successfully via 1-Click OAuth!`, 'success');
+        fetchData();
+        window.history.replaceState({}, document.title, window.location.pathname);
+      } else if (params.get('oauth_error')) {
+        showToast(decodeURIComponent(params.get('oauth_error')), 'error');
+        window.history.replaceState({}, document.title, window.location.pathname);
+      }
+    } catch {
+      // Ignore URL parsing errors
+    }
+
     fetchData();
     const interval = setInterval(fetchData, 12000);
     return () => clearInterval(interval);
@@ -2059,8 +2075,29 @@ export default function App({ defaultTab = 'studio', apiUrl } = {}) {
               </div>
             </div>
 
+            {/* 1-Click Meta OAuth Connect Button */}
+            <div className="pt-2">
+              <a
+                href={`${API_BASE}/api/auth/meta/login`}
+                className="w-full py-3.5 px-4 rounded-2xl bg-gradient-to-r from-[#1877F2] via-[#E1306C] to-[#FD1D1D] text-white font-black text-xs uppercase tracking-wider flex items-center justify-center gap-2.5 shadow-xl shadow-[#1877F2]/25 hover:opacity-95 hover:scale-[1.01] active:scale-[0.99] transition-all cursor-pointer border border-white/20"
+              >
+                <Sparkles className="w-4 h-4 text-white animate-pulse" />
+                <span>1-Click Connect with Facebook & Instagram</span>
+              </a>
+              <p className="text-[10px] text-slate-400 text-center mt-2 leading-relaxed">
+                Connects your Instagram Business feed and Facebook Page directly via Meta OAuth (no manual tokens needed).
+              </p>
+            </div>
+
+            <div className="relative flex items-center justify-center my-4">
+              <div className="border-t border-white/[0.08] w-full" />
+              <span className="bg-[#0e1118] px-3 text-[10px] text-slate-500 uppercase tracking-widest font-semibold absolute">
+                Or Manual Developer Credentials
+              </span>
+            </div>
+
             {/* Add Custom Handle & Credentials */}
-            <form onSubmit={handleConnectInstagram} className="space-y-3 pt-3 border-t border-white/[0.06]">
+            <form onSubmit={handleConnectInstagram} className="space-y-3">
               <label className="text-xs font-bold text-slate-300 block">Connect Your Account / Channel:</label>
               
               <div className="grid grid-cols-2 gap-2">

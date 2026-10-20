@@ -1,3 +1,5 @@
+import requests
+from fastapi.responses import RedirectResponse
 import base64
 import time
 import os
@@ -559,3 +561,125 @@ async def delete_post(post_id: str):
     if not success:
         raise HTTPException(status_code=404, detail="Post not found")
     return {"success": True}
+
+
+# --- META / FACEBOOK & INSTAGRAM 1-CLICK OAUTH 2.0 FLOW ---
+
+@router.get("/auth/meta/url")
+async def get_meta_oauth_url():
+    redirect_uri = f"{CONFIG.BACKEND_PUBLIC_URL.rstrip('/')}/api/auth/meta/callback"
+    scopes = [
+        "pages_show_list",
+        "pages_read_engagement",
+        "pages_manage_posts",
+        "instagram_basic",
+        "instagram_content_publish",
+        "business_management",
+        "public_profile"
+    ]
+    scope_str = ",".join(scopes)
+    encoded_redirect = requests.utils.quote(redirect_uri, safe="")
+    encoded_scope = requests.utils.quote(scope_str, safe="")
+    url = (
+        f"https://www.facebook.com/v21.0/dialog/oauth?"
+        f"client_id={CONFIG.META_APP_ID}&"
+        f"redirect_uri={encoded_redirect}&"
+        f"scope={encoded_scope}&"
+        f"response_type=code"
+    )
+    return {"url": url, "redirectUri": redirect_uri, "appId": CONFIG.META_APP_ID}
+
+@router.get("/auth/meta/login")
+async def meta_oauth_redirect():
+    data = await get_meta_oauth_url()
+    return RedirectResponse(url=data["url"])
+
+@router.get("/auth/meta/callback")
+async def meta_oauth_callback(
+    code: Optional[str] = None,
+    error: Optional[str] = None,
+    error_description: Optional[str] = None
+):
+    frontend_base = CONFIG.FRONTEND_URL.rstrip('/')
+    if error or not code:
+        err_msg = error_description or error or "Authorization canceled by user"
+        return RedirectResponse(url=f"{frontend_base}?oauth_error={requests.utils.quote(err_msg)}")
+
+    redirect_uri = f"{CONFIG.BACKEND_PUBLIC_URL.rstrip('/')}/api/auth/meta/callback"
+
+    try:
+        # Step 1: Exchange code for short-lived access token
+        token_url = (
+            f"https://graph.facebook.com/v21.0/oauth/access_token?"
+            f"client_id={CONFIG.META_APP_ID}&"
+            f"client_secret={CONFIG.META_APP_SECRET}&"
+            f"redirect_uri={requests.utils.quote(redirect_uri, safe='')}&"
+            f"code={code}"
+        )
+        token_res = requests.get(token_url, timeout=15).json()
+        short_token = token_res.get("access_token")
+        if not short_token:
+            err = token_res.get("error", {}).get("message", "Could not exchange authorization code")
+            return RedirectResponse(url=f"{frontend_base}?oauth_error={requests.utils.quote(err)}")
+
+        # Step 2: Exchange short-lived token for long-lived 60-day user token
+        long_url = (
+            f"https://graph.facebook.com/v21.0/oauth/access_token?"
+            f"grant_type=fb_exchange_token&"
+            f"client_id={CONFIG.META_APP_ID}&"
+            f"client_secret={CONFIG.META_APP_SECRET}&"
+            f"fb_exchange_token={short_token}"
+        )
+        long_res = requests.get(long_url, timeout=15).json()
+        user_token = long_res.get("access_token") or short_token
+
+        # Step 3: Fetch user's managed Facebook Pages and linked Instagram accounts
+        accounts_url = (
+            f"https://graph.facebook.com/v21.0/me/accounts?"
+            f"fields=id,name,access_token,instagram_business_account{{id,username,profile_picture_url}}&"
+            f"access_token={user_token}"
+        )
+        acc_res = requests.get(accounts_url, timeout=15).json()
+        pages = acc_res.get("data", [])
+
+        if not pages:
+            return RedirectResponse(url=f"{frontend_base}?oauth_error={requests.utils.quote('No Facebook Pages found. Please ensure you manage at least one Facebook Page.')}")
+
+        connected_count = 0
+        first_chan_name = ""
+
+        for p in pages:
+            p_id = p.get("id")
+            p_name = p.get("name")
+            p_token = p.get("access_token") # Long-lived Page token!
+            ig_data = p.get("instagram_business_account") or {}
+            ig_id = ig_data.get("id")
+            ig_username = ig_data.get("username")
+            avatar = ig_data.get("profile_picture_url") or "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop&q=80"
+
+            chan_id = f"chan_meta_{p_id}"
+            chan_name = f"{p_name} (@{ig_username})" if ig_username else p_name
+            chan_handle = f"@{ig_username}" if ig_username else f"@{p_name.lower().replace(' ', '')}"
+
+            channel_obj = {
+                "id": chan_id,
+                "name": chan_name,
+                "handle": chan_handle,
+                "platform": "instagram" if ig_id else "facebook",
+                "platforms": ["instagram", "facebook"] if ig_id else ["facebook"],
+                "avatar": avatar,
+                "connected": True,
+                "provider": "Meta 1-Click OAuth",
+                "fbPageId": p_id,
+                "fbAccessToken": p_token,
+                "igBusinessAccountId": ig_id,
+                "discordWebhookUrl": None
+            }
+            QueueService.add_channel(channel_obj)
+            connected_count += 1
+            if not first_chan_name:
+                first_chan_name = chan_name
+
+        return RedirectResponse(url=f"{frontend_base}?oauth_success=true&connected_count={connected_count}&channel_name={requests.utils.quote(first_chan_name)}")
+    except Exception as e:
+        return RedirectResponse(url=f"{frontend_base}?oauth_error={requests.utils.quote(str(e))}")

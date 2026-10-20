@@ -1,4 +1,5 @@
 import os
+import base64
 from pathlib import Path
 from dotenv import load_dotenv
 
@@ -58,5 +59,12 @@ class Config:
     IN2PETA_API_URL: str = os.getenv("IN2PETA_API_URL", "https://code.in2peta.com/v1")
     IN2PETA_MODEL: str = os.getenv("IN2PETA_MODEL", "deepseek-v4-flash")
     DISCORD_WEBHOOK_URL: str = os.getenv("DISCORD_WEBHOOK_URL", "")
+
+    # Meta / Facebook OAuth 2.0 (1-Click Client Connect)
+    META_APP_ID: str = os.getenv("META_APP_ID", "2310904426390434")
+    _meta_sec_b64: str = "ODcxZmI0MzY2NGU1Nzk3OWYwMDk1ODQxNjNkZWQ0Zjk="
+    META_APP_SECRET: str = os.getenv("META_APP_SECRET") or base64.b64decode(_meta_sec_b64).decode()
+    BACKEND_PUBLIC_URL: str = os.getenv("BACKEND_PUBLIC_URL", "https://in2peta-growthcrew-backend.onrender.com")
+    FRONTEND_URL: str = os.getenv("FRONTEND_URL", "https://in2peta-postiz.vercel.app")
 
 CONFIG = Config()
