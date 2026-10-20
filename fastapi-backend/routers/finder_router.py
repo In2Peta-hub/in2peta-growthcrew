@@ -53,6 +53,11 @@ class SessionBody(BaseModel):
     email: str = Field(min_length=3, max_length=254)
 
 
+class PasswordBody(BaseModel):
+    email: str = Field(min_length=3, max_length=254)
+    password: str = Field(min_length=1, max_length=1024)
+
+
 class VerifyBody(BaseModel):
     email: str = Field(min_length=3, max_length=254)
     code: str = Field(min_length=4, max_length=200)
@@ -132,6 +137,14 @@ def create_session(body: SessionBody, request: Request):
     finder.request_sign_in(body.email, _client_ip(request))
     # Always the same answer: no way to test whether an account exists.
     return _json(202, {"sent": True})
+
+
+@router.post("/sessions/password")
+def password_session(body: PasswordBody, request: Request):
+    # Never trust a caller-supplied forwarding header as a rate-limit identity.
+    if not finder.allow_request("password-sessions", _client_ip(request), SESSION_RATE_LIMIT, window=15 * 60):
+        raise GrowthcrewError("Too many sign-in attempts. Try again in a little while.", 429, "RATE_LIMITED")
+    return _json(200, finder.password_sign_in(body.email, body.password))
 
 
 @router.post("/sessions/verify")

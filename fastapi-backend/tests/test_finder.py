@@ -10,6 +10,7 @@ import io
 import os
 import socket
 import tempfile
+import time
 from datetime import datetime, timedelta, timezone
 
 os.environ["FINDER_DATA_FILE"] = tempfile.mktemp(suffix=".json")
@@ -569,3 +570,47 @@ def test_relevance_matches_whole_words_only():
     clinic = _candidate("Zach Muegge", "President", "Balcones Family Dental", "zach@balcones.example", city="Austin", category="Dental")
     ranked = rank_candidates([beads, clinic], "dentists", 5)
     assert ranked[0]["company"] == "Balcones Family Dental"
+
+
+def test_database_query_expands_saas_and_plural_founders():
+    from growthcrew.finder import _database_query
+    words = _database_query('Saas founders').lower().split()
+    assert 'software' in words
+    assert 'founder' in words
+
+
+def test_founder_search_requires_founder_role_not_company_name():
+    candidates = [
+        _candidate('Wrong Person', 'Software Developer', 'Founders Insurance', 'wrong@example.com', category='Software'),
+        _candidate('Right Person', 'CEO/Co-Founder', 'Acme Software', 'right@example.com', category='Software'),
+    ]
+    assert [r['email'] for r in rank_candidates(candidates, 'SaaS founders', 5)] == ['right@example.com']
+
+
+def test_preview_does_not_report_no_matches_when_sources_fail(monkeypatch):
+    from growthcrew import finder
+    preview_id = 'source-failure-regression'
+    monkeypatch.setitem(finder._PREVIEWS, preview_id, {'describe': 'SaaS founders in USA', 'createdTs': time.time()})
+    monkeypatch.setattr(finder, 'understand', lambda *args: {'who': 'SaaS founders', 'where': 'USA'})
+    monkeypatch.setattr(finder.leadsdb, 'is_configured', lambda: True)
+    monkeypatch.setattr(finder.leadsdb, 'search_dataset', lambda *args: [])
+    monkeypatch.setattr(finder.service, '_coreclaw_configured', lambda: True)
+    def unavailable(*args):
+        raise RuntimeError('provider unavailable')
+    monkeypatch.setattr(finder, '_live_records', unavailable)
+    finder._preview_worker(preview_id)
+    payload = finder.preview_payload(preview_id)
+    assert payload['status'] == 'failed'
+    assert 'unavailable' in payload['error']
+
+
+def test_successful_empty_search_still_suggests_broader_description(monkeypatch):
+    from growthcrew import finder
+    preview_id = 'genuine-empty-regression'
+    monkeypatch.setitem(finder._PREVIEWS, preview_id, {'describe': 'rare trade in USA', 'createdTs': time.time()})
+    monkeypatch.setattr(finder, 'understand', lambda *args: {'who': 'rare trade', 'where': 'USA'})
+    monkeypatch.setattr(finder.leadsdb, 'is_configured', lambda: True)
+    monkeypatch.setattr(finder.leadsdb, 'search_dataset', lambda *args: [])
+    monkeypatch.setattr(finder.service, '_coreclaw_configured', lambda: False)
+    finder._preview_worker(preview_id)
+    assert finder.preview_payload(preview_id)['status'] == 'empty'

@@ -419,9 +419,11 @@ def _who_tokens(who: str) -> set[str]:
 
 
 # Words the database query may also search for, so "dentists" finds records
-# stored as "dental". Only concrete trades belong here: generic words such as
-# "owner" would match almost every row.
+# stored as "dental". Keep expansions specific to the requested trade or role;
+# generic words such as "business" would match almost every row.
 DB_BROADEN: dict[str, str] = {
+    "saas": "software",
+    "founder": "founder",
     "dentist": "dental",
     "orthodontist": "orthodontic",
     "doctor": "medical",
@@ -442,16 +444,17 @@ DB_BROADEN: dict[str, str] = {
 
 
 def _database_query(who: str) -> str:
-    """The user's words plus at most two trade synonyms for the SQL search.
+    """The user's words plus at most two trade or role terms for SQL search.
 
     leadsdb matches ANY token, so adding "dental" to "dentists" turns two
     matches into a usable pool without changing the meaning of the search.
     """
     extras: list[str] = []
+    words = set(re.findall(r"[a-z0-9]+", _text(who).lower()))
     for raw in re.findall(r"[a-z0-9]+", _text(who).lower()):
         for variant in (raw, raw[:-1] if raw.endswith("s") else raw):
             extra = DB_BROADEN.get(variant)
-            if extra and extra not in extras and extra not in _text(who).lower():
+            if extra and extra not in extras and extra not in words:
                 extras.append(extra)
     return " ".join([_text(who), *extras[:2]]).strip()
 
@@ -488,11 +491,14 @@ def rank_candidates(candidates: list[dict], who: str, limit: int) -> list[dict]:
     if not candidates or limit <= 0:
         return []
     tokens = _who_tokens(who)
+    wants_founder = bool(re.search(r"\bfounders?\b", who, re.I))
     scored: list[tuple[float, int, dict]] = []
     for index, candidate in enumerate(candidates):
         if not isinstance(candidate, dict):
             continue
         role = clean_role(candidate.get("role") or candidate.get("title"))
+        if wants_founder and not re.search(r"\b(?:co[ -]?)?founder\b", role or "", re.I):
+            continue
         company = _clean_company(candidate.get("company"))
         if not company:
             continue
@@ -1156,13 +1162,13 @@ def _live_records(who: str, where: str, started: float, deadline_seconds: float)
             result = service._coreclaw_poll(run_slug)
         except Exception as error:  # noqa: BLE001 - live search is best effort
             logger.warning("Live lead search poll failed: %s", error)
-            return []
+            raise GrowthcrewError("Live search is temporarily unavailable.", 502, "LIVE_UNAVAILABLE") from error
         status = result.get("status")
         if status == "completed":
             return [lead for lead in (result.get("leads") or []) if isinstance(lead, dict)]
         if status == "failed":
-            return []
-    return []
+            raise GrowthcrewError("Live search could not complete.", 502, "LIVE_FAILED")
+    raise GrowthcrewError("Live search took too long. Try again.", 504, "LIVE_TIMEOUT")
 
 
 def _collect_records(understood: dict, wanted: int) -> list[dict]:
@@ -1290,6 +1296,9 @@ def _preview_worker(preview_id: str) -> None:
         where = _text(understood.get("where"))
         outside = is_clearly_outside_usa(where)
         records: list[dict] = []
+        source_failed = not (
+            (not outside and leadsdb.is_configured()) or service._coreclaw_configured()
+        )
 
         # 1. The database answers first, and the page shows those people while
         #    the (slower) live search is still running.
@@ -1302,6 +1311,7 @@ def _preview_worker(preview_id: str) -> None:
                 )
                 records = _records_from_candidates(candidates, "database", who)
             except Exception as error:  # noqa: BLE001 - live search may still work
+                source_failed = True
                 logger.warning("Lead database search failed: %s", error)
             _publish_preview_records(preview_id, records)
 
@@ -1313,6 +1323,7 @@ def _preview_worker(preview_id: str) -> None:
                 records = _merge_records(records, _records_from_candidates(live, "live", who))
                 _publish_preview_records(preview_id, records)
             except Exception as error:  # noqa: BLE001 - live search is best effort
+                source_failed = True
                 logger.warning("Live lead search failed: %s", error)
 
         # 3. One AI call picks the best five and writes the "why" lines.
@@ -1327,6 +1338,12 @@ def _preview_worker(preview_id: str) -> None:
                     for record in picked
                 ],
                 suggestions=[],
+            )
+        elif source_failed:
+            _update_preview(
+                preview_id,
+                status="failed",
+                error="A search service is unavailable. We could not check for matches. Try again shortly.",
             )
         else:
             _update_preview(
@@ -1401,8 +1418,11 @@ def account_for_token(token: str | None) -> dict | None:
     return finder_store.find_account_by_token_hash(_sha256_hex(token))
 
 
-def create_account(email: str, preview_id: str | None = None) -> dict:
+def create_account(email: str, preview_id: str | None = None, *, _password_verified: bool = False) -> dict:
     normalized = _normalized_email(email)
+    if (not _password_verified and CONFIG.FINDER_TEST_PASSWORD_HASH
+            and normalized == _text(CONFIG.FINDER_TEST_EMAIL).lower()):
+        raise GrowthcrewError("Sign in to continue.", 409, "ACCOUNT_EXISTS")
     if finder_store.get_account(normalized):
         raise GrowthcrewError(
             "An account with this email already exists. Sign in instead.",
@@ -1431,6 +1451,40 @@ def create_account(email: str, preview_id: str | None = None) -> dict:
                 continue
             finder_store.save_lead(_make_lead(normalized, record, 1, record.get("why")))
 
+    token = secrets.token_urlsafe(32)
+    finder_store.save_token(_sha256_hex(token), normalized)
+    return {"account": public_account(account), "token": token}
+
+
+def password_sign_in(email: str, password: str) -> dict:
+    """Optional testing login, using a server-configured salted PBKDF2 hash.
+
+    Format: pbkdf2_sha256$600000$<32 hex salt>$<64 hex digest>.
+    There is no default testing account or password in application code.
+    """
+    normalized = _text(email).lower()
+    configured_email = _text(CONFIG.FINDER_TEST_EMAIL).lower()
+    configured_hash = _text(CONFIG.FINDER_TEST_PASSWORD_HASH)
+    valid_config = False
+    salt = bytes(16)
+    expected = bytes(32)
+    try:
+        algorithm, rounds, salt_hex, digest_hex = configured_hash.split("$")
+        if algorithm == "pbkdf2_sha256" and rounds == "600000":
+            salt = bytes.fromhex(salt_hex)
+            expected = bytes.fromhex(digest_hex)
+            valid_config = len(salt) == 16 and len(expected) == 32 and is_valid_email(configured_email)
+    except (ValueError, TypeError):
+        pass
+    # Perform the same expensive comparison for unknown emails or disabled config.
+    actual = hashlib.pbkdf2_hmac("sha256", password.encode("utf-8"), salt, 600000)
+    password_matches = hmac.compare_digest(actual, expected)
+    email_matches = hmac.compare_digest(normalized.encode(), configured_email.encode())
+    if not (valid_config and password_matches and email_matches):
+        raise GrowthcrewError("Email or password is incorrect.", 401, "INVALID_CREDENTIALS")
+    account = finder_store.get_account(normalized)
+    if not account:
+        return create_account(normalized, _password_verified=True)
     token = secrets.token_urlsafe(32)
     finder_store.save_token(_sha256_hex(token), normalized)
     return {"account": public_account(account), "token": token}
@@ -1685,6 +1739,9 @@ def _batch_number(account_email: str) -> int:
 
 
 def _consume_batch_quota(account: dict) -> None:
+    if (CONFIG.FINDER_TEST_PASSWORD_HASH and CONFIG.FINDER_TEST_EMAIL
+            and account.get("email") == _text(CONFIG.FINDER_TEST_EMAIL).lower()):
+        return
     today = datetime.now(timezone.utc).date().isoformat()
     counts = account.get("batchCounts") if isinstance(account.get("batchCounts"), dict) else {}
     used = int(counts.get(today) or 0)

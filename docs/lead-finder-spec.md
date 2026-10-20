@@ -246,3 +246,33 @@ Gmail link: `https://mail.google.com/mail/?view=cm&fs=1&to=<email>&su=<subject>&
 - Frontend: `cd client && npx vite build` and `npx oxlint src` show no new errors; the flow works
   end to end in the browser at 1440px and 390px in mock mode and against the real backend.
 - A first-time user gets their first useful lead in under two minutes without reading anything.
+
+## Testing account and service configuration
+
+The optional testing login uses the same session and tools as a normal account.
+Run `python scripts/configure-finder-test-login.py` from `fastapi-backend` to
+configure an email and salted password hash in the ignored backend `.env`, then
+restart the backend. On Sign in, choose **Sign in with a testing password**.
+The configured account bypasses the daily batch quota; sign-in rate limits remain.
+There is no default password or subscription gate in the application.
+
+`POST /api/finder/sessions/password` accepts `{email, password}` and returns
+`{account, token}`. It permits five attempts per source IP per 15 minutes.
+Incorrect credentials return a generic 401. Blank configuration disables access.
+For deployment, set `FINDER_TEST_EMAIL` and `FINDER_TEST_PASSWORD_HASH` separately
+in the backend environment; the local `.env` is never deployed or committed.
+
+Service access still depends on the configured providers:
+
+- `MOTHERDUCK_TOKEN` and `MOTHERDUCK_DATABASE` provide the US dataset. US country
+  aliases select its coverage; city/state terms still narrow the query.
+- `LITELLM_BASE_URL` must point to a running gateway, with a valid
+  `LITELLM_MASTER_KEY`. A localhost URL requires a local gateway process.
+- Live searches need a valid `CORECLAW_API_KEY` and sufficient provider credits.
+- Sign-in mail and weekly digests require `AGENTMAIL_API_KEY` and
+  `FINDER_FROM_INBOX`, naming an existing AgentMail inbox.
+- Social publishing requires connected destination accounts and their credentials.
+
+A failed search provider must not be shown as a successful search with no matches.
+When no usable leads remain after a provider failure, the preview reports `failed`.
+A successful search with zero results reports `empty` and suggests broader wording.

@@ -278,6 +278,8 @@ export const getPreview = pick('getPreview');
 export const createAccount = pick('createAccount');
 export const requestSignIn = pick('requestSignIn');
 export const verifySignIn = pick('verifySignIn');
+// Password login always uses the real server, including when sample mode is on.
+export const passwordSignIn = (email, password) => finder('/sessions/password', json('POST', { email, password }));
 export const me = pick('me');
 export const setOffer = pick('setOffer');
 export const listLeads = pick('listLeads');

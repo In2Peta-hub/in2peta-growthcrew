@@ -1,6 +1,6 @@
 import React, { useId, useState } from 'react';
 import { ArrowLeft, ArrowRight, Loader2, Mail } from 'lucide-react';
-import { requestSignIn, setSession, verifySignIn } from './finder/finderApi';
+import { passwordSignIn, requestSignIn, setSession, verifySignIn } from './finder/finderApi';
 
 // Same switch finderApi uses. Sample mode has no inbox to check, so we sign straight in.
 const sampleMode = () =>
@@ -9,6 +9,8 @@ const sampleMode = () =>
 export default function LoginPage({ notice = '', onSignedIn, onBack }) {
   const id = useId();
   const [email, setEmail] = useState('');
+  const [passwordMode, setPasswordMode] = useState(false);
+  const [password, setPassword] = useState('');
   const [step, setStep] = useState('form'); // 'form' | 'sent'
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
@@ -21,6 +23,14 @@ export default function LoginPage({ notice = '', onSignedIn, onBack }) {
     setBusy(true);
     setError('');
     try {
+      if (passwordMode) {
+        const { account, token } = await passwordSignIn(clean, password);
+        localStorage.removeItem('gc_finder_mock');
+        setPassword('');
+        setSession(account.email, token);
+        onSignedIn?.(account);
+        return;
+      }
       if (sample) {
         const { account, token } = await verifySignIn(clean, 'sample');
         setSession(account?.email || clean, token);
@@ -62,7 +72,7 @@ export default function LoginPage({ notice = '', onSignedIn, onBack }) {
             <>
               <h1 className="ui-title fn-login-title">Sign in</h1>
               <p className="ui-sub fn-login-sub">
-                Enter your email and we will send you a link. No password.
+                {passwordMode ? 'Use the password provided for your testing account.' : 'Enter your email and we will send you a link.'}
               </p>
 
               {notice && <p className="fn-notice" role="status">{notice}</p>}
@@ -85,15 +95,31 @@ export default function LoginPage({ notice = '', onSignedIn, onBack }) {
                   />
                 </div>
 
+                {passwordMode && (
+                  <div>
+                    <label className="ui-label" htmlFor={`${id}-password`}>Password</label>
+                    <input
+                      id={`${id}-password`}
+                      type="password"
+                      required
+                      autoComplete="current-password"
+                      value={password}
+                      onChange={(event) => setPassword(event.target.value)}
+                      className="ui-input"
+                      aria-describedby={error ? `${id}-error` : undefined}
+                    />
+                  </div>
+                )}
+
                 {error && <p id={`${id}-error`} className="fn-error" role="alert">{error}</p>}
 
-                <button type="submit" disabled={busy || !email.trim()} className="ui-btn ui-btn-primary ui-btn-lg ui-btn-block">
+                <button type="submit" disabled={busy || !email.trim() || (passwordMode && !password)} className="ui-btn ui-btn-primary ui-btn-lg ui-btn-block">
                   {busy ? (
                     <>
                       <Loader2 className="ui-spin" aria-hidden="true" />
-                      {sample ? 'Signing in' : 'Sending'}
+                      {sample || passwordMode ? 'Signing in' : 'Sending'}
                     </>
-                  ) : sample ? (
+                  ) : sample || passwordMode ? (
                     <>
                       Sign in
                       <ArrowRight aria-hidden="true" />
@@ -107,7 +133,16 @@ export default function LoginPage({ notice = '', onSignedIn, onBack }) {
                 </button>
               </form>
 
-              {sample && (
+              <button
+                type="button"
+                className="ui-btn ui-btn-ghost ui-btn-block"
+                disabled={busy}
+                onClick={() => { setPasswordMode(!passwordMode); setPassword(''); setError(''); }}
+              >
+                {passwordMode ? 'Use an email sign-in link' : 'Sign in with a testing password'}
+              </button>
+
+              {sample && !passwordMode && (
                 <p className="ui-hint fn-login-sample">
                   Sample mode: nothing is emailed and the people you see are made up.
                 </p>

@@ -55,6 +55,9 @@ class Config:
     FINDER_DIGEST_SECRET: str = os.getenv("FINDER_DIGEST_SECRET", "")
     FRONTEND_URL: str = os.getenv("FRONTEND_URL", "http://localhost:5173")
     FINDER_SCHEDULER: str = os.getenv("FINDER_SCHEDULER", "")
+    # Optional testing account; PBKDF2 hash only, never a plaintext password.
+    FINDER_TEST_EMAIL: str = os.getenv("FINDER_TEST_EMAIL", "")
+    FINDER_TEST_PASSWORD_HASH: str = os.getenv("FINDER_TEST_PASSWORD_HASH", "")
 
     # GrowthCrew AI drafting (LiteLLM gateway / OpenAI-compatible endpoints)
     LITELLM_BASE_URL: str = os.getenv("LITELLM_BASE_URL", "")

@@ -150,6 +150,16 @@ def _tokens(text: Any) -> list[str]:
     return [token for token in cleaned.split() if len(token) >= 2 and token not in STOPWORDS]
 
 
+def _location_tokens(location: str) -> list[str]:
+    # This dataset is entirely US-based. Country names identify its coverage,
+    # not text that must appear in a city/state/address. Keep narrower places.
+    location = re.sub(
+        r"\b(?:united states(?: of america)?|u\.?s\.?a\.?|u\.?s\.?)\b\.?",
+        " ", location, flags=re.I,
+    )
+    return _tokens(location)
+
+
 def _or_predicate(column: str, tokens: list[str]) -> str:
     """True when ANY token matches — tolerant to partial queries."""
     if not tokens:
@@ -243,7 +253,7 @@ def search_dataset(query: str, location: str, max_results: int) -> list[dict]:
         return []
     wanted = max(int(max_results or 20), 1)
     limit = min(max(wanted * 3, 30), 300)
-    query_tokens, location_tokens = _tokens(query), _tokens(location)
+    query_tokens, location_tokens = _tokens(query), _location_tokens(location)
 
     rows: list[tuple] = []
     con = _connection()
