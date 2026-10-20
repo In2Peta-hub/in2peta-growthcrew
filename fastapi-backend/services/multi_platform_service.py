@@ -120,11 +120,13 @@ class MultiPlatformPublisher:
         media_url: Optional[str] = None,
         fb_page_id: Optional[str] = None,
         fb_access_token: Optional[str] = None,
+        ig_business_account_id: Optional[str] = None,
         discord_webhook_url: Optional[str] = None
     ) -> Dict[str, Any]:
         """
         Broadcast a single post simultaneously to all selected platforms.
         Flow: AI Generated Post -> Broadcast -> Same post across all channels.
+        Supports multi-client channel credentials per publish.
         """
         results: Dict[str, Any] = {}
         target_platforms = [p.lower().strip() for p in (platforms or cls.SUPPORTED_PLATFORMS)]
@@ -132,6 +134,7 @@ class MultiPlatformPublisher:
         page_id = (fb_page_id or CONFIG.FB_PAGE_ID).strip()
         access_token = (fb_access_token or CONFIG.FB_PAGE_ACCESS_TOKEN).strip()
         discord_url = (discord_webhook_url or CONFIG.DISCORD_WEBHOOK_URL).strip()
+        ig_user_id = (ig_business_account_id or os.getenv("IG_BUSINESS_ACCOUNT_ID") or CONFIG.IG_BUSINESS_ACCOUNT_ID or "17841415311653642").strip()
 
         # 1. FACEBOOK
         if "facebook" in target_platforms:
@@ -158,7 +161,6 @@ class MultiPlatformPublisher:
         # 2. INSTAGRAM (Direct Meta Graph API Container & Publish)
         if "instagram" in target_platforms:
             try:
-                ig_user_id = os.getenv("IG_BUSINESS_ACCOUNT_ID", CONFIG.IG_BUSINESS_ACCOUNT_ID or "17841415311653642")
                 clean_img_url = media_url or "https://images.unsplash.com/photo-1621905251189-08b45d6a269e?w=1080&auto=format&fit=crop&q=80"
                 # Automatically format image if aspect ratio is incompatible with Instagram
                 clean_img_url = cls.format_image_for_instagram(clean_img_url)

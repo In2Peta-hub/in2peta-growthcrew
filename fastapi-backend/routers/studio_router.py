@@ -1,3 +1,5 @@
+import requests
+from fastapi.responses import RedirectResponse
 import base64
 import time
 import os
@@ -140,11 +142,17 @@ async def get_channels():
                 p for p in queue
                 if p.get("integrationId") == ch.get("id") or (p.get("platforms") and ch.get("platform") in p.get("platforms"))
             ])
-            mapped.append({**ch, "postsCount": p_count, "connected": True})
+            safe_ch = {**ch, "postsCount": p_count, "connected": True}
+            if safe_ch.get("fbAccessToken"):
+                safe_ch["fbAccessToken"] = "***"
+            mapped.append(safe_ch)
         return mapped
     except Exception as e:
         print(f"Error fetching channels: {e}")
-        return QueueService.get_channels()
+        return [
+            {**c, "fbAccessToken": "***" if c.get("fbAccessToken") else None}
+            for c in QueueService.get_channels()
+        ]
 
 @router.post("/channels")
 async def add_channel(channel: Dict[str, Any] = Body(...)):
@@ -343,10 +351,26 @@ async def create_queue_post(post: CreateQueuePostRequest):
         target_platforms = data.get("platforms") or ["facebook", "instagram", "linkedin", "x", "reddit", "youtube", "discord"]
         clean_text = data.get("fullPostText") or data.get("caption") or ""
         media_url = data.get("visualUrl") or data.get("mediaUrl")
+
+        # Resolve channel-specific credentials for multi-client isolation
+        channel = QueueService.get_channel_by_id(data.get("integrationId"))
+        if not channel and channels:
+            channel = channels[0]
+        channel = channel or {}
+
+        ch_fb_page_id = channel.get("fbPageId")
+        ch_fb_token = channel.get("fbAccessToken")
+        ch_ig_id = channel.get("igBusinessAccountId")
+        ch_discord_url = channel.get("discordWebhookUrl")
+
         broadcast_result = MultiPlatformPublisher.broadcast_to_all(
             platforms=target_platforms,
             text=clean_text,
-            media_url=media_url
+            media_url=media_url,
+            fb_page_id=ch_fb_page_id,
+            fb_access_token=ch_fb_token,
+            ig_business_account_id=ch_ig_id,
+            discord_webhook_url=ch_discord_url
         )
         final_post_id = None
         if "facebook" in broadcast_result.get("platforms", {}):
@@ -429,11 +453,27 @@ async def publish_now(post_id: str):
     media_url = post.get("visualUrl") or post.get("mediaUrl")
     target_platforms = post.get("platforms") or ["facebook", "instagram", "linkedin", "x", "reddit", "youtube", "discord"]
 
-    # Multi-platform simultaneous broadcasting: same post to all selected channels!
+    # Resolve channel-specific credentials for multi-client isolation
+    channel = QueueService.get_channel_by_id(post.get("integrationId"))
+    if not channel:
+        channels = QueueService.get_channels()
+        channel = channels[0] if channels else {}
+    channel = channel or {}
+
+    ch_fb_page_id = channel.get("fbPageId")
+    ch_fb_token = channel.get("fbAccessToken")
+    ch_ig_id = channel.get("igBusinessAccountId")
+    ch_discord_url = channel.get("discordWebhookUrl")
+
+    # Multi-platform simultaneous broadcasting using channel's dedicated credentials
     broadcast_result = MultiPlatformPublisher.broadcast_to_all(
         platforms=target_platforms,
         text=clean_text,
-        media_url=media_url
+        media_url=media_url,
+        fb_page_id=ch_fb_page_id,
+        fb_access_token=ch_fb_token,
+        ig_business_account_id=ch_ig_id,
+        discord_webhook_url=ch_discord_url
     )
 
     final_post_id = None
@@ -467,24 +507,47 @@ class CustomChannelConnectRequest(BaseModel):
 
 @router.post("/channels/custom-connect")
 async def custom_connect_channel(req: CustomChannelConnectRequest):
-    if req.platform in ("facebook", "instagram") and req.fbPageId and req.fbAccessToken:
-        CONFIG.FB_PAGE_ID = req.fbPageId.strip()
-        CONFIG.FB_PAGE_ACCESS_TOKEN = req.fbAccessToken.strip()
-    if req.platform == "discord" and req.discordWebhookUrl:
-        CONFIG.DISCORD_WEBHOOK_URL = req.discordWebhookUrl.strip()
+    clean_page_id = req.fbPageId.strip() if req.fbPageId else None
+    clean_token = req.fbAccessToken.strip() if req.fbAccessToken else None
+    clean_discord = req.discordWebhookUrl.strip() if req.discordWebhookUrl else None
+    ig_id = None
+
+    if req.platform in ("facebook", "instagram") and clean_page_id and clean_token:
+        # Automatically look up linked Instagram Business Account ID from Facebook Page
+        try:
+            lookup = requests.get(
+                f"https://graph.facebook.com/v21.0/{clean_page_id}?fields=instagram_business_account,name&access_token={clean_token}",
+                timeout=10
+            ).json()
+            if "instagram_business_account" in lookup and "id" in lookup["instagram_business_account"]:
+                ig_id = lookup["instagram_business_account"]["id"]
+                print(f"[Custom Connect] Auto-detected Instagram Business ID: {ig_id}")
+        except Exception as e:
+            print(f"[Custom Connect] Instagram lookup notice: {e}")
 
     channel_obj = {
         "id": f"chan_{int(time.time() * 1000)}",
         "name": req.name or f"Connected ({req.platform.title()})",
         "handle": req.handle or f"@{req.platform.lower()}",
         "platform": req.platform.lower(),
-        "platforms": [req.platform.lower()],
+        "platforms": ["instagram", "facebook"] if req.platform in ("instagram", "facebook") else [req.platform.lower()],
         "avatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop&q=80",
         "connected": True,
-        "provider": "Custom Auth"
+        "provider": "Custom Auth",
+        "fbPageId": clean_page_id,
+        "fbAccessToken": clean_token,
+        "igBusinessAccountId": ig_id,
+        "discordWebhookUrl": clean_discord
     }
     updated = QueueService.add_channel(channel_obj)
-    return {"success": True, "channel": channel_obj, "channels": updated}
+
+    # Return safe sanitized channel info to the client
+    safe_channel = {**channel_obj, "fbAccessToken": "***" if clean_token else None}
+    safe_channels = [
+        {**c, "fbAccessToken": "***" if c.get("fbAccessToken") else None}
+        for c in updated
+    ]
+    return {"success": True, "channel": safe_channel, "channels": safe_channels}
 
 @router.get("/facebook/status")
 async def get_facebook_status():
@@ -498,3 +561,125 @@ async def delete_post(post_id: str):
     if not success:
         raise HTTPException(status_code=404, detail="Post not found")
     return {"success": True}
+
+
+# --- META / FACEBOOK & INSTAGRAM 1-CLICK OAUTH 2.0 FLOW ---
+
+@router.get("/auth/meta/url")
+async def get_meta_oauth_url():
+    redirect_uri = f"{CONFIG.BACKEND_PUBLIC_URL.rstrip('/')}/api/auth/meta/callback"
+    scopes = [
+        "pages_show_list",
+        "pages_read_engagement",
+        "pages_manage_posts",
+        "instagram_basic",
+        "instagram_content_publish",
+        "business_management",
+        "public_profile"
+    ]
+    scope_str = ",".join(scopes)
+    encoded_redirect = requests.utils.quote(redirect_uri, safe="")
+    encoded_scope = requests.utils.quote(scope_str, safe="")
+    url = (
+        f"https://www.facebook.com/v21.0/dialog/oauth?"
+        f"client_id={CONFIG.META_APP_ID}&"
+        f"redirect_uri={encoded_redirect}&"
+        f"scope={encoded_scope}&"
+        f"response_type=code"
+    )
+    return {"url": url, "redirectUri": redirect_uri, "appId": CONFIG.META_APP_ID}
+
+@router.get("/auth/meta/login")
+async def meta_oauth_redirect():
+    data = await get_meta_oauth_url()
+    return RedirectResponse(url=data["url"])
+
+@router.get("/auth/meta/callback")
+async def meta_oauth_callback(
+    code: Optional[str] = None,
+    error: Optional[str] = None,
+    error_description: Optional[str] = None
+):
+    frontend_base = CONFIG.FRONTEND_URL.rstrip('/')
+    if error or not code:
+        err_msg = error_description or error or "Authorization canceled by user"
+        return RedirectResponse(url=f"{frontend_base}?oauth_error={requests.utils.quote(err_msg)}")
+
+    redirect_uri = f"{CONFIG.BACKEND_PUBLIC_URL.rstrip('/')}/api/auth/meta/callback"
+
+    try:
+        # Step 1: Exchange code for short-lived access token
+        token_url = (
+            f"https://graph.facebook.com/v21.0/oauth/access_token?"
+            f"client_id={CONFIG.META_APP_ID}&"
+            f"client_secret={CONFIG.META_APP_SECRET}&"
+            f"redirect_uri={requests.utils.quote(redirect_uri, safe='')}&"
+            f"code={code}"
+        )
+        token_res = requests.get(token_url, timeout=15).json()
+        short_token = token_res.get("access_token")
+        if not short_token:
+            err = token_res.get("error", {}).get("message", "Could not exchange authorization code")
+            return RedirectResponse(url=f"{frontend_base}?oauth_error={requests.utils.quote(err)}")
+
+        # Step 2: Exchange short-lived token for long-lived 60-day user token
+        long_url = (
+            f"https://graph.facebook.com/v21.0/oauth/access_token?"
+            f"grant_type=fb_exchange_token&"
+            f"client_id={CONFIG.META_APP_ID}&"
+            f"client_secret={CONFIG.META_APP_SECRET}&"
+            f"fb_exchange_token={short_token}"
+        )
+        long_res = requests.get(long_url, timeout=15).json()
+        user_token = long_res.get("access_token") or short_token
+
+        # Step 3: Fetch user's managed Facebook Pages and linked Instagram accounts
+        accounts_url = (
+            f"https://graph.facebook.com/v21.0/me/accounts?"
+            f"fields=id,name,access_token,instagram_business_account{{id,username,profile_picture_url}}&"
+            f"access_token={user_token}"
+        )
+        acc_res = requests.get(accounts_url, timeout=15).json()
+        pages = acc_res.get("data", [])
+
+        if not pages:
+            return RedirectResponse(url=f"{frontend_base}?oauth_error={requests.utils.quote('No Facebook Pages found. Please ensure you manage at least one Facebook Page.')}")
+
+        connected_count = 0
+        first_chan_name = ""
+
+        for p in pages:
+            p_id = p.get("id")
+            p_name = p.get("name")
+            p_token = p.get("access_token") # Long-lived Page token!
+            ig_data = p.get("instagram_business_account") or {}
+            ig_id = ig_data.get("id")
+            ig_username = ig_data.get("username")
+            avatar = ig_data.get("profile_picture_url") or "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop&q=80"
+
+            chan_id = f"chan_meta_{p_id}"
+            chan_name = f"{p_name} (@{ig_username})" if ig_username else p_name
+            chan_handle = f"@{ig_username}" if ig_username else f"@{p_name.lower().replace(' ', '')}"
+
+            channel_obj = {
+                "id": chan_id,
+                "name": chan_name,
+                "handle": chan_handle,
+                "platform": "instagram" if ig_id else "facebook",
+                "platforms": ["instagram", "facebook"] if ig_id else ["facebook"],
+                "avatar": avatar,
+                "connected": True,
+                "provider": "Meta 1-Click OAuth",
+                "fbPageId": p_id,
+                "fbAccessToken": p_token,
+                "igBusinessAccountId": ig_id,
+                "discordWebhookUrl": None
+            }
+            QueueService.add_channel(channel_obj)
+            connected_count += 1
+            if not first_chan_name:
+                first_chan_name = chan_name
+
+        return RedirectResponse(url=f"{frontend_base}?oauth_success=true&connected_count={connected_count}&channel_name={requests.utils.quote(first_chan_name)}")
+    except Exception as e:
+        return RedirectResponse(url=f"{frontend_base}?oauth_error={requests.utils.quote(str(e))}")
