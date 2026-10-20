@@ -158,7 +158,7 @@ def update_me(body: OfferBody, request: Request):
 def leads(request: Request, status: str = "all"):
     account = _require_account(request)
     if status not in ("pending", "kept", "skipped", "all"):
-        raise GrowthcrewError("status must be pending, kept, skipped or all.", 400, "INVALID_STATUS")
+        raise GrowthcrewError("That view of your list does not exist. Reload the page.", 400, "INVALID_STATUS")
     return {"leads": finder.list_leads(account["email"], status)}
 
 

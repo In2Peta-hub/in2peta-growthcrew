@@ -1528,7 +1528,7 @@ def list_leads(account_email: str, status: str = "all") -> list[dict]:
 def _owned_lead(account_email: str, key: str) -> dict:
     lead = finder_store.get_lead(key)
     if not lead or lead.get("account") != _text(account_email).lower():
-        raise GrowthcrewError("Lead not found.", 404, "LEAD_NOT_FOUND")
+        raise GrowthcrewError("That person is no longer on your list. Reload the page.", 404, "LEAD_NOT_FOUND")
     return lead
 
 
@@ -1545,7 +1545,7 @@ def decide(account_email: str, key: str, decision: str) -> dict:
     elif decision == "undo":
         lead["status"] = "pending"
     else:
-        raise GrowthcrewError("decision must be keep, skip or undo.", 400, "INVALID_DECISION")
+        raise GrowthcrewError("That choice did not go through. Try again.", 400, "INVALID_DECISION")
     finder_store.save_lead(lead)
     return {"lead": public_lead(lead)}
 
@@ -1690,7 +1690,7 @@ def _consume_batch_quota(account: dict) -> None:
     used = int(counts.get(today) or 0)
     if used >= BATCH_DAILY_LIMIT:
         raise GrowthcrewError(
-            "You have reached today's limit of 20 batches. Try again tomorrow.",
+            "You have reached today's limit of 20 searches. Try again tomorrow.",
             429,
             "BATCH_LIMIT",
         )

@@ -53,8 +53,8 @@ const STREET_WIDE = {
 const LEAD_STOPS = [
   { title: 'Found', note: 'Matches the trade and place you described.', status: 'New' },
   { title: 'Kept', note: 'You choose who belongs on your list.', status: 'Kept' },
-  { title: 'Written to', note: 'Copy a personal first message into your own Gmail.', status: 'Message ready' },
-  { title: 'Every Monday', note: '10 more people arrive for you to review.', status: 'Weekly' },
+  { title: 'First message', note: 'Copy a personal first message into your own Gmail.', status: 'Message ready' },
+  { title: 'Every Monday', note: 'Turn it on and 10 more people arrive each week.', status: 'Weekly' },
 ];
 
 const COMPARISON = [
@@ -62,7 +62,7 @@ const COMPARISON = [
   ['Choose who fits', 'Keep or skip each person', 'Clean a long list by hand'],
   ['First message', 'Written for each person you keep', 'One template for everyone'],
   ['Send it', 'Copy it or open it in your Gmail', 'Move between tools'],
-  ['Next week', '10 more arrive on Monday', 'Start over'],
+  ['Next week', '10 more every Monday, if you turn it on', 'Start over'],
 ];
 
 const useReveal = (rootRef) => {
@@ -175,7 +175,7 @@ export default function LandingPage({ onLoginClick, onSignedIn, onOpenList }) {
               <span className="gc-line"><span style={{ '--i': 1 }}>talk to next?</span></span>
             </h1>
             <p className="gc-hero-sub gc-load" style={{ '--i': 2 }}>
-              Describe the people you want to meet. See five good matches before you sign up.
+              Describe the people you want to meet. See up to five good matches before you sign up.
             </p>
             <div className="gc-hero-form gc-load" style={{ '--i': 3 }}>
               <DescribeBox
@@ -217,7 +217,7 @@ export default function LandingPage({ onLoginClick, onSignedIn, onOpenList }) {
           <div className="gc-street-copy">
             <h2 className="gc-h2" id={`${idBase}-street`} data-reveal>Every shopfront has someone</h2>
             <p className="gc-lead" data-reveal style={{ '--i': 1 }}>
-              Name a trade and a place. GrowthCrew looks through its lead database and live listings for people who fit.
+              Name a trade and a place. GrowthCrew searches its business records and the web for people who fit.
             </p>
           </div>
           <figure className="gc-street-wide" data-reveal>
@@ -246,7 +246,7 @@ export default function LandingPage({ onLoginClick, onSignedIn, onOpenList }) {
         <section className="gc-strip" id="gc-how" aria-labelledby={`${idBase}-how`}>
           {LEAD_STOPS.map((stop, i) => (
             <div className={`gc-field gc-field-${i}`} key={stop.title} data-reveal style={{ '--i': i }}>
-              {i === 0 && <h2 className="gc-strip-title" id={`${idBase}-how`}>One lead, four stops</h2>}
+              {i === 0 && <h2 className="gc-strip-title" id={`${idBase}-how`}>One person, four stops</h2>}
               <article className="gc-card" data-ui aria-label={`Lead card: ${stop.status}`}>
                 <div className="gc-card-top">
                   <span className="gc-card-name">Smile Craft Dental</span>
@@ -287,11 +287,11 @@ export default function LandingPage({ onLoginClick, onSignedIn, onOpenList }) {
               <span className="gc-line"><span>one sentence.</span></span>
             </h2>
             <p className="gc-lead" data-reveal>
-              You will see five matches before we ask for your email.
+              You'll see who matches before we ask for your email.
             </p>
           </div>
           <button type="button" className="gc-btn gc-btn-light gc-btn-lg gc-final-button" data-reveal onClick={focusHero}>
-            Describe who you need <ArrowRight size={18} aria-hidden="true" />
+            Find people <ArrowRight size={18} aria-hidden="true" />
           </button>
         </section>
       </main>

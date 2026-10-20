@@ -496,6 +496,7 @@ export default function ReviewScreen({
                   {batch.state === 'empty' ? (
                     <>
                       <p className="ui-sub">No new people for that description yet.</p>
+                      <button type="button" className="ui-btn" onClick={openHeaderRefine}>Change your description</button>
                       {batch.suggestions.length > 0 && (
                         <>
                           <p className="ui-hint">Try one of these instead:</p>
@@ -541,9 +542,10 @@ export default function ReviewScreen({
               )}
 
             {view !== 'pending' && rows.length === 0 && (
-              <p className="ui-sub fn-quiet">
-                {view === 'kept' ? 'Nobody kept yet.' : 'Nobody skipped yet.'}
-              </p>
+              <div className="fn-quiet">
+                <p className="ui-sub">{view === 'kept' ? 'Nobody kept yet.' : 'Nobody skipped yet.'}</p>
+                <button type="button" className="ui-link" onClick={() => setView('pending')}>Back to people to review</button>
+              </div>
             )}
 
             {account && <AutopilotCard account={account} onToggle={handleAutopilotToggle} />}

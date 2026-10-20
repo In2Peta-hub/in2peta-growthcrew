@@ -64,7 +64,8 @@ export default function PreviewList({
       {status === 'rate-limited' && (
         <div className="gc-state-message">
           <h2>Too many searches for now</h2>
-          <p>We limit searches to keep live listings available. Please try again later.</p>
+          <p>We limit searches from one address. Wait a few minutes, then try again.</p>
+          <button type="button" className="gc-btn gc-btn-dark" onClick={onRetry}>Try again</button>
         </div>
       )}
 

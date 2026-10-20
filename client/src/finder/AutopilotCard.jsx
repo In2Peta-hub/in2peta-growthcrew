@@ -1,5 +1,5 @@
 // The autopilot card at the end of the list. One switch turns the Monday
-// email on or off; one "Connect" button opens a menu whose only item is a
+// email on or off; one "Export" button opens a menu whose only item is a
 // CSV download of the kept leads.
 
 import React, { useEffect, useMemo, useRef, useState } from 'react';
@@ -86,7 +86,7 @@ export default function AutopilotCard({ account, onToggle }) {
           aria-expanded={menuOpen}
           onClick={() => setMenuOpen((open) => !open)}
         >
-          Connect
+          Export
         </button>
         {menuOpen && (
           <div role="menu" className="ui-menu fn-connect-menu" style={{ '--ui-origin': 'top right' }}>
@@ -101,7 +101,7 @@ export default function AutopilotCard({ account, onToggle }) {
             >
               <Download aria-hidden="true" /> Download CSV
             </button>
-            <p className="fn-connect-hint">Opens in Google Sheets, Excel or any CRM.</p>
+            <p className="fn-connect-hint">Google Sheets, Excel and most CRMs can import it.</p>
           </div>
         )}
       </div>

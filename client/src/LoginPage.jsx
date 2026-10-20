@@ -122,8 +122,13 @@ export default function LoginPage({ notice = '', onSignedIn, onBack }) {
                 It works for 30 minutes.
               </p>
               <p className="ui-hint">
-                Nothing yet? Look in spam, or start with a search on the home page if you are new here.
+                Nothing yet? Look in spam. New here? Start with a search instead.
               </p>
+              {onBack && (
+                <button type="button" onClick={onBack} className="ui-btn ui-btn-block">
+                  Start a search
+                </button>
+              )}
               <button type="button" onClick={useDifferentEmail} className="ui-btn ui-btn-ghost ui-btn-block">
                 Use a different email
               </button>
