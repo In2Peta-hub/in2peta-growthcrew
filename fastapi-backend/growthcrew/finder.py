@@ -1770,6 +1770,7 @@ def start_batch(account_email: str, count: int, refine: dict | None = None) -> s
             "leads": [],
             "suggestions": [],
             "count": max(1, min(int(count or 10), 25)),
+            "refine": refine,
             "createdAt": _now_iso(),
         }
     )
@@ -1859,7 +1860,7 @@ def _batch_worker(batch_id: str) -> None:
     try:
         account = finder_store.get_account(batch.get("account")) or {}
         wanted = int(batch.get("count") or 10)
-        picked, suggestions, _understood = _build_batch_leads(account, wanted)
+        picked, suggestions, _understood = _build_batch_leads(account, wanted, batch.get("refine"))
 
         if picked:
             number = _batch_number(batch["account"])

@@ -614,3 +614,23 @@ def test_successful_empty_search_still_suggests_broader_description(monkeypatch)
     monkeypatch.setattr(finder.service, '_coreclaw_configured', lambda: False)
     finder._preview_worker(preview_id)
     assert finder.preview_payload(preview_id)['status'] == 'empty'
+
+
+def test_batch_worker_applies_requested_refinement(tmp_path, monkeypatch):
+    from growthcrew import finder, finder_store
+    monkeypatch.setattr(finder_store._STORE, 'path', tmp_path / 'finder.json')
+    account = {'email': 'refine@example.com', 'understood': {'who': 'dentists', 'where': 'Austin'}}
+    finder_store.save_account(account)
+    class NoThread:
+        def __init__(self, *args, **kwargs): pass
+        def start(self): pass
+    monkeypatch.setattr(finder.threading, 'Thread', NoThread)
+    captured = []
+    def collect(understood, wanted):
+        captured.append(understood)
+        return []
+    monkeypatch.setattr(finder, '_collect_records', collect)
+    bid = finder.start_batch(account['email'], 10, {'who': 'SaaS founders', 'where': 'USA'})
+    finder._batch_worker(bid)
+    assert captured == [{'who': 'SaaS founders', 'where': 'USA'}]
+    assert finder_store.get_account(account['email'])['understood'] == captured[0]
