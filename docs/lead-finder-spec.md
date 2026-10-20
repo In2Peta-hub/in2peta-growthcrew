@@ -119,13 +119,14 @@ Refine = {
 | `POST /api/finder/sessions` | none, rate-limited | `{email}` | Always `202 {sent: true}` (no account enumeration). If the account exists, emails a sign-in link `FRONTEND_URL/?signin=<code>&email=<email>` (code: one-time, 30 min). |
 | `POST /api/finder/sessions/verify` | none | `{email, code}` | `{account, token}` or 401 |
 | `GET /api/finder/me` | token | | `{account}` |
+| `PUT /api/finder/me` | token | `{offer: string (3–200)}` | `{account}`. Stores what the user sells (first person) and fills it into unedited messages that still carry the placeholder line. |
 | `GET /api/finder/leads?status=pending\|kept\|skipped\|all` | token | | `{leads: Lead[]}` newest batch first |
-| `POST /api/finder/leads/{key}/decision` | token | `{decision:"keep"\|"skip"}` | `{lead}`. Keep writes the first message (AI, ≤ 30s, template fallback). Re-deciding is allowed (undo). |
+| `POST /api/finder/leads/{key}/decision` | token | `{decision:"keep"\|"skip"\|"undo"}` | `{lead}`. Keep writes the first message (AI, ≤ 30s, template fallback). Undo puts the lead back to pending. Skipping keeps any written message. |
 | `PUT /api/finder/leads/{key}/message` | token | `{subject, body}` | `{lead}` (`edited: true`) |
 | `POST /api/finder/batches` | token, ≤ 20/day/account | `{count?: 10, refine?: Refine}` | `202 {batchId}` |
 | `GET /api/finder/batches/{batchId}` | token | | `{status:"running"\|"done"\|"empty"\|"failed", leads: Lead[], suggestions: string[]}` |
 | `PUT /api/finder/autopilot` | token | `{enabled: boolean, count?: number (5–25)}` | `{account}` |
-| `GET /api/finder/export.csv` | token (also accepts `?token=` so a plain link can download) | | CSV of kept leads: name, role, company, email, phone, website, city, why, subject, message |
+| `GET /api/finder/export.csv` | token (header only, so it never lands in access logs; the client downloads via fetch + blob) | | CSV of kept leads: name, role, company, email, phone, website, city, why, subject, message |
 | `POST /api/finder/digests/run` | header `X-Digest-Secret` = `FINDER_DIGEST_SECRET` (if unset: localhost only) | | `{sent: n, skipped: n}` |
 
 ### Behaviour

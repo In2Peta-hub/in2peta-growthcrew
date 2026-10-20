@@ -23,18 +23,19 @@ import {
   Clock,
   CloudUpload,
   LogOut,
-  Mail,
   X,
   ChevronDown,
   ThumbsUp,
   Repeat2,
   BarChart3,
   ArrowBigUp,
-  ArrowBigDown
+  ArrowBigDown,
+  Loader2
 } from 'lucide-react';
 import LoginPage from './LoginPage';
-import OutreachPanel from './OutreachPanel';
 import LandingPage from './LandingPage';
+import ReviewScreen from './finder/ReviewScreen';
+import { clearSession, getSession, verifySignIn, setSession } from './finder/finderApi';
 import { API_BASE } from './api';
 import Segmented from './ui/Segmented';
 
@@ -122,69 +123,12 @@ const SAMPLE_IN2PETA_MEDIA = [
   },
 ];
 
-export default function App({ defaultTab = 'studio', apiUrl } = {}) {
-  // Authentication State - defaults to null on fresh open so login is shown first
-  const [currentUser, setCurrentUser] = useState(() => {
-    try {
-      const saved = localStorage.getItem('growthcrew_auth');
-      if (!saved) return null;
-      const parsed = JSON.parse(saved);
-      if (parsed.name === 'Scalora Admin') {
-        return {
-          email: 'aarya@in2peta.com',
-          name: 'Aarya',
-          initial: 'A',
-          role: 'Admin',
-        };
-      }
-      return {
-        ...parsed,
-        name: parsed.name || 'Aarya',
-        initial: parsed.initial || (parsed.name ? parsed.name[0].toUpperCase() : 'A'),
-      };
-    } catch {
-      return null;
-    }
-  });
-
-  // The public landing page introduces both products before sign-in.
-  const [viewMode, setViewMode] = useState('landing');
-  const [pendingProduct, setPendingProduct] = useState(null);
-
-  const handleLogin = (user) => {
-    const activeUser = {
-      email: user?.email || 'aarya@in2peta.com',
-      name: user?.name || 'Aarya',
-      initial: user?.initial || 'A',
-      role: user?.role || 'Admin',
-    };
-    setCurrentUser(activeUser);
-    localStorage.setItem('growthcrew_auth', JSON.stringify(activeUser));
-    if (pendingProduct) {
-      setProductMode(pendingProduct === 'leadgen' ? 'growthcrew' : 'social');
-      setPendingProduct(null);
-      setViewMode('app');
-    } else {
-      setViewMode('landing');
-    }
-    showToast(`Welcome back, ${activeUser.name}!`, 'success');
-  };
-
-  const handleLogout = () => {
-    setCurrentUser(null);
-    localStorage.removeItem('growthcrew_auth');
-    setPendingProduct(null);
-    setViewMode('landing');
-    showToast('Signed out successfully.', 'info');
-  };
-
-  // Product mode: Social Studio (PostPulse) vs GrowthCrew Outreach
-  const [productMode, setProductMode] = useState(defaultTab === 'outreach' ? 'growthcrew' : 'social');
-  const [activeTab, setActiveTab] = useState(defaultTab === 'outreach' ? 'studio' : defaultTab); // 'studio' | 'queue' | 'history'
+// Social Studio. Reached only from the account menu on the review screen.
+function SocialStudio({ currentUser, onBack, onLogout, defaultTab = 'studio' }) {
+  const [activeTab, setActiveTab] = useState(defaultTab); // 'studio' | 'queue' | 'history'
   const [showBeginnerGuide, setShowBeginnerGuide] = useState(true);
   const [accountMenuOpen, setAccountMenuOpen] = useState(false);
   const accountMenuRef = useRef(null);
-  const isGrowthcrew = productMode === 'growthcrew';
 
   useEffect(() => {
     if (!accountMenuOpen) return undefined;
@@ -204,13 +148,6 @@ export default function App({ defaultTab = 'studio', apiUrl } = {}) {
       document.removeEventListener('pointerdown', closeOnOutside);
     };
   }, [accountMenuOpen]);
-
-  const switchProductMode = (mode) => {
-    setProductMode(mode);
-    if (mode === 'social' && activeTab === 'outreach') {
-      setActiveTab('studio');
-    }
-  };
 
   // Channels & Account
   const [channels, setChannels] = useState([
@@ -329,11 +266,10 @@ export default function App({ defaultTab = 'studio', apiUrl } = {}) {
   };
 
   useEffect(() => {
-    if (viewMode !== 'app' || !currentUser) return;
     fetchData();
     const interval = setInterval(fetchData, 12000);
     return () => clearInterval(interval);
-  }, [viewMode, currentUser]);
+  }, []);
 
   // Handle Connecting Custom Channel & Credentials
   const handleConnectInstagram = async (e) => {
@@ -666,38 +602,6 @@ export default function App({ defaultTab = 'studio', apiUrl } = {}) {
     }
   };
 
-  if (viewMode === 'login' || (viewMode === 'app' && !currentUser)) {
-    return (
-      <LoginPage
-        onLogin={handleLogin}
-        onBack={() => {
-          setPendingProduct(null);
-          setViewMode('landing');
-        }}
-      />
-    );
-  }
-
-  // 2. If viewMode is 'landing', render Dashboard (Scalora Marketing Landing Page)
-  if (viewMode === 'landing') {
-    return (
-      <LandingPage
-        currentUser={currentUser}
-        onLogout={handleLogout}
-        onNavigate={(mode) => {
-          if (!currentUser) {
-            setPendingProduct(mode);
-            setViewMode('login');
-            return;
-          }
-          switchProductMode(mode === 'leadgen' ? 'growthcrew' : 'social');
-          setViewMode('app');
-        }}
-        onLoginClick={() => setViewMode('login')}
-      />
-    );
-  }
-
   const queueList = queueData.queue || [];
   const pendingCount = queueList.filter((p) => p.status === 'PENDING_REVIEW').length;
   const filteredQueue =
@@ -718,17 +622,15 @@ export default function App({ defaultTab = 'studio', apiUrl } = {}) {
       <header>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 min-h-18 flex flex-wrap items-center justify-between gap-3 py-3">
           <div className="flex items-center gap-3 min-w-0">
-            <button type="button" onClick={() => setViewMode('landing')} className="ui-btn ui-btn-ghost ui-btn-icon shrink-0" aria-label="GrowthCrew home">
+            <button type="button" onClick={onBack} className="ui-btn ui-btn-ghost ui-btn-icon shrink-0" aria-label="Back to your leads">
               <img className="brand-logo" src="/brand/in2peta-logo.png" alt="" width="40" height="40" />
             </button>
-            <h1 className="ui-panel-title truncate text-base sm:text-lg">GrowthCrew <span className="hidden sm:inline text-[var(--ui-muted)] font-normal">/ {isGrowthcrew ? 'Lead Gen' : 'Social Studio'}</span></h1>
-            <button type="button" onClick={() => setViewMode('landing')} className="ui-btn ui-btn-ghost ui-btn-sm hidden sm:inline-flex">
-              <ArrowRight className="rotate-180" aria-hidden="true" /> Back to home
+            <h1 className="ui-panel-title truncate text-base sm:text-lg">GrowthCrew <span className="hidden sm:inline text-[var(--ui-muted)] font-normal">/ Social Studio</span></h1>
+            <button type="button" onClick={onBack} className="ui-btn ui-btn-ghost ui-btn-sm hidden sm:inline-flex">
+              <ArrowRight className="rotate-180" aria-hidden="true" /> Back to your leads
             </button>
           </div>
           <div className="flex items-center gap-2 shrink-0 max-sm:ms-auto">
-            {!isGrowthcrew && (
-              <>
                 <a href={IN2PETA_EXPLORE_URL} target="_blank" rel="noopener noreferrer" className="ui-link text-[13px] hidden sm:inline-flex items-center gap-1.5">
                   Explore models <ExternalLink className="w-3.5 h-3.5" aria-hidden="true" />
                 </a>
@@ -742,20 +644,19 @@ export default function App({ defaultTab = 'studio', apiUrl } = {}) {
                   <span className="hidden md:inline">{settings.autoApprove ? 'Auto-publish on' : 'Review before publish'}</span>
                   <span className="hidden sm:inline md:hidden">Auto-publish</span>
                 </button>
-              </>
-            )}
             <div className="relative" ref={accountMenuRef}>
-              <button type="button" onClick={() => setAccountMenuOpen((open) => !open)} aria-expanded={accountMenuOpen} aria-haspopup="menu" aria-label={`Account menu for ${currentUser?.name || 'Aarya'}`} className="ui-btn ui-btn-ghost ui-btn-icon rounded-full bg-[var(--ui-raised)]">
-                {currentUser?.initial || 'A'}
+              <button type="button" onClick={() => setAccountMenuOpen((open) => !open)} aria-expanded={accountMenuOpen} aria-haspopup="menu" aria-label={`Account menu for ${currentUser.email}`} className="ui-btn ui-btn-ghost ui-btn-icon rounded-full bg-[var(--ui-raised)]">
+                {currentUser.initial}
               </button>
               {accountMenuOpen && (
                 <div role="menu" className="ui-menu absolute end-0 [inset-block-start:100%] mt-2 w-60 z-50" style={{ '--ui-origin': 'top right' }}>
                   <div className="px-3 py-2">
-                    <p className="text-sm font-semibold truncate">{currentUser?.name || 'Aarya'}</p>
-                    <p className="ui-hint truncate">{currentUser?.email || 'aarya@in2peta.com'}</p>
-                    <span className="ui-badge mt-2">Admin</span>
+                    <p className="ui-hint truncate">{currentUser.email}</p>
                   </div>
-                  <button type="button" role="menuitem" onClick={() => { setAccountMenuOpen(false); handleLogout(); }} className="ui-menu-item">
+                  <button type="button" role="menuitem" onClick={() => { setAccountMenuOpen(false); onBack(); }} className="ui-menu-item">
+                    <ArrowRight className="rotate-180 w-4 h-4" aria-hidden="true" /> Back to your leads
+                  </button>
+                  <button type="button" role="menuitem" onClick={() => { setAccountMenuOpen(false); onLogout(); }} className="ui-menu-item">
                     <LogOut aria-hidden="true" className="w-4 h-4" /> Sign out
                   </button>
                 </div>
@@ -767,22 +668,12 @@ export default function App({ defaultTab = 'studio', apiUrl } = {}) {
 
       <nav className="px-4 sm:px-8" aria-label="Workspace">
         <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-2 py-2">
-          <div className="ui-tabs">
-            <button type="button" onClick={() => switchProductMode('social')} className="ui-tab" aria-selected={!isGrowthcrew}>
-              <Sparkles aria-hidden="true" /> Social Studio
-            </button>
-            <button type="button" onClick={() => switchProductMode('growthcrew')} className="ui-tab" aria-selected={isGrowthcrew}>
-              <Mail aria-hidden="true" /> Lead Gen
-            </button>
-          </div>
-          {!isGrowthcrew && (
-            <div className="ui-tabs max-w-full" aria-label="Social Studio views">
+          <div className="ui-tabs max-w-full" aria-label="Social Studio views">
               <button type="button" onClick={() => setActiveTab('studio')} className="ui-tab" aria-selected={activeTab === 'studio'}><Sparkles aria-hidden="true" /> Create post</button>
               <button type="button" onClick={() => setActiveTab('queue')} className="ui-tab" aria-selected={activeTab === 'queue'}><Layers aria-hidden="true" /> Review & queue {pendingCount > 0 && <span className="ui-badge">{pendingCount}</span>}</button>
               <button type="button" onClick={() => setActiveTab('history')} className="ui-tab" aria-selected={activeTab === 'history'}><CheckCircle2 aria-hidden="true" /> Published posts <span className="ui-badge">{publishedPosts.length}</span></button>
-            </div>
-          )}
-          {!isGrowthcrew && <button type="button" onClick={() => setShowBeginnerGuide(!showBeginnerGuide)} className="ui-btn ui-btn-ghost ui-btn-sm hidden lg:inline-flex"><HelpCircle aria-hidden="true" />{showBeginnerGuide ? 'Hide guide' : 'Workflow guide'}</button>}
+          </div>
+          <button type="button" onClick={() => setShowBeginnerGuide(!showBeginnerGuide)} className="ui-btn ui-btn-ghost ui-btn-sm hidden lg:inline-flex"><HelpCircle aria-hidden="true" />{showBeginnerGuide ? 'Hide guide' : 'Workflow guide'}</button>
         </div>
       </nav>
       </div>
@@ -790,7 +681,7 @@ export default function App({ defaultTab = 'studio', apiUrl } = {}) {
       {/* Main Workspace */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1 w-full space-y-8">
         {/* Workflow guide */}
-        {showBeginnerGuide && !isGrowthcrew && (
+        {showBeginnerGuide && (
           <div className="ui-panel space-y-4">
             <div className="flex items-center justify-between mb-4">
               <h2 className="ui-panel-title">How it works</h2>
@@ -831,13 +722,7 @@ export default function App({ defaultTab = 'studio', apiUrl } = {}) {
           </div>
         )}
 
-        {isGrowthcrew && (
-          <section aria-label="GrowthCrew outreach">
-            <OutreachPanel />
-          </section>
-        )}
-
-        {!isGrowthcrew && activeTab === 'studio' && (
+        {activeTab === 'studio' && (
           <div className="ui-view grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
             {/* Left Column: STEP 1 (Media Hub) + STEP 2 (Caption studio) */}
             <div className="lg:col-span-7 space-y-6">
@@ -1502,7 +1387,7 @@ export default function App({ defaultTab = 'studio', apiUrl } = {}) {
         )}
 
         {/* TAB 2: REVIEW & SCHEDULED QUEUE */}
-        {!isGrowthcrew && activeTab === 'queue' && (
+        {activeTab === 'queue' && (
           <div className="ui-view space-y-6">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2">
               <div>
@@ -1636,7 +1521,7 @@ export default function App({ defaultTab = 'studio', apiUrl } = {}) {
         )}
 
         {/* TAB 3: PUBLISHED HISTORY */}
-        {!isGrowthcrew && activeTab === 'history' && (() => {
+        {activeTab === 'history' && (() => {
           const allPublished = (publishedPosts && publishedPosts.length > 0)
             ? publishedPosts
             : (queueData.queue || []).filter((p) => p.status === 'PUBLISHED');
@@ -2063,5 +1948,160 @@ export default function App({ defaultTab = 'studio', apiUrl } = {}) {
         </div>
       )}
     </div>
+  );
+}
+
+/* ── Routing ─────────────────────────────────────────────────────
+   The finder session is the signed-in state:
+     landing  → (LandingPage calls onSignedIn) → review
+     ?signin=<code>&email=<email> → verify → review
+     ?autopilot=off → remembered, applied once signed in
+   Social Studio is reachable only from the account menu on review. */
+
+const AUTOPILOT_OFF_KEY = 'gc_finder_autopilot_off';
+
+function readEntryParams() {
+  const params = new URLSearchParams(window.location.search);
+  return {
+    signin: params.get('signin') || '',
+    email: params.get('email') || '',
+    autopilotOff: params.get('autopilot') === 'off',
+  };
+}
+
+const userFromEmail = (email) => ({
+  email,
+  name: email.split('@')[0],
+  initial: (email[0] || 'G').toUpperCase(),
+});
+
+function SigningIn() {
+  return (
+    <div className="fn-center" role="status">
+      <Loader2 className="ui-spin" aria-hidden="true" />
+      <p className="ui-sub">Signing you in…</p>
+    </div>
+  );
+}
+
+export default function App() {
+  const [entry] = useState(readEntryParams);
+  const [session, setSessionState] = useState(getSession);
+  const [signedInAccount, setSignedInAccount] = useState(null);
+  const [loginNotice, setLoginNotice] = useState('');
+  const [autopilotOff, setAutopilotOff] = useState(
+    () => entry.autopilotOff || localStorage.getItem(AUTOPILOT_OFF_KEY) === '1'
+  );
+  const [view, setView] = useState(() => {
+    if (entry.signin && entry.email) return 'verifying';
+    if (getSession()) return 'review';
+    return entry.autopilotOff ? 'login' : 'landing';
+  });
+  const verifyStarted = useRef(false);
+
+  // Strip one-time params from the address bar and remember the "turn off" request.
+  useEffect(() => {
+    if (entry.autopilotOff) localStorage.setItem(AUTOPILOT_OFF_KEY, '1');
+    if (entry.signin || entry.email || entry.autopilotOff) {
+      const url = new URL(window.location.href);
+      ['signin', 'email', 'autopilot'].forEach((name) => url.searchParams.delete(name));
+      window.history.replaceState(null, '', `${url.pathname}${url.search}${url.hash}`);
+    }
+  }, [entry]);
+
+  // Sign-in link from the email. The code works once, so guard against a second run.
+  useEffect(() => {
+    if (!entry.signin || !entry.email || verifyStarted.current) return;
+    verifyStarted.current = true;
+    verifySignIn(entry.email, entry.signin)
+      .then(({ account, token }) => {
+        setSession(account?.email || entry.email, token);
+        setSessionState(getSession());
+        setSignedInAccount(account || null);
+        setView('review');
+      })
+      .catch(() => {
+        setLoginNotice('That sign-in link has expired or was already used. Enter your email and we will send a new one.');
+        setView('login');
+      });
+  }, [entry]);
+
+  const handleSignedIn = (account) => {
+    setSessionState(getSession());
+    setSignedInAccount(account || null);
+    setLoginNotice('');
+    setView('review');
+  };
+
+  const handleSignOut = () => {
+    clearSession();
+    localStorage.removeItem('growthcrew_auth');
+    setSessionState(null);
+    setSignedInAccount(null);
+    setView('landing');
+  };
+
+  // The finder token stopped working; back to the sign-in page.
+  const handleSessionExpired = () => {
+    clearSession();
+    setSessionState(null);
+    setSignedInAccount(null);
+    setView('login');
+  };
+
+  const handleAutopilotHandled = () => {
+    localStorage.removeItem(AUTOPILOT_OFF_KEY);
+    setAutopilotOff(false);
+  };
+
+  const currentUser = session ? userFromEmail(session.email) : null;
+
+  // The session can disappear (cleared in another tab); never show the review screen without one.
+  const activeView = !session && (view === 'review' || view === 'social') ? 'login' : view;
+
+  if (activeView === 'verifying') return <SigningIn />;
+
+  if (activeView === 'login') {
+    return (
+      <LoginPage
+        notice={loginNotice || (autopilotOff ? 'Sign in to turn off the weekly email.' : '')}
+        onSignedIn={handleSignedIn}
+        onBack={() => setView('landing')}
+      />
+    );
+  }
+
+  if (activeView === 'review') {
+    return (
+      <ReviewScreen
+        key={session.email}
+        session={session}
+        initialAccount={signedInAccount}
+        turnAutopilotOff={autopilotOff}
+        onAutopilotHandled={handleAutopilotHandled}
+        onHome={() => setView('landing')}
+        onOpenSocial={() => setView('social')}
+        onSignOut={handleSignOut}
+        onSessionExpired={handleSessionExpired}
+      />
+    );
+  }
+
+  if (activeView === 'social') {
+    return (
+      <SocialStudio
+        currentUser={currentUser}
+        onBack={() => setView('review')}
+        onLogout={handleSignOut}
+      />
+    );
+  }
+
+  return (
+    <LandingPage
+      onLoginClick={() => setView(session ? 'review' : 'login')}
+      onSignedIn={handleSignedIn}
+      onOpenList={() => setView('review')}
+    />
   );
 }

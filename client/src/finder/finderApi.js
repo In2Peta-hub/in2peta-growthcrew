@@ -67,17 +67,32 @@ const real = {
   requestSignIn: (email) => finder('/sessions', json('POST', { email })),
   verifySignIn: (email, code) => finder('/sessions/verify', json('POST', { email, code })),
   me: () => finder('/me'),
+  setOffer: (offer) => finder('/me', json('PUT', { offer })),
   listLeads: (status = 'all') => finder(`/leads?status=${encodeURIComponent(status)}`),
   decide: (key, decision) => finder(`/leads/${encodeURIComponent(key)}/decision`, json('POST', { decision })),
   saveMessage: (key, subject, body) => finder(`/leads/${encodeURIComponent(key)}/message`, json('PUT', { subject, body })),
   startBatch: (count = 10, refine) => finder('/batches', json('POST', { count, refine })),
   getBatch: (batchId) => finder(`/batches/${encodeURIComponent(batchId)}`),
   setAutopilot: (enabled, count) => finder('/autopilot', json('PUT', { enabled, count })),
-  exportUrl: () => {
-    const session = getSession();
-    return session ? apiUrl(`/api/finder/export.csv?token=${encodeURIComponent(session.token)}`) : '#';
+  // Header auth only (a ?token= link would land in server access logs), so the
+  // file is fetched and handed to the browser as a blob.
+  async downloadExport() {
+    const response = await fetch(apiUrl('/api/finder/export.csv'), { headers: authHeaders() });
+    if (!response.ok) throw new Error(`Download failed (${response.status})`);
+    saveBlob(await response.blob());
   }
 };
+
+function saveBlob(blob) {
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = 'growthcrew-leads.csv';
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
 
 /* ── Mock client ─────────────────────────────────────────────── */
 
@@ -185,6 +200,15 @@ const mock = {
     if (!mockState.account) await mock.createAccount(getSession()?.email || 'you@example.com');
     return { account: mockAccount() };
   },
+  async setOffer(offer) {
+    await wait(300);
+    const text = /^(we|i|our|my)\b/i.test(offer) ? offer : `We offer ${offer}`;
+    mockState.account.understood = { ...mockState.account.understood, offer: text };
+    mockState.leads.forEach((l) => {
+      if (l.message && !l.message.edited) l.message.body = l.message.body.replace(OFFER_PLACEHOLDER, `${text}.`);
+    });
+    return { account: mockAccount() };
+  },
   async listLeads(status = 'all') {
     await wait(250);
     if (!mockState.account) await mock.me();
@@ -195,12 +219,12 @@ const mock = {
     await wait(decision === 'keep' ? 1200 : 150);
     const lead = mockState.leads.find((l) => l.key === key);
     if (!lead) throw new Error('Lead not found');
-    lead.status = decision === 'keep' ? 'kept' : 'skipped';
+    lead.status = { keep: 'kept', skip: 'skipped', undo: 'pending' }[decision];
     if (decision === 'keep' && !lead.message) {
       const first = lead.name ? lead.name.split(' ')[0] : 'there';
       lead.message = {
         subject: `A quick question for ${lead.company}`,
-        body: `Hi ${first},\n\nI came across ${lead.company} while looking at clinics in ${lead.city}. We build fast websites for dental clinics, and I think there may be a simple win for you there.\n\nWould a 15-minute call next week be useful?\n\nBest,`,
+        body: `Hi ${first},\n\nI came across ${lead.company} in ${lead.city}.\n\n${mockState.account?.understood?.offer ? `${mockState.account.understood.offer}.` : OFFER_PLACEHOLDER}\n\nWould a short call next week be useful? If it is not relevant, tell me and I will not follow up.\n\nBest,`,
         edited: false
       };
     }
@@ -238,10 +262,10 @@ const mock = {
     mockState.account.autopilot = { enabled, count, weekday: 'monday', nextRunAt: enabled ? next.toISOString() : null };
     return { account: mockAccount() };
   },
-  exportUrl: () => {
+  async downloadExport() {
     const rows = mockState.leads.filter((l) => l.status === 'kept');
     const csv = ['name,role,company,email', ...rows.map((l) => [l.name, l.role, l.company, l.email].map((v) => `"${(v || '').replace(/"/g, '""')}"`).join(','))].join('\n');
-    return `data:text/csv;charset=utf-8,${encodeURIComponent(csv)}`;
+    saveBlob(new Blob([csv], { type: 'text/csv' }));
   }
 };
 
@@ -255,13 +279,17 @@ export const createAccount = pick('createAccount');
 export const requestSignIn = pick('requestSignIn');
 export const verifySignIn = pick('verifySignIn');
 export const me = pick('me');
+export const setOffer = pick('setOffer');
 export const listLeads = pick('listLeads');
 export const decide = pick('decide');
 export const saveMessage = pick('saveMessage');
 export const startBatch = pick('startBatch');
 export const getBatch = pick('getBatch');
 export const setAutopilot = pick('setAutopilot');
-export const exportUrl = pick('exportUrl');
+export const downloadExport = pick('downloadExport');
+
+// Shown in a first message when we don't know what the user offers.
+export const OFFER_PLACEHOLDER = '[One sentence on what you offer them]';
 
 export const gmailComposeUrl = (to, subject, body) =>
   `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(to)}&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;

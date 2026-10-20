@@ -538,3 +538,34 @@ def test_messages_that_describe_unseen_things_are_rejected():
     body = ("Hi Joseph,\n\nI noticed your current site presents your services clearly. " + "word " * 60
             + "\n\nWould a call help?\n\nBest,")
     assert _message_is_valid(body, lead) is False
+
+
+def test_messages_that_invent_past_clients_are_rejected():
+    from growthcrew.finder import _message_is_valid
+
+    lead = {"name": "Zach Muegge"}
+    body = ("Hi Zach,\n\nWe build fast websites for dental clinics. I can share examples of similar clinics we have helped. "
+            + "word " * 50 + "\n\nWould a call help?\n\nBest,")
+    assert _message_is_valid(body, lead) is False
+
+
+def test_set_offer_fills_placeholder_in_unedited_messages(tmp_path, monkeypatch):
+    from growthcrew import finder, finder_store
+
+    email = "offer-test@example.com"
+    finder_store.save_account({"email": email, "describe": "dentists in Austin", "understood": {"who": "dentists", "where": "Austin", "offer": None}})
+    finder_store.save_lead({"key": "k-offer-1", "account": email, "email": "a@b.example", "status": "kept",
+                            "message": {"subject": "s", "body": f"Hi,\n\n{finder.OFFER_PLACEHOLDER}\n\nBest,", "edited": False}})
+    finder_store.save_lead({"key": "k-offer-2", "account": email, "email": "c@d.example", "status": "kept",
+                            "message": {"subject": "s", "body": f"Mine\n\n{finder.OFFER_PLACEHOLDER}", "edited": True}})
+    result = finder.set_offer(email, "websites for dental clinics")
+    assert result["account"]["understood"]["offer"] == "We offer websites for dental clinics"
+    assert "We offer websites for dental clinics." in finder_store.get_lead("k-offer-1")["message"]["body"]
+    assert finder.OFFER_PLACEHOLDER in finder_store.get_lead("k-offer-2")["message"]["body"]
+
+
+def test_relevance_matches_whole_words_only():
+    beads = _candidate("Lian Ya", "President", "Occidentalbeads", "lian@beads.example", city="Austin", category="Manufacturing")
+    clinic = _candidate("Zach Muegge", "President", "Balcones Family Dental", "zach@balcones.example", city="Austin", category="Dental")
+    ranked = rank_candidates([beads, clinic], "dentists", 5)
+    assert ranked[0]["company"] == "Balcones Family Dental"

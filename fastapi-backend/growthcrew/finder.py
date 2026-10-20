@@ -103,8 +103,11 @@ HYPE_WORDS = (
 # A first message may not describe or judge anything we have not seen.
 UNSEEN_CLAIMS = (
     "your site", "your website", "your current site", "your reviews", "your work",
-    "your services", "your team", "your growth", "your patients love", "i noticed you",
-    "impressed", "love what you",
+    "your services", "your team", "your growth", "your patients love",
+    "impressed", "love what you", "solo founder",
+    # Nothing tells us the sender has past clients or results to point to.
+    "we have helped", "we've helped", "we helped", "our clients", "our customers",
+    "case stud", "examples of", "similar clinics", "similar businesses", "track record",
 )
 
 STOPWORDS = {
@@ -470,7 +473,9 @@ def _candidate_relevance(candidate: dict, tokens: set[str]) -> int:
     ).lower()
     if not haystack:
         return 0
-    return sum(1 for token in tokens if token in haystack)
+    # Whole words (with plural/suffix room at the end), so "dent" in
+    # "Occidentalbeads" doesn't count as a dentist.
+    return sum(1 for token in tokens if re.search(rf"\b{re.escape(token)}", haystack))
 
 
 def rank_candidates(candidates: list[dict], who: str, limit: int) -> list[dict]:
@@ -947,7 +952,7 @@ Rules for "why":
 
 OFFER_PLACEHOLDER = "[One sentence on what you offer them]"
 
-MESSAGE_PROMPT = """You write the first message a solo founder sends to one person they found.
+MESSAGE_PROMPT = """You write the first short email someone sends to one business contact they found.
 
 What the founder sells: {offer}
 The person (facts only): {facts}
@@ -957,7 +962,9 @@ Write the message.
 Rules:
 - 60 to 110 words.
 - Plain text. No links, no markdown, no emojis, no bullet points, no hype.
-- Greet with the first name when the facts have one; otherwise "Hi there,".
+- The first line is exactly "Hi <first name>," when the facts have a name, otherwise exactly "Hi there,".
+- Never describe the sender (no "I'm a founder", no job titles); just say what they offer.
+- Never mention past clients, examples, case studies, results or numbers: you do not know any.
 - One specific observation taken from the facts above (role, company, city or category).
 - Never invent a fact about the person or their business. You have NOT seen their website, reviews,
   work, team or customers: never describe, praise or judge them.
@@ -1533,10 +1540,12 @@ def decide(account_email: str, key: str, decision: str) -> dict:
             lead["message"] = build_first_message(account, lead)
         lead["status"] = "kept"
     elif decision == "skip":
+        # The message stays, so changing your mind later doesn't rewrite it.
         lead["status"] = "skipped"
-        lead["message"] = None
+    elif decision == "undo":
+        lead["status"] = "pending"
     else:
-        raise GrowthcrewError("decision must be keep or skip.", 400, "INVALID_DECISION")
+        raise GrowthcrewError("decision must be keep, skip or undo.", 400, "INVALID_DECISION")
     finder_store.save_lead(lead)
     return {"lead": public_lead(lead)}
 
@@ -1591,6 +1600,9 @@ def _message_is_valid(body: str, lead: dict) -> bool:
     name = clean_person_name(lead.get("name"))
     first = first_name(name) if name else ""
     first_line = text.splitlines()[0].strip() if text else ""
+    # "Zach," is a fine greeting that only lacks the "Hi".
+    if re.fullmatch(r"[A-Z][\w'-]*,", first_line):
+        return _message_is_valid(f"Hi {text}", lead)
     if first:
         if not first_line.lower().startswith("hi ") or first.lower() not in first_line.lower():
             return False
@@ -1652,6 +1664,8 @@ def build_first_message(account: dict, lead: dict) -> dict:
         )
         subject = _clip(_text(data.get("subject")), 90) or "Quick question"
         body = str(data.get("body") or "").strip()
+        if re.match(r"[A-Z][\w'-]*,\s*\n", body):
+            body = f"Hi {body}"
         if _message_is_valid(body, lead):
             return {"subject": subject, "body": body, "edited": False}
         logger.info("Lead finder message failed validation; using the template")
@@ -1829,6 +1843,29 @@ def batch_payload(account_email: str, batch_id: str) -> dict:
 # ---------------------------------------------------------------------------
 # Autopilot and digests
 # ---------------------------------------------------------------------------
+
+
+def set_offer(account_email: str, offer: str) -> dict:
+    """Store what the user sells, and fill it into unedited first messages
+    that still carry the placeholder line."""
+    account = finder_store.get_account(account_email)
+    if not account:
+        raise GrowthcrewError("Sign in to continue.", 401, "UNAUTHORIZED")
+    text = re.sub(r"https?://\S+", "", _text(offer)).strip(" .")
+    if not 3 <= len(text) <= 200:
+        raise GrowthcrewError("Describe what you offer in one short sentence.", 400, "INVALID_OFFER")
+    if not re.match(r"(?i)(we|i|our|my)\b", text):
+        text = f"We offer {text[0].lower()}{text[1:]}"
+    sentence = f"{text[0].upper()}{text[1:]}."
+    understood = account.get("understood") if isinstance(account.get("understood"), dict) else {}
+    account["understood"] = {**understood, "offer": text}
+    finder_store.save_account(account)
+    for lead in finder_store.list_leads(account_email):
+        message = lead.get("message")
+        if isinstance(message, dict) and not message.get("edited") and OFFER_PLACEHOLDER in (message.get("body") or ""):
+            message["body"] = message["body"].replace(OFFER_PLACEHOLDER, sentence)
+            finder_store.save_lead(lead)
+    return {"account": public_account(account)}
 
 
 def set_autopilot(account_email: str, enabled: bool, count: int | None = None) -> dict:

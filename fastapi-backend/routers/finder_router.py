@@ -59,7 +59,7 @@ class VerifyBody(BaseModel):
 
 
 class DecisionBody(BaseModel):
-    decision: Literal["keep", "skip"]
+    decision: Literal["keep", "skip", "undo"]
 
 
 class MessageBody(BaseModel):
@@ -76,6 +76,10 @@ class RefineBody(BaseModel):
 class BatchBody(BaseModel):
     count: int = Field(default=10, ge=1, le=25)
     refine: RefineBody | None = None
+
+
+class OfferBody(BaseModel):
+    offer: str = Field(min_length=3, max_length=200)
 
 
 class AutopilotBody(BaseModel):
@@ -139,6 +143,12 @@ def verify_session(body: VerifyBody):
 def me(request: Request):
     account = _require_account(request)
     return {"account": finder.public_account(account)}
+
+
+@router.put("/me")
+def update_me(body: OfferBody, request: Request):
+    account = _require_account(request)
+    return finder.set_offer(account["email"], body.offer)
 
 
 # --- leads ------------------------------------------------------------------
