@@ -118,14 +118,14 @@ def _message_text(content: Any) -> str:
     return content or ""
 
 
-def chat_via_openai(endpoint: str, api_key: str, model: str, prompt: str) -> str:
+def chat_via_openai(endpoint: str, api_key: str, model: str, prompt: str, system: str = "Return only valid JSON with subject and body fields.") -> str:
     response = requests.post(
         f"{normalize_openai_base(endpoint)}/chat/completions",
         headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"},
         json={
             "model": model,
             "messages": [
-                {"role": "system", "content": "Return only valid JSON with subject and body fields."},
+                {"role": "system", "content": system},
                 {"role": "user", "content": prompt},
             ],
             "temperature": 0.6,
@@ -168,9 +168,11 @@ def generate_draft(settings: dict, lead: dict, icp: str, product_context: str, s
         if not key:
             raise RuntimeError("AI gateway is not configured (LITELLM_MASTER_KEY is missing).")
         discovered = list_gateway_models(base, key)
-        candidates = list(dict.fromkeys([settings["ai"].get("model") or "gpt-oss-120b", *discovered, *GATEWAY_FALLBACK_MODELS]))
+        candidates = list(dict.fromkeys([CONFIG.LITELLM_MODEL, settings["ai"].get("model"), *discovered, *GATEWAY_FALLBACK_MODELS]))
         last_error: Exception = RuntimeError("AI gateway is not configured.")
         for model in candidates:
+            if not model:
+                continue
             try:
                 return parse_draft(chat_via_openai(base, key, model, prompt))
             except Exception as error:

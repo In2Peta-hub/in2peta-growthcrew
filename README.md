@@ -77,6 +77,29 @@ use can leave the outreach keys blank, and vice versa.
 | Outreach email | `CORECLAW_API_KEY`, `AGENTMAIL_API_KEY`, `AGENTMAIL_WEBHOOK_SECRET`, `CENTRAL_INBOX` |
 | Lead database | `MOTHERDUCK_TOKEN`, `MOTHERDUCK_DATABASE` |
 
+## MotherDuck MCP and AI model
+
+The lead finder keeps its describe → preview → keep/skip experience. Database
+candidate searches for previews, refined batches, digests and manual outreach
+now execute server-generated, bounded SQL through MotherDuck's hosted MCP
+`query` tool at `https://api.motherduck.com/mcp`. USA country normalization,
+SaaS/founder expansion, ranking and deduplication remain in the existing finder.
+No separate MCP process is needed. Direct DuckDB is retained for database
+health/size checks and diagnosing account failures, rather than lead retrieval.
+
+Set `MOTHERDUCK_TOKEN`, `MOTHERDUCK_DATABASE`, `LITELLM_BASE_URL` and
+`LITELLM_MASTER_KEY` in the backend environment. `LITELLM_MODEL` defaults to
+`kimi-k3`; for gateway calls it takes precedence over an older model saved in
+workspace settings. Provider fallback behavior remains available. The Render
+blueprint and `.env.example` also select Kimi K3. Restart the API after changing
+environment settings. Never put tokens in frontend environment variables.
+
+`POST /api/growthcrew/leads/chat` is also available for conversational clients:
+it accepts `message`, optional `previousFilters` and up to 12 `history` messages,
+validates AI-generated filters, and returns normalized leads with executed SQL.
+The PR's UI continues to use `/api/finder` and its existing request interpretation;
+it does not perform a second AI interpretation through the chat endpoint.
+
 ## Layout
 
 ```

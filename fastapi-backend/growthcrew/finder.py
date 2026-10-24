@@ -861,13 +861,13 @@ def _ai_text(prompt: str) -> str:
             raise RuntimeError("AI gateway is not configured.")
         models = list(
             dict.fromkeys(
-                [ai.get("model") or "gpt-oss-120b", *list_gateway_models(base, key), *GATEWAY_FALLBACK_MODELS]
+                [CONFIG.LITELLM_MODEL, ai.get("model") or CONFIG.LITELLM_MODEL, *list_gateway_models(base, key), *GATEWAY_FALLBACK_MODELS]
             )
         )
         last_error: Exception = RuntimeError("AI gateway failed.")
         for model in models:
             try:
-                return chat_via_openai(base, key, model, prompt)
+                return chat_via_openai(base, key, model, prompt, system="Return only valid JSON matching the schema requested in the prompt.")
             except Exception as error:  # try the next model
                 last_error = error
         raise last_error
@@ -889,7 +889,7 @@ def _ai_text(prompt: str) -> str:
         last_error = RuntimeError("AI provider failed for all fallback models.")
         for model in models:
             try:
-                return chat_via_openai(endpoint, key, model, prompt)
+                return chat_via_openai(endpoint, key, model, prompt, system="Return only valid JSON matching the schema requested in the prompt.")
             except Exception as error:
                 last_error = error
         raise last_error

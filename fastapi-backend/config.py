@@ -63,6 +63,7 @@ class Config:
     # GrowthCrew AI drafting (LiteLLM gateway / OpenAI-compatible endpoints)
     LITELLM_BASE_URL: str = os.getenv("LITELLM_BASE_URL", "")
     LITELLM_MASTER_KEY: str = os.getenv("LITELLM_MASTER_KEY", "")
+    LITELLM_MODEL: str = os.getenv("LITELLM_MODEL", "kimi-k3")
     OPENAI_API_KEY: str = os.getenv("OPENAI_API_KEY", "")
     OPENAI_API_BASE: str = os.getenv("OPENAI_API_BASE", "")
     API_KEY_ENCRYPTION_KEY: str = os.getenv("API_KEY_ENCRYPTION_KEY", "")
