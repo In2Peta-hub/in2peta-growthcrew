@@ -1,102 +1,84 @@
 @import "tailwindcss";
 
+@theme {
+  --font-sans: 'Hanken Grotesk', system-ui, sans-serif;
+  --font-display: 'Bricolage Grotesque', system-ui, sans-serif;
+  --color-slate-100: #f6f2fb;
+  --color-slate-200: #e8e0f2;
+  --color-slate-300: #cec3df;
+  --color-slate-400: #b7adca;
+  --color-slate-500: #a89ab9;
+  --color-slate-600: #a195b1;
+}
+
 @layer base {
   :root {
-    --scalora-bg: #07080a;
-    --scalora-surface: #0e1118;
-    --scalora-surface-hover: #141822;
-    --scalora-border: rgba(255, 255, 255, 0.08);
-    --scalora-border-light: rgba(255, 255, 255, 0.14);
-    --scalora-coral: #FF6B4A;
-    --scalora-amber: #FFA84A;
-    --scalora-rose: #FF5376;
-    --scalora-violet: #8B5CF6;
+    color-scheme: dark;
+    --brand-bg: #0c0911;
+    --brand-surface: #15111d;
+    --brand-raised: #20192b;
+    --brand-purple: #9702fa;
+    --brand-purple-hover: #8400d8;
+    --brand-lavender: #b69cde;
+    --brand-ink: #f6f2fb;
+    --brand-muted: #b7adca;
+    --font-display: 'Bricolage Grotesque', system-ui, sans-serif;
+    --font-body: 'Hanken Grotesk', system-ui, sans-serif;
+
+    /* Existing components share the same brand through these legacy aliases. */
+    --scalora-bg: var(--brand-bg);
+    --scalora-surface: var(--brand-surface);
+    --scalora-surface-hover: var(--brand-raised);
+    --scalora-border: color-mix(in oklch, var(--brand-lavender) 14%, transparent);
+    --scalora-border-light: color-mix(in oklch, var(--brand-lavender) 24%, transparent);
+    --scalora-coral: var(--brand-purple);
+    --scalora-amber: var(--brand-lavender);
+    --scalora-rose: var(--brand-lavender);
+    --scalora-violet: var(--brand-purple);
   }
 
   body {
-    background-color: var(--scalora-bg);
-    color: #f1f5f9;
-    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+    background: var(--brand-bg);
+    color: var(--brand-ink);
+    font-family: var(--font-body);
     margin: 0;
-    padding: 0;
-    min-height: 100vh;
+    min-block-size: 100svh;
     -webkit-font-smoothing: antialiased;
   }
+
+  h1, h2, h3 {
+    font-family: var(--font-display);
+    text-wrap: balance;
+  }
+
+  button, input, textarea, select { font-family: inherit; }
+  button, a, input, textarea, select { accent-color: var(--brand-purple); }
+  :focus-visible { outline: 2px solid var(--brand-lavender); outline-offset: 3px; }
+  ::selection { background: var(--brand-purple); color: white; }
 }
 
-.font-serif-accent {
-  font-family: 'Instrument Serif', Georgia, serif;
+.brand-logo {
+  display: block;
+  flex: none;
+  inline-size: 3rem;
+  block-size: 3rem;
+  object-fit: contain;
+  background: white;
+  border-radius: 0.5rem;
+  padding: 0.1rem;
 }
 
-/* Scalora Ambient Background Gradients */
-.scalora-mesh-bg {
-  background-image: 
-    radial-gradient(at 15% 10%, rgba(255, 107, 74, 0.12) 0px, transparent 50%),
-    radial-gradient(at 85% 15%, rgba(139, 92, 246, 0.10) 0px, transparent 50%),
-    radial-gradient(at 50% 80%, rgba(255, 83, 118, 0.08) 0px, transparent 50%);
+.brand-logo-login {
+  inline-size: 5.5rem;
+  block-size: 5.5rem;
+  margin-inline: auto;
 }
 
-.scalora-card-glow {
-  position: relative;
-  background: linear-gradient(180deg, rgba(20, 24, 34, 0.7) 0%, rgba(12, 15, 22, 0.85) 100%);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.12);
-  backdrop-filter: blur(16px);
-}
-
-.scalora-card-glow:hover {
-  border-color: rgba(255, 255, 255, 0.14);
-}
-
-.scalora-btn-primary {
-  background: linear-gradient(135deg, #FF6B4A 0%, #FFA84A 100%);
-  box-shadow: 0 4px 20px -2px rgba(255, 107, 74, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.35);
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.scalora-btn-primary:hover {
-  filter: brightness(1.08);
-  transform: translateY(-1px);
-  box-shadow: 0 8px 25px -2px rgba(255, 107, 74, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.45);
-}
-
-.scalora-btn-primary:active {
-  transform: translateY(0);
-}
-
-.scalora-pill-tab {
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  transition: all 0.2s ease;
-}
-
-.scalora-pill-tab:hover {
-  background: rgba(255, 255, 255, 0.06);
-  border-color: rgba(255, 255, 255, 0.12);
-}
-
-.scalora-pill-tab-active {
-  background: linear-gradient(135deg, rgba(255, 107, 74, 0.15) 0%, rgba(255, 168, 74, 0.1) 100%);
-  border: 1px solid rgba(255, 107, 74, 0.4);
-  color: #FFA84A;
-  box-shadow: 0 0 15px rgba(255, 107, 74, 0.15);
-}
-
-/* Custom Sleek Scrollbar */
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-
-::-webkit-scrollbar-track {
-  background: #07080a;
-}
-
-::-webkit-scrollbar-thumb {
-  background: #1e2433;
-  border-radius: 9999px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: #2e384d;
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

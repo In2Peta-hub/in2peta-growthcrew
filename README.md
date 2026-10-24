@@ -45,7 +45,24 @@ The Vite dev server proxies `/api/*` to the backend, so no `VITE_API_URL` is
 needed locally. Set `VITE_API_URL=http://localhost:3005` in `client/.env` only
 if you bypass the proxy.
 
-**Windows:** `start-local.bat` starts FastAPI on `:3005` and the Vite client on `:5173`.
+After installing the backend dependencies above, run both services from one
+terminal with the cross-platform launcher:
+
+```bash
+# Linux or macOS
+python3 start-local.py
+```
+
+On Windows, run `py -3 start-local.py` or double-click `start-local.bat`.
+Python and Bun must be installed, with Bun on `PATH`. The launcher uses
+`fastapi-backend/.venv`, then the root `.venv`, or the active Python interpreter.
+Install the backend dependencies into that environment.
+
+The launcher installs frontend dependencies with the existing lockfile, starts
+FastAPI on `:3005` and Vite on `:5173`, and stops both services on Ctrl+C or when
+either exits. If a port is occupied, startup fails instead of choosing another
+port. Use `--skip-install` to skip the frontend dependency install. Paths resolve
+relative to the launcher, so it also works from another directory.
 
 ## Env
 
@@ -59,6 +76,29 @@ use can leave the outreach keys blank, and vice versa.
 | Studio publishing | `FB_PAGE_ID`, `FB_PAGE_ACCESS_TOKEN`, `POSTIZ_*` |
 | Outreach email | `CORECLAW_API_KEY`, `AGENTMAIL_API_KEY`, `AGENTMAIL_WEBHOOK_SECRET`, `CENTRAL_INBOX` |
 | Lead database | `MOTHERDUCK_TOKEN`, `MOTHERDUCK_DATABASE` |
+
+## MotherDuck MCP and AI model
+
+The lead finder keeps its describe → preview → keep/skip experience. Database
+candidate searches for previews, refined batches, digests and manual outreach
+now execute server-generated, bounded SQL through MotherDuck's hosted MCP
+`query` tool at `https://api.motherduck.com/mcp`. USA country normalization,
+SaaS/founder expansion, ranking and deduplication remain in the existing finder.
+No separate MCP process is needed. Direct DuckDB is retained for database
+health/size checks and diagnosing account failures, rather than lead retrieval.
+
+Set `MOTHERDUCK_TOKEN`, `MOTHERDUCK_DATABASE`, `LITELLM_BASE_URL` and
+`LITELLM_MASTER_KEY` in the backend environment. `LITELLM_MODEL` defaults to
+`kimi-k3`; for gateway calls it takes precedence over an older model saved in
+workspace settings. Provider fallback behavior remains available. The Render
+blueprint and `.env.example` also select Kimi K3. Restart the API after changing
+environment settings. Never put tokens in frontend environment variables.
+
+`POST /api/growthcrew/leads/chat` is also available for conversational clients:
+it accepts `message`, optional `previousFilters` and up to 12 `history` messages,
+validates AI-generated filters, and returns normalized leads with executed SQL.
+The PR's UI continues to use `/api/finder` and its existing request interpretation;
+it does not perform a second AI interpretation through the chat endpoint.
 
 ## Layout
 

@@ -33,7 +33,7 @@ def default_settings() -> dict[str, Any]:
     return {
         "ai": {
             "provider": "gateway",
-            "model": "gpt-oss-120b",
+            "model": CONFIG.LITELLM_MODEL,
             "endpoint": CONFIG.LITELLM_BASE_URL,
             "apiKey": CONFIG.LITELLM_MASTER_KEY,
         },

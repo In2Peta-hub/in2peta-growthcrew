@@ -1,0 +1,2007 @@
+/*  GrowthCrew landing — "the product performs".
+    Every rule is scoped under .gc-landing so nothing leaks into the
+    Social Studio / Lead Gen application shells.
+
+    The page is built from working fragments of the product (marked
+    data-ui): inside them the app's own conventions apply — small radii,
+    1px control borders, depth on the open dialog. Outside them the
+    page separates surfaces by tone alone.
+
+    Brand: near-black plum ground, In2Peta violet as the one accent,
+    lavender as its light companion. Bricolage Grotesque for display,
+    Hanken Grotesk for text and interface.                             */
+
+/* ── Tokens & scoped reset ─────────────────────────────────── */
+.gc-landing,
+.gc-landing *,
+.gc-landing *::before,
+.gc-landing *::after {
+  box-sizing: border-box;
+  min-width: 0;
+}
+
+.gc-landing {
+  --gc-purple: var(--brand-purple, #9702fa);
+  --gc-lavender: var(--brand-lavender, #b69cde);
+  --gc-bg: var(--brand-bg, #0c0911);
+  --gc-surface: var(--brand-surface, #15111d);
+  --gc-raised: var(--brand-raised, #20192b);
+  --gc-ink: var(--brand-ink, #f6f2fb);
+  --gc-muted: var(--brand-muted, #b7adca);
+
+  /* Tone steps for fields, darkest to lightest. */
+  --gc-step-1: #15111d;
+  --gc-step-2: #221a2e;
+  --gc-step-3: #33264a;
+  --gc-plum: #1c1028;
+  --gc-on-light: #160c22;
+
+  --gc-purple-hover: color-mix(in oklch, var(--gc-purple), white 12%);
+  --gc-ui-line: color-mix(in oklch, var(--gc-ink) 13%, transparent);
+  --gc-ui-line-strong: color-mix(in oklch, var(--gc-ink) 22%, transparent);
+
+  /* Type: five steps for the page; interface text keeps its own size. */
+  --gc-fs-display: clamp(3.25rem, 1.4rem + 6.4vw, 7.5rem);
+  --gc-fs-h1: clamp(2.6rem, 1.3rem + 3.9vw, 4.75rem);
+  --gc-fs-h2: clamp(2rem, 1.2rem + 2.6vw, 3.25rem);
+  --gc-fs-lead: clamp(1.1875rem, 1rem + 0.6vw, 1.5rem);
+  --gc-fs-body: 1.0625rem;
+  --gc-fs-ui: 0.875rem;
+
+  --gc-gutter: clamp(1.25rem, 0.5rem + 2.6vw, 2.5rem);
+
+  /* Motion (Emil Kowalski's curves): strong ease-out for anything
+     arriving, ease-in-out for things that travel while visible. */
+  --gc-ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --gc-ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+  --gc-ease-soft: cubic-bezier(0.33, 1, 0.68, 1);
+  --gc-t-press: 140ms;
+  --gc-t-hover: 180ms;
+  --gc-t-ui: 240ms;
+  --gc-t-reveal: 800ms;
+
+  color-scheme: dark;
+  min-block-size: 100svh;
+  background: var(--gc-bg);
+  color: var(--gc-ink);
+  font-family: var(--font-body, 'Hanken Grotesk'), system-ui, -apple-system, sans-serif;
+  font-size: var(--gc-fs-body);
+  line-height: 1.55;
+  font-synthesis: none;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: clip;
+}
+
+.gc-landing ::selection {
+  background: var(--gc-purple);
+  color: white;
+}
+
+.gc-landing :where(h1, h2, h3) {
+  margin: 0;
+  font-family: var(--font-display, 'Bricolage Grotesque'), system-ui, sans-serif;
+  font-weight: 700;
+  letter-spacing: -0.035em;
+  line-height: 0.98;
+}
+
+.gc-landing :where(p, ul, ol, figure, form) {
+  margin: 0;
+  padding: 0;
+}
+
+.gc-landing :where(img, svg) {
+  display: block;
+  max-width: 100%;
+}
+
+.gc-landing :where(button) {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+}
+
+.gc-landing :where(a) {
+  color: inherit;
+  text-decoration: none;
+}
+
+.gc-landing :focus-visible {
+  outline: 2px solid var(--gc-lavender);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+.gc-sr {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.gc-skip {
+  position: absolute;
+  inset-inline-start: var(--gc-gutter);
+  inset-block-start: 0.75rem;
+  z-index: 60;
+  padding: 0.6rem 1rem;
+  background: var(--gc-ink);
+  color: var(--gc-bg);
+  font-weight: 600;
+  transform: translateY(-200%);
+}
+
+.gc-skip:focus-visible {
+  transform: none;
+}
+
+/* ── Buttons: one shape (square, 4px), one fill each ─────────── */
+.gc-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-block-size: 2.75rem;
+  padding: 0 1.25rem;
+  border-radius: 4px;
+  font-weight: 600;
+  font-size: 0.9375rem;
+  white-space: nowrap;
+  transition:
+    background-color var(--gc-t-hover) ease,
+    color var(--gc-t-hover) ease,
+    transform var(--gc-t-press) var(--gc-ease-out);
+}
+
+.gc-btn:active {
+  transform: scale(0.97);
+}
+
+.gc-btn svg {
+  transition: transform var(--gc-t-ui) var(--gc-ease-out);
+}
+
+.gc-btn-lg {
+  min-block-size: 3.25rem;
+  padding: 0 1.6rem;
+  font-size: 1.0625rem;
+}
+
+.gc-btn-block {
+  inline-size: 100%;
+}
+
+.gc-btn-accent {
+  background: var(--gc-purple);
+  color: white;
+}
+
+.gc-btn-light {
+  background: var(--gc-ink);
+  color: var(--gc-on-light);
+}
+
+.gc-btn-dark {
+  background: var(--gc-raised);
+}
+
+.gc-btn-text {
+  padding: 0 0.25rem;
+  color: var(--gc-ink);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .gc-btn-accent:hover { background: var(--gc-purple-hover); }
+  .gc-btn-light:hover { background: white; }
+  .gc-btn-dark:hover { background: var(--gc-step-3); }
+  .gc-btn:hover svg { transform: translateX(3px); }
+}
+
+/* ── Header: a plain bar over the hero's two tones ───────────── */
+.gc-header {
+  position: absolute;
+  inset: 0 0 auto;
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  padding: 1.25rem var(--gc-gutter);
+}
+
+.gc-logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+  transition: transform var(--gc-t-press) var(--gc-ease-out);
+}
+
+.gc-logo:active {
+  transform: scale(0.97);
+}
+
+.gc-logo-mark {
+  display: grid;
+  place-items: center;
+  inline-size: 2.25rem;
+  block-size: 2.25rem;
+  border-radius: 6px;
+  background: white;
+  overflow: hidden;
+}
+
+.gc-logo-mark img {
+  inline-size: 100%;
+  block-size: 100%;
+  object-fit: contain;
+}
+
+.gc-logo-word {
+  font-family: var(--font-display, 'Bricolage Grotesque'), system-ui, sans-serif;
+  font-weight: 700;
+  font-size: 1.1875rem;
+  letter-spacing: -0.02em;
+}
+
+.gc-nav {
+  display: flex;
+  gap: 1.75rem;
+  margin-inline-start: auto;
+}
+
+.gc-nav-link {
+  position: relative;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: var(--gc-muted);
+  transition: color var(--gc-t-hover) ease;
+}
+
+.gc-nav-link::after {
+  content: '';
+  position: absolute;
+  inset: auto 0 -4px;
+  block-size: 2px;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform var(--gc-t-ui) var(--gc-ease-out);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .gc-nav-link:hover { color: var(--gc-ink); }
+  .gc-nav-link:hover::after { transform: scaleX(1); transform-origin: left; }
+}
+
+.gc-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+.gc-burger {
+  display: none;
+  inline-size: 2.75rem;
+  block-size: 2.75rem;
+  place-items: center;
+  border-radius: 4px;
+  background: var(--gc-raised);
+  transition: transform var(--gc-t-press) var(--gc-ease-out);
+}
+
+.gc-burger:active {
+  transform: scale(0.95);
+}
+
+.gc-profile {
+  position: relative;
+}
+
+.gc-avatar {
+  display: grid;
+  place-items: center;
+  inline-size: 2.5rem;
+  block-size: 2.5rem;
+  border-radius: 50%;
+  background: var(--gc-purple);
+  color: white;
+  font-weight: 700;
+  transition: transform var(--gc-t-press) var(--gc-ease-out);
+}
+
+.gc-avatar:active {
+  transform: scale(0.95);
+}
+
+/* The account menu really floats, so it may carry a shadow. It scales
+   in from the avatar it belongs to. */
+.gc-menu {
+  position: absolute;
+  inset-block-start: calc(100% + 0.6rem);
+  inset-inline-end: 0;
+  inline-size: 16rem;
+  padding: 0.4rem;
+  border-radius: 8px;
+  background: var(--gc-raised);
+  box-shadow: 0 18px 40px -12px rgb(0 0 0 / 0.6); /* taste-skill-ignore: open menu */
+  transform-origin: top right;
+  transition:
+    opacity 180ms var(--gc-ease-out),
+    transform 180ms var(--gc-ease-out);
+
+  @starting-style {
+    opacity: 0;
+    transform: scale(0.96) translateY(-4px);
+  }
+}
+
+.gc-menu-head {
+  display: grid;
+  padding: 0.6rem 0.75rem 0.75rem;
+}
+
+.gc-menu-name {
+  font-weight: 600;
+}
+
+.gc-menu-mail {
+  font-size: var(--gc-fs-ui);
+  color: var(--gc-muted);
+  overflow-wrap: anywhere;
+}
+
+.gc-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  inline-size: 100%;
+  padding: 0.6rem 0.75rem;
+  border-radius: 6px;
+  font-size: 0.9375rem;
+  text-align: start;
+  transition: background-color var(--gc-t-hover) ease;
+}
+
+.gc-menu-item:focus-visible {
+  background: var(--gc-step-3);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .gc-menu-item:hover { background: var(--gc-step-3); }
+}
+
+.gc-menu-danger {
+  color: oklch(0.78 0.13 15);
+}
+
+.gc-mobile {
+  position: absolute;
+  inset: 100% 0 auto;
+  display: grid;
+  gap: 1.5rem;
+  padding: 1rem var(--gc-gutter) 1.5rem;
+  background: var(--gc-raised);
+  transition:
+    opacity 220ms var(--gc-ease-out),
+    transform 220ms var(--gc-ease-out);
+
+  @starting-style {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+}
+
+.gc-mobile nav {
+  display: grid;
+}
+
+.gc-mobile-link {
+  padding: 0.85rem 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  text-align: start;
+}
+
+/* ── Interface fragments (data-ui) ───────────────────────────── */
+.gc-landing [data-ui] {
+  font-size: var(--gc-fs-ui);
+  line-height: 1.5;
+  color: var(--gc-ink);
+}
+
+.gc-ui-label {
+  display: block;
+  margin-block-end: 0.4rem;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--gc-muted);
+}
+
+.gc-ui-input {
+  inline-size: 100%;
+  min-block-size: 2.75rem;
+  padding: 0 0.85rem;
+  border: 1px solid var(--gc-ui-line-strong);
+  border-radius: 6px;
+  background: var(--gc-bg);
+  color: var(--gc-ink);
+  font: inherit;
+  font-size: 0.9375rem;
+  transition: border-color var(--gc-t-hover) ease;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .gc-ui-input:hover { border-color: color-mix(in oklch, var(--gc-ink) 34%, transparent); }
+}
+
+.gc-ui-input:focus-visible {
+  outline: 2px solid var(--gc-purple);
+  outline-offset: 0;
+  border-color: transparent;
+}
+
+.gc-ui-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  min-block-size: 2.25rem;
+  padding: 0 0.9rem;
+  border-radius: 6px;
+  background: var(--gc-purple);
+  color: white;
+  font-weight: 600;
+  font-size: var(--gc-fs-ui);
+  white-space: nowrap;
+  transition:
+    background-color var(--gc-t-hover) ease,
+    transform var(--gc-t-press) var(--gc-ease-out);
+}
+
+.gc-ui-btn:active {
+  transform: scale(0.97);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .gc-ui-btn:hover { background: var(--gc-purple-hover); }
+}
+
+.gc-ui-btn-block {
+  inline-size: 100%;
+  min-block-size: 2.75rem;
+  font-size: 0.9375rem;
+}
+
+.gc-ui-dim {
+  color: var(--gc-muted);
+}
+
+/* Segmented switch: real radios under a sliding thumb. The thumb travels
+   while visible, so it uses ease-in-out; it is a transition, so a quick
+   double click retargets instead of restarting. */
+.gc-seg {
+  position: relative;
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+  padding: 3px;
+  border-radius: 8px;
+  background: var(--gc-bg);
+  isolation: isolate;
+}
+
+.gc-seg-thumb {
+  position: absolute;
+  inset-block: 3px;
+  inset-inline-start: 3px;
+  inline-size: calc((100% - 6px) / var(--seg-n));
+  border-radius: 6px;
+  background: var(--gc-step-3);
+  transform: translateX(calc(var(--seg-i) * 100%));
+  transition: transform var(--gc-t-ui) var(--gc-ease-in-out);
+  z-index: -1;
+}
+
+.gc-seg-opt {
+  display: grid;
+  place-items: center;
+  min-block-size: 2.25rem;
+  padding: 0 0.75rem;
+  font-weight: 600;
+  color: var(--gc-muted);
+  cursor: pointer;
+  border-radius: 6px;
+  transition: color var(--gc-t-hover) ease;
+}
+
+.gc-seg-opt[data-on] {
+  color: var(--gc-ink);
+  background-color: var(--gc-step-3);
+  transition:
+    color var(--gc-t-hover) ease,
+    background-color 0s linear var(--gc-t-ui);
+}
+
+.gc-seg-opt input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.gc-seg-opt:has(input:focus-visible) {
+  outline: 2px solid var(--gc-lavender);
+  outline-offset: -2px;
+}
+
+/* ── Hero: two tones, the composer on the lighter half ───────── */
+.gc-hero {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  min-block-size: max(100svh, 46rem);
+}
+
+.gc-hero-copy {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 1.5rem;
+  padding: 8rem var(--gc-gutter) clamp(2.5rem, 6vh, 4.5rem);
+}
+
+.gc-h1 {
+  font-size: var(--gc-fs-h1);
+}
+
+.gc-lines .gc-line > span {
+  white-space: nowrap;
+}
+
+.gc-hero-sub {
+  max-inline-size: 40ch;
+  font-size: var(--gc-fs-lead);
+  line-height: 1.45;
+}
+
+.gc-hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem 1.25rem;
+  margin-block-start: 0.5rem;
+}
+
+.gc-hero-stage {
+  display: grid;
+  place-items: center;
+  padding: 7rem var(--gc-gutter) 3rem;
+  background: var(--gc-surface);
+}
+
+.gc-composer {
+  display: grid;
+  gap: 1rem;
+  inline-size: min(100%, 30rem);
+  padding: 1.25rem;
+  border: 1px solid var(--gc-ui-line);
+  border-radius: 12px;
+  background: var(--gc-raised);
+}
+
+.gc-ui-out {
+  min-block-size: 14.5rem;
+  padding: 1rem;
+  border-radius: 8px;
+  background: var(--gc-bg);
+}
+
+.gc-ui-pane {
+  display: grid;
+  gap: 0.75rem;
+  animation: gc-pane-in 220ms var(--gc-ease-out);
+}
+
+.gc-ui-channels {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.gc-ui-channel {
+  display: grid;
+  place-items: center;
+  inline-size: 2rem;
+  block-size: 2rem;
+  border-radius: 6px;
+  color: var(--gc-muted);
+  transition:
+    background-color var(--gc-t-hover) ease,
+    color var(--gc-t-hover) ease,
+    transform var(--gc-t-press) var(--gc-ease-out);
+}
+
+.gc-ui-channel svg {
+  inline-size: 1rem;
+  block-size: 1rem;
+}
+
+.gc-ui-channel:active {
+  transform: scale(0.95);
+}
+
+.gc-ui-channel[aria-pressed='true'] {
+  background: var(--gc-step-3);
+  color: var(--gc-ink);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .gc-ui-channel:hover { color: var(--gc-ink); }
+}
+
+.gc-ui-chan-name {
+  margin-inline-start: auto;
+  font-size: 0.8125rem;
+  color: var(--gc-muted);
+}
+
+.gc-ui-text {
+  font-size: 0.9375rem;
+  line-height: 1.55;
+}
+
+.gc-ui-tags {
+  color: var(--gc-lavender);
+  font-weight: 500;
+}
+
+.gc-ui-readout {
+  font-size: 0.8125rem;
+  color: var(--gc-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.gc-ui-lead {
+  display: grid;
+}
+
+.gc-ui-lead-name,
+.gc-ui-subject {
+  font-weight: 600;
+}
+
+.gc-ui-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.gc-ui-note {
+  font-size: 0.8125rem;
+  color: var(--gc-muted);
+}
+
+/* ── Showcase: one control, blown up ─────────────────────────── */
+.gc-show {
+  position: relative;
+  min-block-size: 92svh;
+  padding: clamp(4rem, 10vh, 7rem) var(--gc-gutter);
+  overflow: hidden;
+  background: var(--gc-lavender);
+  color: var(--gc-on-light);
+  transition:
+    background-color 360ms ease,
+    color 360ms ease;
+}
+
+.gc-show[data-timing='later'] {
+  background: var(--gc-plum);
+  color: var(--gc-ink);
+}
+
+.gc-show-copy {
+  display: grid;
+  gap: 1.25rem;
+  max-inline-size: 34rem;
+}
+
+.gc-h2 {
+  font-size: var(--gc-fs-h2);
+}
+
+.gc-lead {
+  font-size: var(--gc-fs-lead);
+  line-height: 1.45;
+  max-inline-size: 36ch;
+}
+
+.gc-swap {
+  display: inline-block;
+}
+
+.gc-landing .gc-show-control {
+  position: absolute;
+  inset-block-end: -0.35em;
+  inset-inline-start: 32%;
+  font-size: min(11vh, 6.2vw);
+}
+
+/* The same switch at poster size: every dimension is in em, so it scales
+   as one object with its label, thumb and radii. */
+.gc-landing .gc-seg-poster {
+  inline-size: max-content;
+  padding: 0.08em;
+  border-radius: 0.36em;
+  background: var(--gc-on-light);
+  font-size: 1em;
+}
+
+.gc-seg-poster .gc-seg-thumb {
+  inset-block: 0.08em;
+  inset-inline-start: 0.08em;
+  inline-size: calc((100% - 0.16em) / var(--seg-n));
+  border-radius: 0.28em;
+  background: var(--gc-ink);
+}
+
+.gc-seg-poster .gc-seg-opt {
+  min-block-size: 1.9em;
+  padding: 0 0.6em;
+  border-radius: 0.28em;
+  color: color-mix(in oklch, var(--gc-ink) 55%, transparent);
+  font-family: var(--font-display, 'Bricolage Grotesque'), system-ui, sans-serif;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  white-space: nowrap;
+}
+
+.gc-seg-poster .gc-seg-opt[data-on] {
+  color: var(--gc-on-light);
+  background-color: var(--gc-ink);
+}
+
+.gc-seg-poster .gc-seg-opt:has(input:focus-visible) {
+  outline-width: 0.05em;
+}
+
+.gc-show-readout {
+  margin-block-start: 0.3em;
+  padding-inline-start: 0.2em;
+  font-size: 0.32em;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── The street: real shopfronts, the world leads come from ──── */
+.gc-street {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  column-gap: 1.5rem;
+  row-gap: clamp(3rem, 7vh, 5rem);
+  padding: clamp(7rem, 16vh, 12rem) 0 0 var(--gc-gutter);
+}
+
+.gc-street-copy {
+  grid-column: 1 / 6;
+  align-self: end;
+  display: grid;
+  justify-items: start;
+  gap: 1.5rem;
+  padding-block-end: 2rem;
+}
+
+.gc-street-wide {
+  grid-column: 6 / -1;
+  display: grid;
+  gap: 0.6rem;
+}
+
+.gc-street-wide-frame,
+.gc-shop-frame {
+  overflow: hidden;
+  background: var(--gc-surface);
+}
+
+.gc-street-wide-frame {
+  aspect-ratio: 16 / 10;
+}
+
+.gc-street-wide-frame img,
+.gc-shop-frame img {
+  inline-size: 100%;
+  block-size: 100%;
+  object-fit: cover;
+}
+
+.gc-shops {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.5rem;
+  margin: 0;
+  padding: 0 var(--gc-gutter) 0 0;
+  list-style: none;
+}
+
+.gc-shop {
+  display: grid;
+  gap: 0.4rem;
+}
+
+.gc-shop-frame {
+  aspect-ratio: 4 / 5;
+  margin-block-end: 0.5rem;
+}
+
+.gc-shop-frame img {
+  transition: transform 700ms var(--gc-ease-soft);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .gc-shop:hover .gc-shop-frame img { transform: scale(1.04); }
+}
+
+.gc-shop-name {
+  font-family: var(--font-display, 'Bricolage Grotesque'), system-ui, sans-serif;
+  font-size: clamp(1.25rem, 1rem + 0.6vw, 1.5rem);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+}
+
+.gc-credit {
+  font-size: 0.8125rem;
+  color: var(--gc-muted);
+}
+
+.gc-credit a {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  text-decoration-color: color-mix(in oklch, currentColor 45%, transparent);
+}
+
+/* ── How it works: one lead, four fields ─────────────────────── */
+.gc-strip {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+}
+
+.gc-field {
+  position: relative;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  min-block-size: 84svh;
+  padding: clamp(2.5rem, 6vh, 4rem) 1.75rem 1.75rem;
+}
+
+.gc-field-0 { background: var(--gc-bg); }
+.gc-field-1 { background: var(--gc-step-2); }
+.gc-field-2 { background: var(--gc-step-3); }
+.gc-field-3 { background: var(--gc-purple); }
+
+.gc-strip-title {
+  grid-row: 1;
+  font-size: var(--gc-fs-lead);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+}
+
+.gc-card {
+  position: absolute;
+  inset-block-start: 38%;
+  inset-inline-start: 50%;
+  display: grid;
+  gap: 0.5rem;
+  inline-size: min(17rem, calc(100% - 2.5rem));
+  padding: 0.9rem 1rem;
+  border: 1px solid var(--gc-ui-line);
+  border-radius: 10px;
+  background: var(--gc-surface);
+  translate: -50% 0;
+  transition: transform 150ms var(--gc-ease-out);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .gc-field:hover .gc-card { transform: translateY(-6px); }
+}
+
+.gc-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.gc-card-name {
+  font-weight: 600;
+  font-size: 0.9375rem;
+}
+
+.gc-card-status {
+  padding: 0.1rem 0.5rem;
+  border-radius: 999px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  background: var(--gc-step-3);
+  white-space: nowrap;
+}
+
+.gc-status-3 {
+  background: var(--gc-purple);
+  color: white;
+}
+
+.gc-card-meta {
+  color: var(--gc-muted);
+  font-size: 0.8125rem;
+}
+
+.gc-card-row {
+  display: grid;
+  font-size: 0.8125rem;
+}
+
+.gc-card-reply {
+  padding: 0.6rem 0.7rem;
+  border-radius: 6px;
+  background: var(--gc-raised);
+  font-size: 0.875rem;
+}
+
+.gc-clause {
+  grid-row: 3;
+  font-family: var(--font-display, 'Bricolage Grotesque'), system-ui, sans-serif;
+  font-size: clamp(1.375rem, 0.9rem + 1vw, 2rem);
+  font-weight: 600;
+  letter-spacing: -0.025em;
+  line-height: 1.1;
+}
+
+/* ── Compare: a table set in words ───────────────────────────── */
+.gc-compare {
+  padding: clamp(7rem, 16vh, 12rem) var(--gc-gutter);
+}
+
+.gc-compare-title {
+  margin-block-end: 3rem;
+}
+
+.gc-table {
+  position: relative;
+  display: grid;
+  isolation: isolate;
+}
+
+/* The column that matters: one filled block behind its cells, rising
+   above the first row, so it reads as a single object with no seams. */
+.gc-table::before {
+  content: '';
+  position: absolute;
+  inset-block: 0;
+  inset-inline-start: calc(100% * 5 / 12);
+  inline-size: calc(100% * 3.5 / 12);
+  background: var(--gc-purple);
+  z-index: -1;
+}
+
+.gc-tr {
+  display: grid;
+  grid-template-columns: 5fr 3.5fr 3.5fr;
+  align-items: stretch;
+}
+
+.gc-tr:nth-child(even) .gc-td-job,
+.gc-tr:nth-child(even) .gc-td-usual {
+  background: var(--gc-surface);
+}
+
+.gc-td-job,
+.gc-td {
+  display: flex;
+  align-items: center;
+  min-block-size: 4.25rem;
+  padding: 0.75rem 1.25rem;
+}
+
+.gc-td-job {
+  font-family: var(--font-display, 'Bricolage Grotesque'), system-ui, sans-serif;
+  font-size: clamp(1.25rem, 1rem + 0.6vw, 1.5rem);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  padding-inline-start: 0;
+}
+
+.gc-tr:nth-child(even) .gc-td-job {
+  padding-inline-start: 1.25rem;
+  margin-inline-start: -1.25rem;
+}
+
+.gc-td-feature {
+  color: white;
+  font-weight: 500;
+}
+
+.gc-td-usual {
+  color: var(--gc-muted);
+}
+
+.gc-th .gc-td {
+  min-block-size: auto;
+  padding-block: 2.25rem 1rem;
+  font-weight: 700;
+}
+
+.gc-th .gc-td:not(.gc-td-feature) {
+  padding-block-start: 1rem;
+  align-items: flex-end;
+}
+
+.gc-th {
+  grid-template-columns: 5fr 3.5fr 3.5fr;
+}
+
+.gc-th > .gc-sr + .gc-td {
+  grid-column: 2;
+}
+
+.gc-only-sm {
+  display: none;
+}
+
+/* ── Final: first step, already open ─────────────────────────── */
+.gc-final {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  column-gap: 1.5rem;
+  min-block-size: 90svh;
+  padding: clamp(3rem, 8vh, 5rem) var(--gc-gutter);
+  background: var(--gc-purple);
+  color: white;
+}
+
+.gc-final-copy {
+  grid-column: 1 / 7;
+  align-self: end;
+  display: grid;
+  gap: 1.5rem;
+}
+
+.gc-final-title {
+  font-size: var(--gc-fs-display);
+  line-height: 0.92;
+  letter-spacing: -0.045em;
+}
+
+.gc-final .gc-lead {
+  color: white;
+}
+
+.gc-dialog {
+  grid-column: 8 / 12;
+  align-self: center;
+  display: grid;
+  gap: 1rem;
+  padding: 1.5rem;
+  border-radius: 12px;
+  background: var(--gc-surface);
+  box-shadow: 0 30px 60px -20px rgb(20 0 40 / 0.55); /* taste-skill-ignore: the product's dialog casts this */
+}
+
+.gc-dialog-title {
+  font-size: 1.125rem;
+  font-weight: 700;
+}
+
+.gc-dialog .gc-ui-label {
+  margin-block-end: -0.6rem;
+}
+
+/* ── Footer: one quiet line ──────────────────────────────────── */
+.gc-footer {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: baseline;
+  gap: 1.5rem;
+  padding: 30svh var(--gc-gutter) 1.75rem;
+  font-size: 0.9375rem;
+  color: var(--gc-muted);
+}
+
+.gc-footer-nav {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.gc-footer-nav :is(a, button) {
+  color: var(--gc-ink);
+  transition: color var(--gc-t-hover) ease;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .gc-footer-nav :is(a, button):hover { color: var(--gc-lavender); }
+}
+
+.gc-footer-copy {
+  justify-self: end;
+}
+
+/* ── Motion ──────────────────────────────────────────────────── */
+
+/* Masked lines: each line rises from behind its own baseline. The
+   padding / negative margin pair keeps descenders out of the mask. */
+.gc-lines .gc-line {
+  display: block;
+  overflow: hidden;
+  padding-block-end: 0.1em;
+  margin-block-end: -0.1em;
+}
+
+.gc-lines .gc-line > span {
+  display: block;
+}
+
+/* Streamed draft words: rise, unblur. Blur bridges the two states so the
+   words read as one surface settling rather than items popping in. */
+.gc-stream > span {
+  display: inline-block;
+  white-space: pre;
+}
+
+@keyframes gc-line-up { from { transform: translateY(105%); } }
+@keyframes gc-rise { from { opacity: 0; transform: translateY(18px); } }
+@keyframes gc-settle { from { opacity: 0; transform: translateY(24px) scale(0.97); } }
+@keyframes gc-word { from { opacity: 0; transform: translateY(0.35em); filter: blur(4px); } }
+@keyframes gc-pane-in { from { opacity: 0; transform: translateY(4px); } }
+@keyframes gc-swap-in { from { opacity: 0; transform: translateY(0.25em); filter: blur(6px); } }
+@keyframes gc-fade { from { opacity: 0; } }
+@keyframes gc-drift { from { transform: scale(1.14) translateY(-3%); } to { transform: scale(1.02) translateY(2%); } }
+
+@media (prefers-reduced-motion: no-preference) {
+  /* Load sequence: headline lines, then the sentence and action,
+     then the composer settles onto its stage. */
+  .js .gc-hero .gc-lines .gc-line > span {
+    animation: gc-line-up 900ms var(--gc-ease-out) backwards;
+    animation-delay: calc(var(--i) * 110ms + 150ms);
+  }
+
+  .js .gc-load {
+    animation: gc-rise 700ms var(--gc-ease-out) backwards;
+    animation-delay: calc(var(--i) * 90ms + 260ms);
+  }
+
+  .js .gc-load-ui {
+    animation: gc-settle 1000ms var(--gc-ease-out) 380ms backwards;
+  }
+
+  .gc-stream > span {
+    animation: gc-word 420ms var(--gc-ease-out) backwards;
+    animation-delay: var(--d);
+  }
+
+  .gc-swap {
+    animation: gc-swap-in 360ms var(--gc-ease-out);
+  }
+
+  /* Scroll entrances. Hidden states only exist under html.js, and every
+     element is revealed once, never replayed. Sections choreograph their
+     own parts below; this is the default for a heading, a sentence, a row. */
+  .js [data-reveal]:not(.gc-field, .gc-table, .gc-lines, .gc-show-control, .gc-dialog, .gc-street-wide) {
+    opacity: 0;
+    transform: translateY(24px);
+    transition:
+      opacity 700ms var(--gc-ease-out),
+      transform 900ms var(--gc-ease-out);
+    transition-delay: calc(var(--i, 0) * 80ms);
+  }
+
+  .js [data-reveal].is-in:not(.gc-field, .gc-table, .gc-lines) {
+    opacity: 1;
+    transform: none;
+  }
+
+  /* A revealed button still gives under the finger. */
+  .js .gc-btn[data-reveal].is-in:active {
+    transform: scale(0.97);
+    transition-delay: 0ms;
+  }
+
+  /* The wide photograph opens from the bottom like a shutter, then
+     keeps easing back from a slight scale as it crosses the screen. */
+  .js .gc-street-wide[data-reveal] .gc-street-wide-frame {
+    clip-path: inset(100% 0 0 0);
+    transition: clip-path 1000ms var(--gc-ease-in-out);
+  }
+
+  .js .gc-street-wide.is-in .gc-street-wide-frame {
+    clip-path: inset(0);
+  }
+
+  @supports (animation-timeline: view()) {
+    .gc-street-wide-frame img {
+      animation: gc-drift linear both;
+      animation-timeline: view();
+      animation-range: entry 0% exit 100%;
+    }
+  }
+
+  /* After a hover the shop pictures settle back, so they need their own
+     transition list rather than the generic reveal one. */
+  .js .gc-shop[data-reveal] {
+    transition-delay: calc(var(--i, 0) * 90ms + 120ms);
+  }
+
+  /* The poster control slides in from the edge that crops it. */
+  .js .gc-show-control[data-reveal] {
+    opacity: 0;
+    transform: translateX(8%);
+    transition:
+      opacity 700ms var(--gc-ease-out) 120ms,
+      transform 1100ms var(--gc-ease-out) 120ms;
+  }
+
+  /* Fields stay put; their card and clause arrive, field after field. */
+  .js .gc-field[data-reveal] :is(.gc-card, .gc-clause, .gc-strip-title) {
+    opacity: 0;
+    transition:
+      opacity 600ms var(--gc-ease-out),
+      transform 800ms var(--gc-ease-out),
+      translate 800ms var(--gc-ease-out);
+    transition-delay: calc(var(--i) * 90ms + 80ms);
+  }
+
+  .js .gc-field[data-reveal] .gc-card {
+    translate: -50% 24px;
+    transition:
+      opacity 600ms var(--gc-ease-out),
+      transform 150ms var(--gc-ease-out),
+      translate 800ms var(--gc-ease-out);
+  }
+
+  .js .gc-field[data-reveal] :is(.gc-clause, .gc-strip-title) {
+    transform: translateY(16px);
+  }
+
+  .js .gc-field[data-reveal] .gc-clause {
+    transition-delay: calc(var(--i) * 90ms + 180ms);
+  }
+
+  .js .gc-field.is-in :is(.gc-card, .gc-clause, .gc-strip-title) {
+    opacity: 1;
+  }
+
+  .js .gc-field.is-in .gc-card {
+    translate: -50% 0;
+    transition-delay: calc(var(--i) * 90ms + 80ms), 0ms, calc(var(--i) * 90ms + 80ms);
+  }
+
+  .js .gc-field.is-in :is(.gc-clause, .gc-strip-title) {
+    transform: none;
+  }
+
+  /* Table rows arrive one after another; the violet column draws down. */
+  .js .gc-table[data-reveal] .gc-tr {
+    opacity: 0;
+    transform: translateY(14px);
+    transition:
+      opacity 500ms var(--gc-ease-out),
+      transform 700ms var(--gc-ease-out);
+    transition-delay: calc(var(--i, -1) * 55ms + 120ms);
+  }
+
+  .js .gc-table[data-reveal]::before {
+    clip-path: inset(0 0 100% 0);
+    transition: clip-path 1000ms var(--gc-ease-in-out) 100ms;
+  }
+
+  .js .gc-table.is-in .gc-tr {
+    opacity: 1;
+    transform: none;
+  }
+
+  .js .gc-table.is-in::before {
+    clip-path: inset(0);
+  }
+
+  /* Closing line: the hero's masked rise, replayed once for the ending. */
+  .js .gc-final-title[data-reveal] .gc-line > span {
+    transform: translateY(105%);
+    transition: transform 900ms var(--gc-ease-out);
+    transition-delay: calc(var(--i) * 110ms);
+  }
+
+  .js .gc-final-title.is-in .gc-line > span {
+    transform: none;
+  }
+
+  .js .gc-dialog[data-reveal] {
+    opacity: 0;
+    transform: translateY(32px) scale(0.98);
+    transition:
+      opacity 700ms var(--gc-ease-out) 200ms,
+      transform 1000ms var(--gc-ease-out) 200ms;
+  }
+
+  .js :is(.gc-show-control, .gc-dialog).is-in {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Reduced motion keeps the information changes (fades), drops travel. */
+@media (prefers-reduced-motion: reduce) {
+  .gc-ui-pane,
+  .gc-swap {
+    animation: gc-fade 200ms ease;
+  }
+
+  .gc-landing *,
+  .gc-landing *::before,
+  .gc-landing *::after {
+    transition-property: opacity, color, background-color, border-color !important;
+  }
+}
+
+/* ── Tablet ─────────────────────────────────────────────────── */
+@media (max-width: 1080px) {
+  .gc-nav {
+    display: none;
+  }
+
+  .gc-header-actions {
+    margin-inline-start: auto;
+  }
+
+  .gc-burger {
+    display: grid;
+  }
+
+  .gc-strip {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .gc-street-copy {
+    grid-column: 1 / -1;
+    padding-inline-end: var(--gc-gutter);
+  }
+
+  .gc-street-wide {
+    grid-column: 1 / -1;
+  }
+
+  .gc-shops {
+    grid-template-columns: repeat(2, 1fr);
+    row-gap: 2.5rem;
+  }
+
+  .gc-field {
+    min-block-size: 64svh;
+  }
+
+  .gc-final-copy {
+    grid-column: 1 / -1;
+    margin-block-end: 3rem;
+  }
+
+  .gc-dialog {
+    grid-column: 1 / -1;
+    max-inline-size: 30rem;
+  }
+
+  .gc-final {
+    align-content: end;
+  }
+}
+
+/* ── Phone: its own composition ──────────────────────────────── */
+@media (max-width: 900px) {
+  .gc-hero {
+    grid-template-columns: 1fr;
+    min-block-size: 0;
+  }
+
+  .gc-hero-copy {
+    padding-block: 9rem 3.5rem;
+  }
+
+  .gc-hero-stage {
+    padding: 3rem var(--gc-gutter) 3.5rem;
+  }
+}
+
+@media (max-width: 760px) {
+  .gc-hide-sm {
+    display: none;
+  }
+
+  .gc-header {
+    gap: 1rem;
+  }
+
+  .gc-hero {
+    grid-template-columns: 1fr;
+    min-block-size: 0;
+  }
+
+  .gc-hero-copy {
+    padding-block: 7.5rem 3rem;
+    gap: 1.25rem;
+  }
+
+  .gc-hero-stage {
+    padding: 2.5rem 1rem 3rem;
+  }
+
+  .gc-h1 {
+    font-size: clamp(2.2rem, 10.4vw, 3.4rem);
+  }
+
+  .gc-street {
+    padding-inline-start: 0;
+  }
+
+  .gc-street-copy {
+    padding-inline: var(--gc-gutter);
+  }
+
+  .gc-street-wide .gc-credit {
+    padding-inline: var(--gc-gutter);
+  }
+
+  .gc-shops {
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem 0.75rem;
+    padding-inline: var(--gc-gutter);
+  }
+
+  .gc-composer {
+    padding: 1rem;
+  }
+
+  .gc-ui-foot {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .gc-ui-foot .gc-ui-btn {
+    min-block-size: 2.75rem;
+  }
+
+  .gc-show {
+    min-block-size: 86svh;
+  }
+
+  .gc-landing .gc-show-control {
+    inset-inline-start: var(--gc-gutter);
+    font-size: 10.5vw;
+  }
+
+  .gc-strip {
+    grid-template-columns: 1fr;
+  }
+
+  .gc-field {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    min-block-size: 0;
+    padding: 3rem 1.25rem 3.5rem;
+  }
+
+  .gc-strip-title {
+    order: -2;
+  }
+
+  .gc-clause {
+    order: -1;
+    font-size: 1.5rem;
+  }
+
+  .gc-card {
+    position: static;
+    translate: none;
+  }
+
+  .js .gc-field[data-reveal] .gc-card,
+  .js .gc-field.is-in .gc-card {
+    translate: 0 0;
+  }
+
+  .gc-tr,
+  .gc-th {
+    grid-template-columns: 1fr;
+  }
+
+  .gc-th {
+    display: none;
+  }
+
+  .gc-tr {
+    padding: 1.25rem 0;
+  }
+
+  .gc-tr:nth-child(even) {
+    background: var(--gc-surface);
+    margin-inline: calc(var(--gc-gutter) * -1);
+    padding-inline: var(--gc-gutter);
+  }
+
+  .gc-tr:nth-child(even) :is(.gc-td-job, .gc-td-usual) {
+    background: none;
+    margin: 0;
+    padding-inline: 0;
+  }
+
+  .gc-td-job {
+    min-block-size: 0;
+    padding: 0 0 0.5rem;
+    font-size: 1.25rem;
+  }
+
+  .gc-td {
+    min-block-size: 0;
+    padding: 0.6rem 0.9rem;
+    font-size: 1rem;
+  }
+
+  .gc-table::before {
+    display: none;
+  }
+
+  .gc-td-feature {
+    background: var(--gc-purple);
+  }
+
+  .gc-td-usual {
+    padding-inline: 0;
+  }
+
+  .gc-only-sm {
+    display: inline;
+  }
+
+  .gc-final {
+    min-block-size: 84svh;
+    padding-block: 4rem 2rem;
+    column-gap: 0;
+  }
+
+  .gc-final-title {
+    font-size: 15vw;
+  }
+
+  .gc-dialog {
+    padding: 1.25rem;
+  }
+
+  .gc-footer {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+    padding-block-start: 20svh;
+    font-size: 0.875rem;
+  }
+
+  .gc-footer-nav {
+    flex-wrap: wrap;
+    gap: 0.5rem 1.25rem;
+  }
+
+  .gc-footer-copy {
+    justify-self: start;
+  }
+}
+
+/* ── Lead finder landing ────────────────────────────────────── */
+.gc-results-stage {
+  display: grid;
+  align-content: center;
+  gap: 1rem;
+  min-block-size: 100%;
+  padding: 7rem var(--gc-gutter) 3rem;
+  background: var(--gc-surface);
+}
+
+.gc-hero-form {
+  inline-size: min(100%, 39rem);
+}
+
+.gc-describe {
+  display: grid;
+  gap: 0.8rem;
+}
+
+.gc-describe-row,
+.gc-save-row {
+  display: flex;
+  align-items: stretch;
+  gap: 0.65rem;
+}
+
+.gc-describe-input {
+  min-block-size: 3.25rem;
+  font-size: 1rem;
+}
+
+.gc-find-button {
+  flex: none;
+}
+
+.gc-text-button {
+  justify-self: start;
+  color: var(--gc-lavender);
+  font-size: 0.875rem;
+  font-weight: 600;
+  transition:
+    color var(--gc-t-hover) ease,
+    transform var(--gc-t-press) var(--gc-ease-out);
+}
+
+.gc-text-button:active,
+.gc-suggestion:active {
+  transform: scale(0.97);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .gc-text-button:hover {
+    color: var(--gc-ink);
+  }
+}
+
+.gc-website-field {
+  display: grid;
+  gap: 0.45rem;
+  max-inline-size: 28rem;
+  padding-block-start: 0.35rem;
+}
+
+.gc-result-intro {
+  inline-size: min(100%, 31rem);
+  padding: 1.5rem;
+  border-radius: 12px;
+  background: var(--gc-raised);
+}
+
+.gc-result-intro p {
+  margin-block-end: 0.75rem;
+  color: var(--gc-muted);
+}
+
+.gc-result-intro ul {
+  display: grid;
+  gap: 0.5rem;
+  padding-inline-start: 1.2rem;
+  font-size: 1rem;
+}
+
+.gc-preview {
+  display: grid;
+  gap: 0.85rem;
+  inline-size: min(100%, 35rem);
+}
+
+.gc-understood {
+  font-family: var(--font-display, 'Bricolage Grotesque'), system-ui, sans-serif;
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.gc-progress {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  color: var(--gc-muted);
+  font-size: 0.875rem;
+}
+
+.gc-progress span {
+  flex: none;
+  color: var(--gc-ink);
+  font-variant-numeric: tabular-nums;
+}
+
+.gc-lead-list {
+  display: grid;
+  gap: 0.55rem;
+}
+
+.gc-lead-card,
+.gc-lead-skeleton {
+  min-block-size: 6rem;
+  padding: 0.9rem 1rem;
+  border-radius: 8px;
+  background: var(--gc-raised);
+}
+
+.gc-lead-card {
+  display: grid;
+  gap: 0.2rem;
+}
+
+.gc-lead-card-top {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.gc-lead-card h3 {
+  font-family: var(--font-body, 'Hanken Grotesk'), system-ui, sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0;
+  line-height: 1.25;
+}
+
+.gc-lead-card-top span,
+.gc-lead-meta {
+  color: var(--gc-muted);
+  font-size: 0.8125rem;
+}
+
+.gc-lead-why {
+  font-size: 0.875rem;
+  line-height: 1.4;
+}
+
+.gc-lead-skeleton {
+  display: grid;
+  align-content: center;
+  gap: 0.5rem;
+}
+
+.gc-lead-skeleton span {
+  display: block;
+  block-size: 0.7rem;
+  inline-size: 42%;
+  border-radius: 3px;
+  background: var(--gc-step-3);
+}
+
+.gc-lead-skeleton span:nth-child(2) {
+  inline-size: 62%;
+}
+
+.gc-lead-skeleton span:nth-child(3) {
+  inline-size: 84%;
+}
+
+.gc-state-message {
+  display: grid;
+  justify-items: start;
+  gap: 0.75rem;
+  padding: 1.5rem;
+  border-radius: 12px;
+  background: var(--gc-raised);
+}
+
+.gc-state-message h2,
+.gc-save h2 {
+  font-size: 1.35rem;
+  line-height: 1.15;
+}
+
+.gc-state-message p,
+.gc-save > div p {
+  color: var(--gc-muted);
+  font-size: 0.9375rem;
+}
+
+.gc-suggestions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.gc-suggestion {
+  min-block-size: 2.5rem;
+  padding: 0 0.8rem;
+  border-radius: 4px;
+  background: var(--gc-step-3);
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-align: start;
+  transition:
+    background-color var(--gc-t-hover) ease,
+    transform var(--gc-t-press) var(--gc-ease-out);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .gc-suggestion:hover {
+    background: var(--gc-raised);
+  }
+}
+
+.gc-save {
+  display: grid;
+  gap: 1rem;
+  inline-size: min(100%, 35rem);
+  margin-block-start: 0.25rem;
+  padding: 1.25rem;
+  border-radius: 12px;
+  background: var(--gc-step-2);
+}
+
+.gc-save > div {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.gc-save-form {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.gc-save-row .gc-ui-input {
+  min-block-size: 2.75rem;
+}
+
+.gc-save-confirmation {
+  color: var(--gc-ink);
+  font-weight: 600;
+}
+
+.gc-form-error {
+  color: oklch(0.78 0.13 15);
+  font-size: 0.8125rem;
+}
+
+.gc-landing:has(.gc-save) .gc-find-button {
+  background: var(--gc-step-3);
+}
+
+.gc-street-copy .gc-h2 {
+  max-inline-size: 13ch;
+}
+
+.gc-field-3 {
+  background: var(--gc-plum);
+}
+
+.gc-card-row {
+  color: var(--gc-ink);
+  line-height: 1.4;
+}
+
+.gc-final {
+  align-items: end;
+}
+
+.gc-final-button {
+  grid-column: 8 / 12;
+  align-self: end;
+  justify-self: start;
+}
+
+.gc-footer {
+  grid-template-columns: 1fr auto;
+  padding-block-start: 18svh;
+}
+
+.gc-footer button {
+  color: var(--gc-ink);
+}
+
+@keyframes gc-card-arrive {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+@keyframes gc-skeleton-breathe {
+  0%,
+  100% { opacity: 0.5; }
+  50% { opacity: 0.82; }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .gc-lead-card {
+    animation: gc-card-arrive 280ms var(--gc-ease-out) backwards;
+    animation-delay: calc(var(--i) * 50ms);
+  }
+
+  .gc-lead-skeleton {
+    animation: gc-skeleton-breathe 1.5s ease-in-out infinite;
+  }
+}
+
+@media (max-width: 900px) {
+  .gc-results-stage {
+    min-block-size: 28rem;
+    padding: 2.5rem var(--gc-gutter) 3.5rem;
+  }
+}
+
+@media (max-width: 760px) {
+  .gc-header {
+    padding-block: 1rem;
+  }
+
+  .gc-nav {
+    display: flex;
+    gap: 1rem;
+    margin-inline-start: auto;
+  }
+
+  .gc-logo-word {
+    display: none;
+  }
+
+  .gc-hero-copy {
+    padding-block: 7rem 2.5rem;
+  }
+
+  .gc-lines .gc-line > span {
+    white-space: normal;
+  }
+
+  .gc-describe-row,
+  .gc-save-row {
+    display: grid;
+  }
+
+  .gc-find-button,
+  .gc-save-row .gc-btn {
+    inline-size: 100%;
+  }
+
+  .gc-results-stage {
+    min-block-size: 24rem;
+    padding-inline: 1rem;
+  }
+
+  .gc-progress {
+    display: grid;
+    gap: 0.2rem;
+  }
+
+  .gc-lead-card-top {
+    align-items: start;
+  }
+
+  .gc-street-copy .gc-h2 {
+    max-inline-size: 12ch;
+    font-size: 1.9rem;
+  }
+
+  .gc-final {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-end;
+    gap: 2rem;
+  }
+
+  .gc-final-title {
+    font-size: 11.8vw;
+  }
+
+  .gc-final-button {
+    inline-size: 100%;
+  }
+
+  .gc-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+}
+
+/* Example sentences run a search in one click. */
+.gc-example {
+  color: var(--gc-ink);
+  text-align: start;
+  text-decoration: underline;
+  text-decoration-color: color-mix(in oklch, var(--gc-ink) 30%, transparent);
+  text-underline-offset: 4px;
+  transition: text-decoration-color var(--gc-t-hover) ease;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .gc-example:hover { text-decoration-color: var(--gc-lavender); }
+}
