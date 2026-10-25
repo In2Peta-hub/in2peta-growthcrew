@@ -73,6 +73,7 @@ The legacy Express `server/` app has been retired — FastAPI is the only backen
 
 ## Related guides
 
-- [DEPLOYMENT_GUIDE.md](./DEPLOYMENT_GUIDE.md) — Render (backend) + Vercel (frontend)
+- [KOYEB_DEPLOYMENT.md](./KOYEB_DEPLOYMENT.md) — Docker Hub publishing and Koyeb deployment for the backend
+- [DEPLOYMENT_GUIDE.md](./DEPLOYMENT_GUIDE.md) — legacy Render backend and Vercel frontend setup
 - [REACT_INTEGRATION_GUIDE.md](./REACT_INTEGRATION_GUIDE.md) — run or embed the React client
 - [FASTAPI_INTEGRATION_GUIDE.md](./FASTAPI_INTEGRATION_GUIDE.md) — mount the FastAPI routers
