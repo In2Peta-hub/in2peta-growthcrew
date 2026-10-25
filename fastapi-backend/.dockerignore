@@ -1,6 +1,10 @@
 .env
 .env.*
-!.env.example
+.venv/
+venv/
+data/
+*.pem
+*.key
 __pycache__/
 *.py[cod]
 .pytest_cache/

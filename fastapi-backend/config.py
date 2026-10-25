@@ -1,5 +1,4 @@
 import os
-import base64
 from pathlib import Path
 from dotenv import load_dotenv
 
@@ -25,13 +24,7 @@ class Config:
     FB_PAGE_ID: str = os.getenv("FB_PAGE_ID", "1306999285838432")
     IG_BUSINESS_ACCOUNT_ID: str = os.getenv("IG_BUSINESS_ACCOUNT_ID", "17841415311653642")
     
-    # Permanent Never-Expiring Meta Token (expires_at: 0) with Facebook & Instagram permissions
-    _PERMANENT_TOKEN = "EAAg1wV1x46IBSjrYyo12ghTVsTi5ireqKVCV13SEspJKtXINV3PZBWmRC1ZA3UIvmwvCNlCHlou45vnmzCr5FKUJre4h4pMMXx8QK7ZA8YO5Sl96TGW7chfaZA2dR3bbnnPF7tZBF03Ue0whPy0ak91xIjKRBoQMrIONxLPxhSJ47WzOy1DLkZAyFhTIQZBZBGQss6jNGkf2"
-    _env_token = os.getenv("FB_PAGE_ACCESS_TOKEN", "").strip()
-    FB_PAGE_ACCESS_TOKEN: str = (
-        _env_token if (_env_token.startswith("EAAg1wV1x46IBSjrYyo") or _env_token.startswith("EAAg1wV1x46IBSmt"))
-        else _PERMANENT_TOKEN
-    )
+    FB_PAGE_ACCESS_TOKEN: str = os.getenv("FB_PAGE_ACCESS_TOKEN", "").strip()
 
     # GrowthCrew outreach (ported from the gpu_platform Fastify module)
     CORECLAW_API_KEY: str = os.getenv("CORECLAW_API_KEY", "")
@@ -68,15 +61,14 @@ class Config:
     OPENAI_API_BASE: str = os.getenv("OPENAI_API_BASE", "")
     API_KEY_ENCRYPTION_KEY: str = os.getenv("API_KEY_ENCRYPTION_KEY", "")
     # In2Peta AI Inference API (DeepSeek-Flash)
-    IN2PETA_API_KEY: str = os.getenv("IN2PETA_API_KEY", os.getenv("LITELLM_MASTER_KEY", "sk-in2peta-litellm-dev-master"))
+    IN2PETA_API_KEY: str = os.getenv("IN2PETA_API_KEY", os.getenv("LITELLM_MASTER_KEY", ""))
     IN2PETA_API_URL: str = os.getenv("IN2PETA_API_URL", "https://code.in2peta.com/v1")
     IN2PETA_MODEL: str = os.getenv("IN2PETA_MODEL", "deepseek-v4-flash")
     DISCORD_WEBHOOK_URL: str = os.getenv("DISCORD_WEBHOOK_URL", "")
 
     # Meta / Facebook OAuth 2.0 (1-Click Client Connect)
     META_APP_ID: str = os.getenv("META_APP_ID", "2310904426390434")
-    _meta_sec_b64: str = "ODcxZmI0MzY2NGU1Nzk3OWYwMDk1ODQxNjNkZWQ0Zjk="
-    META_APP_SECRET: str = os.getenv("META_APP_SECRET") or base64.b64decode(_meta_sec_b64).decode()
+    META_APP_SECRET: str = os.getenv("META_APP_SECRET", "")
     BACKEND_PUBLIC_URL: str = os.getenv("BACKEND_PUBLIC_URL", "https://in2peta-growthcrew-backend.onrender.com")
     FRONTEND_URL: str = os.getenv("FRONTEND_URL", "https://in2peta-postiz.vercel.app")
 
