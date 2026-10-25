@@ -1,29 +1,31 @@
 @import "tailwindcss";
 
 @theme {
-  --font-sans: 'Hanken Grotesk', system-ui, sans-serif;
-  --font-display: 'Bricolage Grotesque', system-ui, sans-serif;
-  --color-slate-100: #f6f2fb;
-  --color-slate-200: #e8e0f2;
-  --color-slate-300: #cec3df;
-  --color-slate-400: #b7adca;
-  --color-slate-500: #a89ab9;
-  --color-slate-600: #a195b1;
+  --font-sans: 'Satoshi', system-ui, sans-serif;
+  --font-display: 'Cabinet Grotesk', system-ui, sans-serif;
+  --color-slate-100: #1c1a24;
+  --color-slate-200: #2c2934;
+  --color-slate-300: #3f3a47;
+  --color-slate-400: #57515f;
+  --color-slate-500: #6e6776;
+  --color-slate-600: #81788a;
 }
 
 @layer base {
   :root {
-    color-scheme: dark;
-    --brand-bg: #0c0911;
-    --brand-surface: #15111d;
-    --brand-raised: #20192b;
-    --brand-purple: #9702fa;
-    --brand-purple-hover: #8400d8;
-    --brand-lavender: #b69cde;
-    --brand-ink: #f6f2fb;
-    --brand-muted: #b7adca;
-    --font-display: 'Bricolage Grotesque', system-ui, sans-serif;
-    --font-body: 'Hanken Grotesk', system-ui, sans-serif;
+    color-scheme: light;
+    /* Cream ground, white cards, warm sand for quiet steps. In2Peta purple
+       is the one action colour; everything else is warm ink. */
+    --brand-bg: #fbf7f0;
+    --brand-surface: #ffffff;
+    --brand-raised: #f4ede1;
+    --brand-purple: #6b2fe0;
+    --brand-purple-hover: #5a22c9;
+    --brand-lavender: #6b3fd6;
+    --brand-ink: #1c1a24;
+    --brand-muted: #57515f;
+    --font-display: 'Cabinet Grotesk', system-ui, sans-serif;
+    --font-body: 'Satoshi', system-ui, sans-serif;
 
     /* Existing components share the same brand through these legacy aliases. */
     --scalora-bg: var(--brand-bg);
@@ -48,13 +50,14 @@
 
   h1, h2, h3 {
     font-family: var(--font-display);
+    font-weight: 700;
     text-wrap: balance;
   }
 
   button, input, textarea, select { font-family: inherit; }
   button, a, input, textarea, select { accent-color: var(--brand-purple); }
-  :focus-visible { outline: 2px solid var(--brand-lavender); outline-offset: 3px; }
-  ::selection { background: var(--brand-purple); color: white; }
+  :focus-visible { outline: 2px solid var(--brand-purple); outline-offset: 3px; }
+  ::selection { background: #e2d5ff; color: var(--brand-ink); }
 }
 
 .brand-logo {

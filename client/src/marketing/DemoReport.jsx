@@ -19,6 +19,9 @@ import {
 } from 'lucide-react';
 import { DEMO_DATA } from './demoData';
 import { MODULE_ICONS } from './moduleIcons';
+
+// The sample data names icons by shape; map them to the module they stand for.
+const AGENT_MODULE = { users: 'leads', share: 'social', search: 'seo', star: 'influencer', megaphone: 'ads' };
 import './demoReport.css';
 
 // A complete growth report built from the three sample businesses in
@@ -163,7 +166,7 @@ function AgentsPanel({ data }) {
     >
       <div className="gcr-agents">
         {data.agents.map((agent) => {
-          const Icon = MODULE_ICONS[agent.icon === 'users' ? 'leads' : agent.icon] || Sparkles;
+          const Icon = MODULE_ICONS[AGENT_MODULE[agent.icon]] || Sparkles;
           return (
             <div className="gcr-agent" key={agent.name}>
               <span
@@ -288,7 +291,6 @@ function SocialPanel({ data }) {
       <div className="gcr-pills">
         {data.social.recommended.map((channel, index) => (
           <span className={`gcr-pill ${index === 0 ? 'is-mint' : 'is-violet'}`} key={channel}>
-            {index === 0 ? '★ ' : ''}
             {channel}
           </span>
         ))}
@@ -787,9 +789,8 @@ export default function DemoReport({ initialKey = 'gym' }) {
             </span>
           </div>
           <div className="gcr-context-items">
-            {data.context.map((item, index) => (
+            {data.context.map((item) => (
               <div key={item}>
-                <span className="gcr-mono">{String(index + 1).padStart(2, '0')}</span>
                 {item}
               </div>
             ))}

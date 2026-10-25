@@ -32,6 +32,7 @@
 
 .ws-app :where(h1, h2, h3) {
   font-family: var(--font-display);
+  font-weight: 700;
   letter-spacing: -0.03em;
   line-height: 1.04;
 }
@@ -141,7 +142,7 @@
   display: grid;
   grid-template-columns: minmax(0, 1.4fr) minmax(20rem, 0.85fr);
   gap: clamp(1.5rem, 4vw, 3.5rem);
-  align-items: end;
+  align-items: center;
   padding-block-start: clamp(1rem, 3vw, 2.5rem);
 }
 
@@ -152,11 +153,10 @@
 }
 
 .ws-hero h1 {
-  font-size: clamp(2.4rem, 1.5rem + 3.8vw, 4.4rem);
-  max-inline-size: 15ch;
+  font-size: clamp(2.2rem, 1.4rem + 2.8vw, 3.6rem);
+  max-inline-size: 16ch;
 }
 
-.ws-hero h1 span { color: var(--brand-lavender); }
 
 .ws-hero p {
   max-inline-size: 58ch;
@@ -376,12 +376,12 @@
   .ws-card:hover { background: var(--brand-raised); }
 }
 
-.ws-card-violet { --ws-accent: #a48cff; }
+.ws-card-violet { --ws-accent: #6b2fe0; }
 .ws-card-lavender { --ws-accent: var(--brand-lavender); }
-.ws-card-mint { --ws-accent: #2fe0a8; }
-.ws-card-amber { --ws-accent: #ffb020; }
-.ws-card-sky { --ws-accent: #4cc9ff; }
-.ws-card-coral { --ws-accent: #ff8f8f; }
+.ws-card-mint { --ws-accent: #12805c; }
+.ws-card-amber { --ws-accent: #b7700c; }
+.ws-card-sky { --ws-accent: #1f74b0; }
+.ws-card-coral { --ws-accent: #c9452f; }
 
 .ws-card.is-soon { background: color-mix(in oklch, var(--brand-surface) 76%, var(--brand-bg)); }
 
@@ -441,8 +441,8 @@
 }
 
 .ws-status.is-live {
-  background: color-mix(in oklch, #2fe0a8 15%, transparent);
-  color: #5cf0c0;
+  background: color-mix(in oklch, #12805c 15%, transparent);
+  color: #0f6b4c;
 }
 
 .ws-status.is-soon {
@@ -577,10 +577,10 @@
   background: var(--brand-surface);
 }
 
-.ws-soon-mint { --ws-accent: #2fe0a8; }
-.ws-soon-amber { --ws-accent: #ffb020; }
-.ws-soon-sky { --ws-accent: #4cc9ff; }
-.ws-soon-coral { --ws-accent: #ff8f8f; }
+.ws-soon-mint { --ws-accent: #12805c; }
+.ws-soon-amber { --ws-accent: #b7700c; }
+.ws-soon-sky { --ws-accent: #1f74b0; }
+.ws-soon-coral { --ws-accent: #c9452f; }
 
 .ws-soon-copy {
   display: grid;

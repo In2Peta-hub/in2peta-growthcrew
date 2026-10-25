@@ -5,9 +5,9 @@
       Only things that float (menus, dialogs, toasts) cast a shadow.
     - Violet is for the one primary action and for "selected". Lavender
       is for links and quiet emphasis. Everything else is ink and muted.
-    - Hanken Grotesk for all interface text, sentence case, 13px minimum.
-      Bricolage Grotesque only for page and panel titles.
-    - Buttons are 4px-cornered and flat. Controls (inputs, switches) are
+    - Satoshi for all interface text, sentence case, 13px minimum.
+      Cabinet Grotesk only for page and panel titles.
+    - Buttons are pill-shaped and flat, matching the landing page. Controls (inputs, switches) are
       6px. Panels are 12px. Pills only for status badges and avatars.
     - Motion follows frequency: press feedback everywhere (scale .97),
       fast menus from their trigger, short dialogs, no animation on things
@@ -17,25 +17,25 @@
    (width, margin, grid placement) on top of these classes. */
 @layer components {
   :root {
-    --ui-bg: var(--brand-bg, #0c0911);
-    --ui-surface: var(--brand-surface, #15111d);
-    --ui-raised: var(--brand-raised, #20192b);
-    --ui-step: #2a2138;
-    --ui-step-strong: #33264a;
-    --ui-ink: var(--brand-ink, #f6f2fb);
-    --ui-muted: var(--brand-muted, #b7adca);
-    --ui-faint: #8d82a0;
-    --ui-accent: var(--brand-purple, #9702fa);
-    --ui-accent-hover: color-mix(in oklch, var(--ui-accent), white 12%);
-    --ui-accent-soft: color-mix(in oklch, var(--ui-accent) 18%, var(--ui-surface));
-    --ui-lavender: var(--brand-lavender, #b69cde);
+    --ui-bg: var(--brand-bg, #fbf7f0);
+    --ui-surface: var(--brand-surface, #ffffff);
+    --ui-raised: var(--brand-raised, #f4ede1);
+    --ui-step: #ede4d4;
+    --ui-step-strong: #e2d6c2;
+    --ui-ink: var(--brand-ink, #1c1a24);
+    --ui-muted: var(--brand-muted, #57515f);
+    --ui-faint: #81788a;
+    --ui-accent: var(--brand-purple, #6b2fe0);
+    --ui-accent-hover: var(--brand-purple-hover, #5a22c9);
+    --ui-accent-soft: #efe8ff;
+    --ui-lavender: var(--brand-lavender, #6b3fd6);
     --ui-line: color-mix(in oklch, var(--ui-ink) 12%, transparent);
     --ui-line-strong: color-mix(in oklch, var(--ui-ink) 22%, transparent);
-    --ui-good: oklch(0.8 0.13 155);
-    --ui-warn: oklch(0.84 0.13 80);
-    --ui-bad: oklch(0.76 0.14 18);
+    --ui-good: oklch(0.52 0.12 158);
+    --ui-warn: oklch(0.6 0.13 70);
+    --ui-bad: oklch(0.55 0.18 28);
 
-    --ui-r-btn: 4px;
+    --ui-r-btn: 999px;
     --ui-r-ctl: 6px;
     --ui-r-panel: 12px;
 
@@ -46,7 +46,7 @@
     --ui-t-pop: 180ms;
     --ui-t-dialog: 220ms;
 
-    --ui-shadow-float: 0 18px 44px -14px rgb(0 0 0 / 0.65);
+    --ui-shadow-float: 0 18px 44px -16px rgb(74 52 24 / 0.28), 0 0 0 1px rgb(28 26 36 / 0.06);
   }
 
   /* ── Buttons ─────────────────────────────────────────────────── */
@@ -96,7 +96,7 @@
 
   .ui-btn-light {
     background: var(--ui-ink);
-    color: #160c22;
+    color: var(--ui-bg);
   }
 
   .ui-btn-ghost {
@@ -137,7 +137,7 @@
   @media (hover: hover) and (pointer: fine) {
     .ui-btn:hover:not(:disabled) { background: var(--ui-step); }
     .ui-btn-primary:hover:not(:disabled) { background: var(--ui-accent-hover); }
-    .ui-btn-light:hover:not(:disabled) { background: white; }
+    .ui-btn-light:hover:not(:disabled) { background: #000; }
     .ui-btn-ghost:hover:not(:disabled) { background: var(--ui-raised); color: var(--ui-ink); }
     .ui-btn-danger:hover:not(:disabled) { background: color-mix(in oklch, var(--ui-bad) 24%, var(--ui-surface)); }
   }
@@ -505,7 +505,7 @@
     display: grid;
     place-items: center;
     padding: 1rem;
-    background: rgb(6 3 10 / 0.72);
+    background: rgb(28 26 36 / 0.42);
     transition: opacity var(--ui-t-dialog) ease;
 
     @starting-style {

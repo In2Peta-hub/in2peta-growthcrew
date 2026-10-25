@@ -10,15 +10,15 @@ export const DEMO_DATA = {
       'Subscription membership, $39/month, no joining fee',
       'Primary buyer: urban professionals 22–38, trains 3–5×/week',
       'Top competitors: 3 boutique gyms within 2km, 1 national chain',
-      'Reviews: 4.7★ average across Google & ClassPass'
+      'Reviews: 4.7-star average across Google & ClassPass'
     ],
-    score:{ overall:34, subs:[['Technical SEO',41,'#7c5cff'],['Content & keywords',28,'#2fe0a8'],['Local / maps',22,'#ffb020'],['Authority & backlinks',18,'#ff6b6b']] },
+    score:{ overall:34, subs:[['Technical SEO',41,'#6b2fe0'],['Content & keywords',28,'#14a874'],['Local / maps',22,'#b5750a'],['Authority & backlinks',18,'#e0604a']] },
     findings:[
       { agent:'SEO',   sev:'critical', t:'No structured data on the landing page', fix:'GrowthCrew generates LocalBusiness + Offer + FAQ schema and ships it in 4 minutes' },
       { agent:'SEO',   sev:'high',    t:'Title tags missing on 14 of 31 indexable pages', fix:'Titles generated from location + offer + intent keyword' },
       { agent:'SEO',   sev:'high',    t:'LCP 4.6s on mobile — hero image is 1.9 MB', fix:'Auto-compress, serve AVIF, preload LCP element' },
       { agent:'SEO',   sev:'high',    t:'Google Business Profile not linked in schema', fix:'Connect GBP and inject localBusiness markup sitewide' },
-      { agent:'SEO',   sev:'medium',  t:'No review markup, so 4.7★ is invisible to Google', fix:'Aggregate ClassPass + Google reviews into Review schema' },
+      { agent:'SEO',   sev:'medium',  t:'No review markup, so 4.7-star is invisible to Google', fix:'Aggregate ClassPass + Google reviews into Review schema' },
       { agent:'Social',sev:'high',    t:'No presence on Instagram, TikTok, YouTube or X', fix:'Agent opens accounts, writes 20 posts from 5 pillars, schedules 5/week' },
       { agent:'Social',sev:'medium',  t:'Nothing is being captured — no email or SMS list', fix:'Traffic agent adds a 2-step welcome offer and links it to a landing page' },
       { agent:'Ads',   sev:'high',    t:'No ads account, no pixel, no conversion tracking', fix:'Create pixel + conversion API, then 3 small tests per channel' },
@@ -27,11 +27,11 @@ export const DEMO_DATA = {
       { agent:'Lead',  sev:'medium',  t:'No outbound list — every lead currently walks past the door', fix:'Build a 400-person list from competitor member pages + local events' }
     ],
     agents:[
-      { name:'Grow Customers', tag:'Automatic', icon:'users',  status:'Running', stat:'214 qualified leads', color:'#7c5cff' },
-      { name:'Grow Social',    tag:'Approval',   icon:'share',  status:'Drafting', stat:'20 posts queued',   color:'#a48cff' },
-      { name:'Grow Traffic',   tag:'Ships fixes',icon:'search', status:'Fixing',  stat:'6 fixes shipped',   color:'#2fe0a8' },
-      { name:'Grow Influence', tag:'Approval',   icon:'star',   status:'Outreach', stat:'5 creators found',  color:'#ffb020' },
-      { name:'Grow Ads',       tag:'Approval',   icon:'megaphone', status:'Testing', stat:'3 campaigns live', color:'#4cc9ff' }
+      { name:'Grow Customers', tag:'Automatic', icon:'users',  status:'Running', stat:'214 qualified leads', color:'#6b2fe0' },
+      { name:'Grow Social',    tag:'Approval',   icon:'share',  status:'Drafting', stat:'20 posts queued',   color:'#a083f2' },
+      { name:'Grow Traffic',   tag:'Ships fixes',icon:'search', status:'Fixing',  stat:'6 fixes shipped',   color:'#14a874' },
+      { name:'Grow Influence', tag:'Approval',   icon:'star',   status:'Outreach', stat:'5 creators found',  color:'#b5750a' },
+      { name:'Grow Ads',       tag:'Approval',   icon:'megaphone', status:'Testing', stat:'3 campaigns live', color:'#2b8fd6' }
     ],
     seo:{
       score:34,
@@ -40,11 +40,11 @@ export const DEMO_DATA = {
         {t:'Title tags missing (14 of 31 pages)', sev:'high',    pages:14, impact:84},
         {t:'LCP 4.6s on mobile (hero 1.9 MB)',   sev:'high',    pages:1,  impact:76},
         {t:'Google Business Profile not linked',  sev:'high',    pages:1,  impact:71},
-        {t:'No Review schema (4.7★ unseen)',      sev:'medium',  pages:0,  impact:58},
+        {t:'No Review schema (4.7-star unseen)',      sev:'medium',  pages:0,  impact:58},
         {t:'Core Web Vitals failing',            sev:'medium',  pages:9,  impact:44},
         {t:'Duplicate H1 across 6 pages',         sev:'low',     pages:6,  impact:29}
       ],
-      kws:[['gym membership austin',32,'#7c5cff'],['gym near me',27,'#a48cff'],['boutique gym subscription',19,'#2fe0a8'],['strength training classes',14,'#4cc9ff'],['affordable gym austin',11,'#ffb020']]
+      kws:[['gym membership austin',32,'#6b2fe0'],['gym near me',27,'#a083f2'],['boutique gym subscription',19,'#14a874'],['strength training classes',14,'#2b8fd6'],['affordable gym austin',11,'#b5750a']]
     },
     social:{
       presence:'None — no accounts on Instagram, TikTok, YouTube or X',
@@ -59,8 +59,8 @@ export const DEMO_DATA = {
       total:200,
       rationale:'Instagram delivers 2.4× more reach per dollar for subscription fitness offers in Austin than any other channel, and Reels creatives outperform static by 61% in this category. Google is kept as a smaller capture layer for “gym near me” intent.',
       channels:[
-        {n:'Instagram Reels', icon:'share',    spend:130, reach:'34,200', cpm:'$3.80', cac:'$4.10', color:'#7c5cff'},
-        {n:'Google Search',  icon:'search',   spend:70,  reach:'9,800',  cpm:'$7.10', cac:'$2.60', color:'#2fe0a8'}
+        {n:'Instagram Reels', icon:'share',    spend:130, reach:'34,200', cpm:'$3.80', cac:'$4.10', color:'#6b2fe0'},
+        {n:'Google Search',  icon:'search',   spend:70,  reach:'9,800',  cpm:'$7.10', cac:'$2.60', color:'#14a874'}
       ],
       creatives:['"First week free — no joining fee" Reel, gym interior','Before/after strength coaching carousel','"Why Austin memberships jump in January" founder-to-camera'],
       projected:{impressions:'44,000', clicks:'1,540', trials:'410', paid:'27'}
@@ -70,26 +70,26 @@ export const DEMO_DATA = {
       members:38, cac:2.63,
       rationale:'$100 of creator content reaches ~42,000 people in Austin who already follow fitness. At the observed 3.7% click and 24% trial rate, that is 38 new paying members — a $2.63 cost per member against $39 MRR.',
       creators:[
-        {n:'Maya R.', handle:'@mayastrong', followers:'41.2K', niche:'Strength coaching', price:'$35', color:'#ffb020'},
-        {n:'Jordan L.', handle:'@jfitwithj', followers:'18.6K', niche:'City lifestyle + gym', price:'$30', color:'#7c5cff'},
-        {n:'Sam K.', handle:'@samstrength', followers:'26.4K', niche:'Beginner lifting', price:'$35', color:'#2fe0a8'}
+        {n:'Maya R.', handle:'@mayastrong', followers:'41.2K', niche:'Strength coaching', price:'$35', color:'#b5750a'},
+        {n:'Jordan L.', handle:'@jfitwithj', followers:'18.6K', niche:'City lifestyle + gym', price:'$30', color:'#6b2fe0'},
+        {n:'Sam K.', handle:'@samstrength', followers:'26.4K', niche:'Beginner lifting', price:'$35', color:'#14a874'}
       ],
       deliverables:'1 Reel + 3 stories + 1 link-in-bio mention, 30-day usage rights'
     },
     projection:{
       labels:['D1','D4','D7','D10','D13','D16','D19','D22','D25','D28','D30'],
-      series:[{n:'Paid (ads + influencers)', c:'#7c5cff', v:[0,1,3,6,10,15,21,28,36,45,51]},
-              {n:'Organic (SEO + social)', c:'#2fe0a8', v:[0,0,1,2,4,6,9,12,15,18,21]},
-              {n:'Outbound (lead agent)',  c:'#4cc9ff', v:[0,0,1,1,3,4,6,8,10,11,11]}],
+      series:[{n:'Paid (ads + influencers)', c:'#6b2fe0', v:[0,1,3,6,10,15,21,28,36,45,51]},
+              {n:'Organic (SEO + social)', c:'#14a874', v:[0,0,1,2,4,6,9,12,15,18,21]},
+              {n:'Outbound (lead agent)',  c:'#2b8fd6', v:[0,0,1,1,3,4,6,8,10,11,11]}],
       totals:[0,1,4,9,17,25,36,48,61,74,83],
       revenue:[0,39,156,351,663,975,1404,1872,2379,2886,3237]
     },
     funnel:[
-      {l:'Ad + creator impressions', v:'86,000', w:100, c:'#7c5cff'},
-      {l:'Clicks',                   v:'2,960',  w:74,  c:'#a48cff'},
-      {l:'Landing page visits',      v:'2,960',  w:74,  c:'#4cc9ff'},
-      {l:'Free-week trials',         v:'742',   w:46,  c:'#ffb020'},
-      {l:'Paid memberships',         v:'83',    w:20,  c:'#2fe0a8'}
+      {l:'Ad + creator impressions', v:'86,000', w:100, c:'#6b2fe0'},
+      {l:'Clicks',                   v:'2,960',  w:74,  c:'#a083f2'},
+      {l:'Landing page visits',      v:'2,960',  w:74,  c:'#2b8fd6'},
+      {l:'Free-week trials',         v:'742',   w:46,  c:'#b5750a'},
+      {l:'Paid memberships',         v:'83',    w:20,  c:'#14a874'}
     ],
     plan:[
       {w:'Week 1', items:[
@@ -140,7 +140,7 @@ export const DEMO_DATA = {
       'Competitors: 6 dashboards, all with strong SEO',
       'No social presence beyond a stale LinkedIn page'
     ],
-    score:{ overall:41, subs:[['Technical SEO',55,'#7c5cff'],['Content & keywords',36,'#2fe0a8'],['Pages & landing pages',29,'#ffb020'],['Authority & backlinks',22,'#ff6b6b']] },
+    score:{ overall:41, subs:[['Technical SEO',55,'#6b2fe0'],['Content & keywords',36,'#14a874'],['Pages & landing pages',29,'#b5750a'],['Authority & backlinks',22,'#e0604a']] },
     findings:[
       { agent:'SEO',   sev:'critical', t:'No SoftwareApplication schema on the homepage', fix:'GrowthCrew generates schema + pricing + FAQ markup sitewide' },
       { agent:'SEO',   sev:'high',    t:'22 pages have no meta description', fix:'Generated from page intent, under 155 chars, with a CTA' },
@@ -154,11 +154,11 @@ export const DEMO_DATA = {
       { agent:'Lead',  sev:'medium',  t:'Trial signup needs no email before the aha moment', fix:'Aha-moment checklist → 3-step email sequence' }
     ],
     agents:[
-      { name:'Grow Customers', tag:'Automatic', icon:'users',  status:'Running', stat:'96 qualified leads', color:'#7c5cff' },
-      { name:'Grow Social',    tag:'Approval',   icon:'share',  status:'Drafting', stat:'12 posts queued',   color:'#a48cff' },
-      { name:'Grow Traffic',   tag:'Ships fixes',icon:'search', status:'Fixing',  stat:'4 fixes shipped',   color:'#2fe0a8' },
-      { name:'Grow Influence', tag:'Approval',   icon:'star',   status:'Outreach', stat:'6 creators found',  color:'#ffb020' },
-      { name:'Grow Ads',       tag:'Approval',   icon:'megaphone', status:'Testing', stat:'3 campaigns live', color:'#4cc9ff' }
+      { name:'Grow Customers', tag:'Automatic', icon:'users',  status:'Running', stat:'96 qualified leads', color:'#6b2fe0' },
+      { name:'Grow Social',    tag:'Approval',   icon:'share',  status:'Drafting', stat:'12 posts queued',   color:'#a083f2' },
+      { name:'Grow Traffic',   tag:'Ships fixes',icon:'search', status:'Fixing',  stat:'4 fixes shipped',   color:'#14a874' },
+      { name:'Grow Influence', tag:'Approval',   icon:'star',   status:'Outreach', stat:'6 creators found',  color:'#b5750a' },
+      { name:'Grow Ads',       tag:'Approval',   icon:'megaphone', status:'Testing', stat:'3 campaigns live', color:'#2b8fd6' }
     ],
     seo:{
       score:41,
@@ -170,7 +170,7 @@ export const DEMO_DATA = {
         {t:'6 blog posts are thin (<400 words)', sev:'medium', pages:6, impact:47},
         {t:'No author pages or E-E-A-T signals', sev:'low',    pages:0,  impact:32}
       ],
-      kws:[['shopify analytics dashboard',28,'#7c5cff'],['ecommerce reporting tool',22,'#a48cff'],['klaviyo integration',17,'#2fe0a8'],['stripe revenue dashboard',11,'#4cc9ff'],['ecommerce ops software',9,'#ffb020']]
+      kws:[['shopify analytics dashboard',28,'#6b2fe0'],['ecommerce reporting tool',22,'#a083f2'],['klaviyo integration',17,'#14a874'],['stripe revenue dashboard',11,'#2b8fd6'],['ecommerce ops software',9,'#b5750a']]
     },
     social:{
       presence:'Only LinkedIn — 3 posts, nothing published in 5 months',
@@ -185,8 +185,8 @@ export const DEMO_DATA = {
       total:200,
       rationale:'B2B buyers self-select through high-intent search. Google captures people already comparing dashboards; LinkedIn retargets the 2% who visited pricing but did not start a trial.',
       channels:[
-        {n:'Google Search',  icon:'search', spend:120, reach:'6,400', cpm:'$18.70', cac:'$5.10', color:'#2fe0a8'},
-        {n:'LinkedIn Ads',   icon:'share',  spend:80,  reach:'11,200', cpm:'$7.14', cac:'$7.80', color:'#7c5cff'}
+        {n:'Google Search',  icon:'search', spend:120, reach:'6,400', cpm:'$18.70', cac:'$5.10', color:'#14a874'},
+        {n:'LinkedIn Ads',   icon:'share',  spend:80,  reach:'11,200', cpm:'$7.14', cac:'$7.80', color:'#6b2fe0'}
       ],
       creatives:['"Shopify reporting, minus the spreadsheet" search ad set','3 competitor comparison landing variants','LinkedIn founder-led video ad'],
       projected:{impressions:'17,600', clicks:'640', trials:'180', paid:'39'}
@@ -196,26 +196,26 @@ export const DEMO_DATA = {
       members:22, cac:4.55,
       rationale:'B2B audiences are smaller but convert hard. $100 across 3 niche creators plus 2 newsletters reaches ~12,000 operators and produced 22 paying accounts.',
       creators:[
-        {n:'Priya N.', handle:'@ecomnotes', followers:'9.8K', niche:'Ecommerce ops', price:'$30', color:'#7c5cff'},
-        {n:'Dev R.', handle:'@devopsdaily', followers:'14.2K', niche:'Founder content', price:'$35', color:'#2fe0a8'},
-        {n:'Marc T.', handle:'@theecompodcast', followers:'7.4K', niche:'Podcast + newsletter', price:'$35', color:'#ffb020'}
+        {n:'Priya N.', handle:'@ecomnotes', followers:'9.8K', niche:'Ecommerce ops', price:'$30', color:'#6b2fe0'},
+        {n:'Dev R.', handle:'@devopsdaily', followers:'14.2K', niche:'Founder content', price:'$35', color:'#14a874'},
+        {n:'Marc T.', handle:'@theecompodcast', followers:'7.4K', niche:'Podcast + newsletter', price:'$35', color:'#b5750a'}
       ],
       deliverables:'1 post + 1 mention, newsletter slot, 30-day usage rights'
     },
     projection:{
       labels:['D1','D4','D7','D10','D13','D16','D19','D22','D25','D28','D30'],
-      series:[{n:'Paid (ads + influencers)', c:'#7c5cff', v:[0,0,1,3,6,10,14,19,25,32,38]},
-              {n:'Organic (SEO + social)', c:'#2fe0a8', v:[0,0,0,1,2,4,6,9,12,16,20]},
-              {n:'Outbound (lead agent)',  c:'#4cc9ff', v:[0,0,1,2,3,4,6,8,10,11,13]}],
+      series:[{n:'Paid (ads + influencers)', c:'#6b2fe0', v:[0,0,1,3,6,10,14,19,25,32,38]},
+              {n:'Organic (SEO + social)', c:'#14a874', v:[0,0,0,1,2,4,6,9,12,16,20]},
+              {n:'Outbound (lead agent)',  c:'#2b8fd6', v:[0,0,1,2,3,4,6,8,10,11,13]}],
       totals:[0,0,2,6,11,18,26,36,47,59,71],
       revenue:[0,0,98,294,539,882,1274,1764,2303,2891,3479]
     },
     funnel:[
-      {l:'Ad + creator impressions', v:'29,600', w:100, c:'#7c5cff'},
-      {l:'Clicks',                   v:'1,180',  w:60,  c:'#a48cff'},
-      {l:'Landing page visits',      v:'1,180',  w:60,  c:'#4cc9ff'},
-      {l:'Trials started',           v:'340',   w:34,  c:'#ffb020'},
-      {l:'Paid accounts',            v:'71',    w:16,  c:'#2fe0a8'}
+      {l:'Ad + creator impressions', v:'29,600', w:100, c:'#6b2fe0'},
+      {l:'Clicks',                   v:'1,180',  w:60,  c:'#a083f2'},
+      {l:'Landing page visits',      v:'1,180',  w:60,  c:'#2b8fd6'},
+      {l:'Trials started',           v:'340',   w:34,  c:'#b5750a'},
+      {l:'Paid accounts',            v:'71',    w:16,  c:'#14a874'}
     ],
     plan:[
       {w:'Week 1', items:[
@@ -264,9 +264,9 @@ export const DEMO_DATA = {
       'DTC coffee subscription, $18/month for 2 bags',
       'Buyer: remote professionals 28–45, home brewers',
       'Competitors: 4 national subscriptions, 9 local roasters',
-      'Strong product reviews (4.8★), weak discovery channels'
+      'Strong product reviews (4.8-star), weak discovery channels'
     ],
-    score:{ overall:52, subs:[['Technical SEO',63,'#7c5cff'],['Content & keywords',48,'#2fe0a8'],['Product pages',55,'#ffb020'],['Authority & backlinks',31,'#ff6b6b']] },
+    score:{ overall:52, subs:[['Technical SEO',63,'#6b2fe0'],['Content & keywords',48,'#14a874'],['Product pages',55,'#b5750a'],['Authority & backlinks',31,'#e0604a']] },
     findings:[
       { agent:'SEO',   sev:'high',    t:'No Product + Offer schema on 24 product pages', fix:'Schema + price, availability and review markup generated' },
       { agent:'SEO',   sev:'high',    t:'Title tags missing on 11 of 28 pages', fix:'Origin + roast + intent keyword titles' },
@@ -279,11 +279,11 @@ export const DEMO_DATA = {
       { agent:'Lead',  sev:'medium',  t:'Gift subscriptions ignored — a free acquisition channel', fix:'Build a gifting flow + outreach to local cafes' }
     ],
     agents:[
-      { name:'Grow Customers', tag:'Automatic', icon:'users',  status:'Running', stat:'163 qualified leads', color:'#7c5cff' },
-      { name:'Grow Social',    tag:'Approval',   icon:'share',  status:'Drafting', stat:'16 posts queued',   color:'#a48cff' },
-      { name:'Grow Traffic',   tag:'Ships fixes',icon:'search', status:'Fixing',  stat:'5 fixes shipped',   color:'#2fe0a8' },
-      { name:'Grow Influence', tag:'Approval',   icon:'star',   status:'Outreach', stat:'5 creators found',  color:'#ffb020' },
-      { name:'Grow Ads',       tag:'Approval',   icon:'megaphone', status:'Testing', stat:'2 campaigns live', color:'#4cc9ff' }
+      { name:'Grow Customers', tag:'Automatic', icon:'users',  status:'Running', stat:'163 qualified leads', color:'#6b2fe0' },
+      { name:'Grow Social',    tag:'Approval',   icon:'share',  status:'Drafting', stat:'16 posts queued',   color:'#a083f2' },
+      { name:'Grow Traffic',   tag:'Ships fixes',icon:'search', status:'Fixing',  stat:'5 fixes shipped',   color:'#14a874' },
+      { name:'Grow Influence', tag:'Approval',   icon:'star',   status:'Outreach', stat:'5 creators found',  color:'#b5750a' },
+      { name:'Grow Ads',       tag:'Approval',   icon:'megaphone', status:'Testing', stat:'2 campaigns live', color:'#2b8fd6' }
     ],
     seo:{
       score:52,
@@ -294,7 +294,7 @@ export const DEMO_DATA = {
         {t:'Origin story not marked up for entities', sev:'medium', pages:2, impact:48},
         {t:'No brew-guide internal linking', sev:'low', pages:6, impact:31}
       ],
-      kws:[['coffee subscription',26,'#7c5cff'],['best coffee subscription',19,'#a48cff'],['single origin coffee monthly',14,'#2fe0a8'],['brew guide',9,'#4cc9ff'],['light roast coffee',8,'#ffb020']]
+      kws:[['coffee subscription',26,'#6b2fe0'],['best coffee subscription',19,'#a083f2'],['single origin coffee monthly',14,'#14a874'],['brew guide',9,'#2b8fd6'],['light roast coffee',8,'#b5750a']]
     },
     social:{
       presence:'None — no Instagram, TikTok or YouTube',
@@ -309,8 +309,8 @@ export const DEMO_DATA = {
       total:200,
       rationale:'Meta converts direct-to-consumer subscriptions better than search because the buying decision is visual and impulsive. Google is limited to brand + "coffee subscription" terms where intent is already high.',
       channels:[
-        {n:'Instagram Reels', icon:'share',  spend:140, reach:'41,000', cpm:'$3.41', cac:'$3.20', color:'#7c5cff'},
-        {n:'Google Search',  icon:'search', spend:60,  reach:'8,100',  cpm:'$7.40', cac:'$2.90', color:'#2fe0a8'}
+        {n:'Instagram Reels', icon:'share',  spend:140, reach:'41,000', cpm:'$3.41', cac:'$3.20', color:'#6b2fe0'},
+        {n:'Google Search',  icon:'search', spend:60,  reach:'8,100',  cpm:'$7.40', cac:'$2.90', color:'#14a874'}
       ],
       creatives:['60-second pour-over Reel, ASMR audio','"Why this month\'s Ethiopia tastes like apricot"','Subscription-box unboxing carousel'],
       projected:{impressions:'49,100', clicks:'1,880', trials:'520', paid:'44'}
@@ -320,27 +320,27 @@ export const DEMO_DATA = {
       members:41, cac:2.44,
       rationale:'$100 across 4 home-brewer creators reaches ~47,000 coffee drinkers. At 3.9% click-through and 26% trial rate that is 41 new subscribers at $2.44 each against $18 MRR.',
       creators:[
-        {n:'Alex B.', handle:'@brewhq', followers:'22.4K', niche:'Home brewing', price:'$25', color:'#7c5cff'},
-        {n:'Nia P.', handle:'@niacoffee', followers:'15.9K', niche:'Morning routine', price:'$25', color:'#2fe0a8'},
-        {n:'Tom H.', handle:'@tomgrind', followers:'31.2K', niche:'Gear reviews', price:'$25', color:'#ffb020'},
-        {n:'Eve L.', handle:'@evebrews', followers:'12.8K', niche:'Latte art', price:'$25', color:'#4cc9ff'}
+        {n:'Alex B.', handle:'@brewhq', followers:'22.4K', niche:'Home brewing', price:'$25', color:'#6b2fe0'},
+        {n:'Nia P.', handle:'@niacoffee', followers:'15.9K', niche:'Morning routine', price:'$25', color:'#14a874'},
+        {n:'Tom H.', handle:'@tomgrind', followers:'31.2K', niche:'Gear reviews', price:'$25', color:'#b5750a'},
+        {n:'Eve L.', handle:'@evebrews', followers:'12.8K', niche:'Latte art', price:'$25', color:'#2b8fd6'}
       ],
       deliverables:'1 Reel + 2 stories each, code NORTHLINE, 30-day usage rights'
     },
     projection:{
       labels:['D1','D4','D7','D10','D13','D16','D19','D22','D25','D28','D30'],
-      series:[{n:'Paid (ads + influencers)', c:'#7c5cff', v:[0,1,3,7,12,18,25,33,42,52,62]},
-              {n:'Organic (SEO + social)', c:'#2fe0a8', v:[0,0,1,2,4,6,9,12,16,20,25]},
-              {n:'Outbound (lead agent)',  c:'#4cc9ff', v:[0,0,0,1,2,3,4,5,7,8,9]}],
+      series:[{n:'Paid (ads + influencers)', c:'#6b2fe0', v:[0,1,3,7,12,18,25,33,42,52,62]},
+              {n:'Organic (SEO + social)', c:'#14a874', v:[0,0,1,2,4,6,9,12,16,20,25]},
+              {n:'Outbound (lead agent)',  c:'#2b8fd6', v:[0,0,0,1,2,3,4,5,7,8,9]}],
       totals:[0,1,4,10,18,27,38,50,65,80,96],
       revenue:[0,18,72,180,324,486,684,900,1170,1440,1728]
     },
     funnel:[
-      {l:'Ad + creator impressions', v:'96,000', w:100, c:'#7c5cff'},
-      {l:'Clicks',                   v:'3,740',  w:78,  c:'#a48cff'},
-      {l:'Landing page visits',      v:'3,740',  w:78,  c:'#4cc9ff'},
-      {l:'Free-bag trials',          v:'1,010',  w:52,  c:'#ffb020'},
-      {l:'Paid subscriptions',       v:'96',    w:22,  c:'#2fe0a8'}
+      {l:'Ad + creator impressions', v:'96,000', w:100, c:'#6b2fe0'},
+      {l:'Clicks',                   v:'3,740',  w:78,  c:'#a083f2'},
+      {l:'Landing page visits',      v:'3,740',  w:78,  c:'#2b8fd6'},
+      {l:'Free-bag trials',          v:'1,010',  w:52,  c:'#b5750a'},
+      {l:'Paid subscriptions',       v:'96',    w:22,  c:'#14a874'}
     ],
     plan:[
       {w:'Week 1', items:[

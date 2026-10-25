@@ -1724,10 +1724,9 @@ function SocialStudio({ currentUser, onBack, onLogout, onNavigate, defaultTab = 
             <div className="pt-2">
               <a
                 href={`${API_BASE}/api/auth/meta/login`}
-                className="w-full py-3.5 px-4 rounded-2xl bg-gradient-to-r from-[#1877F2] via-[#E1306C] to-[#FD1D1D] text-white font-black text-xs uppercase tracking-wider flex items-center justify-center gap-2.5 shadow-xl shadow-[#1877F2]/25 hover:opacity-95 hover:scale-[1.01] active:scale-[0.99] transition-all cursor-pointer border border-white/20"
+                className="ui-btn ui-btn-lg w-full !bg-[#1877F2] hover:!bg-[#166FE0] !text-white"
               >
-                <Sparkles className="w-4 h-4 text-white animate-pulse" />
-                <span>1-Click Connect with Facebook & Instagram</span>
+                <span>Connect Facebook &amp; Instagram</span>
               </a>
               <p className="text-[10px] text-slate-400 text-center mt-2 leading-relaxed">
                 Connects your Instagram Business feed and Facebook Page directly via Meta OAuth (no manual tokens needed).
@@ -1735,9 +1734,9 @@ function SocialStudio({ currentUser, onBack, onLogout, onNavigate, defaultTab = 
             </div>
 
             <div className="relative flex items-center justify-center my-4">
-              <div className="border-t border-white/[0.08] w-full" />
-              <span className="bg-[#0e1118] px-3 text-[10px] text-slate-500 uppercase tracking-widest font-semibold absolute">
-                Or Manual Developer Credentials
+              <div className="border-t border-[var(--ui-line)] w-full" />
+              <span className="bg-[var(--ui-surface)] px-3 ui-hint absolute">
+                or enter developer credentials
               </span>
             </div>
 

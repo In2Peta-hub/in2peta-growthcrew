@@ -3,34 +3,31 @@
    .gcr-root so the dense report styling cannot leak into the working app. */
 
 .gcr-root {
-  --gcr-bg: #0c0911;
-  --gcr-panel: #15111d;
-  --gcr-panel-solid: #0f0b16;
-  --gcr-inset: #0a070f;
-  --gcr-line: rgba(246, 242, 251, 0.09);
-  --gcr-line-strong: rgba(246, 242, 251, 0.16);
-  --gcr-track: #241d31;
-  --gcr-ink: #f6f2fb;
-  --gcr-muted: #b7adca;
-  --gcr-dim: #817792;
-  --gcr-violet: #7c5cff;
-  --gcr-violet-2: #b69cde;
-  --gcr-lavender: #a48cff;
-  --gcr-mint: #2fe0a8;
-  --gcr-amber: #ffb020;
-  --gcr-coral: #ff6b6b;
-  --gcr-sky: #4cc9ff;
+  --gcr-bg: #fbf7f0;
+  --gcr-panel: #ffffff;
+  --gcr-panel-solid: #fffdf9;
+  --gcr-inset: #f4ede1;
+  --gcr-line: rgba(28, 26, 36, 0.076);
+  --gcr-line-strong: rgba(28, 26, 36, 0.136);
+  --gcr-track: #ece3d3;
+  --gcr-ink: #1c1a24;
+  --gcr-muted: #5b5563;
+  --gcr-dim: #857c8d;
+  --gcr-violet: #6b2fe0;
+  --gcr-violet-2: #6b3fd6;
+  --gcr-lavender: #8a63ec;
+  --gcr-mint: #12805c;
+  --gcr-amber: #c48012;
+  --gcr-coral: #cc4a34;
+  --gcr-sky: #1f7ab8;
   --gcr-radius: 18px;
 
   position: relative;
   border: 1px solid var(--gcr-line);
   border-radius: calc(var(--gcr-radius) + 6px);
-  background:
-    radial-gradient(72% 50% at 82% 0%, rgba(124, 92, 255, 0.14), transparent 70%),
-    linear-gradient(180deg, #120e1a 0%, #0c0911 100%);
-  box-shadow: 0 34px 80px -48px rgba(0, 0, 0, 0.9);
+  background: var(--gcr-bg);
   color: var(--gcr-ink);
-  font-family: var(--font-body, 'Hanken Grotesk'), system-ui, sans-serif;
+  font-family: var(--font-body, 'Satoshi'), system-ui, sans-serif;
   overflow: hidden;
 }
 
@@ -58,7 +55,7 @@
 .gcr-console {
   position: relative;
   border-block-end: 1px solid var(--gcr-line);
-  background: rgba(10, 7, 15, 0.6);
+  background: rgba(255, 253, 249, 0.6);
 }
 
 .gcr-console-bar {
@@ -89,14 +86,13 @@
   align-items: center;
   gap: 0.35rem;
   padding: 0.25rem 0.6rem;
-  border: 1px dashed rgba(255, 176, 32, 0.4);
+  border: 1px solid rgba(196, 128, 18, 0.44);
   border-radius: 999px;
-  background: rgba(255, 176, 32, 0.08);
-  color: #ffc257;
-  font-size: 0.66rem;
+  background: rgba(196, 128, 18, 0.088);
+  color: #9a5b00;
+  font-size: 0.8125rem;
   font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
+  letter-spacing: 0;
 }
 
 .gcr-context {
@@ -115,14 +111,14 @@
 }
 
 .gcr-context-brand b {
-  font-family: var(--font-display, 'Bricolage Grotesque'), system-ui, sans-serif;
+  font-family: var(--font-display, 'Cabinet Grotesk'), system-ui, sans-serif;
   font-size: 1rem;
   letter-spacing: -0.02em;
 }
 
 .gcr-context-brand span {
   color: var(--gcr-dim);
-  font-size: 0.76rem;
+  font-size: 0.8125rem;
 }
 
 .gcr-context-pills {
@@ -145,7 +141,7 @@
   padding: 0;
   border: 0;
   border-radius: 50%;
-  background: #2a3145;
+  background: #e2d6c2;
   transition: background-color 200ms, transform 200ms;
 }
 
@@ -188,7 +184,7 @@
 
 .gcr-context-head > span:last-child {
   color: var(--gcr-dim);
-  font-size: 0.75rem;
+  font-size: 0.8125rem;
 }
 
 .gcr-context-items {
@@ -202,16 +198,16 @@
   gap: 0.5rem;
   align-items: flex-start;
   padding-inline-start: 0.65rem;
-  border-inline-start: 2px solid rgba(124, 92, 255, 0.4);
+  border-inline-start: 2px solid rgba(107, 47, 224, 0.32);
   color: var(--gcr-muted);
-  font-size: 0.74rem;
+  font-size: 0.8125rem;
   line-height: 1.5;
 }
 
 .gcr-mono {
-  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-family: inherit;
   color: var(--gcr-violet-2);
-  font-size: 0.68rem;
+  font-size: 0.8125rem;
   flex: none;
 }
 
@@ -249,7 +245,7 @@
 }
 
 .gcr-stat b {
-  font-family: var(--font-display, 'Bricolage Grotesque'), system-ui, sans-serif;
+  font-family: var(--font-display, 'Cabinet Grotesk'), system-ui, sans-serif;
   font-size: clamp(1.15rem, 2vw, 1.5rem);
   line-height: 1;
   letter-spacing: -0.03em;
@@ -258,10 +254,9 @@
 
 .gcr-stat span {
   color: var(--gcr-dim);
-  font-size: 0.64rem;
+  font-size: 0.8125rem;
   font-weight: 600;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
+  letter-spacing: 0;
 }
 
 .gcr-stat.is-violet { color: var(--gcr-lavender); }
@@ -293,7 +288,7 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  font-family: var(--font-display, 'Bricolage Grotesque'), system-ui, sans-serif;
+  font-family: var(--font-display, 'Cabinet Grotesk'), system-ui, sans-serif;
   font-size: 0.92rem;
   font-weight: 600;
   letter-spacing: -0.02em;
@@ -308,7 +303,7 @@
 .gcr-sub {
   margin-block: 0.3rem 1rem !important;
   color: var(--gcr-dim);
-  font-size: 0.73rem;
+  font-size: 0.8125rem;
   line-height: 1.45;
 }
 
@@ -319,10 +314,9 @@
 .gcr-eyebrow {
   margin-block-end: 0.55rem !important;
   color: var(--gcr-dim);
-  font-size: 0.66rem;
+  font-size: 0.8125rem;
   font-weight: 700;
-  letter-spacing: 0.09em;
-  text-transform: uppercase;
+  letter-spacing: 0;
 }
 
 .gcr-fineprint {
@@ -330,7 +324,7 @@
   padding-block-start: 0.65rem;
   border-block-start: 1px solid var(--gcr-line);
   color: var(--gcr-dim);
-  font-size: 0.7rem;
+  font-size: 0.8125rem;
   line-height: 1.5;
 }
 
@@ -367,7 +361,7 @@
 
 .gcr-ring-value b {
   display: block;
-  font-family: var(--font-display, 'Bricolage Grotesque'), system-ui, sans-serif;
+  font-family: var(--font-display, 'Cabinet Grotesk'), system-ui, sans-serif;
   font-size: 1.9rem;
   line-height: 1;
   letter-spacing: -0.04em;
@@ -375,9 +369,8 @@
 
 .gcr-ring-value small {
   color: var(--gcr-dim);
-  font-size: 0.62rem;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  font-size: 0.8125rem;
+  letter-spacing: 0;
 }
 
 .gcr-metrics {
@@ -393,12 +386,12 @@
   gap: 0.55rem;
   align-items: center;
   color: var(--gcr-muted);
-  font-size: 0.72rem;
+  font-size: 0.8125rem;
 }
 
 .gcr-metric b {
   color: var(--gcr-ink);
-  font-size: 0.72rem;
+  font-size: 0.8125rem;
   text-align: end;
   font-variant-numeric: tabular-nums;
 }
@@ -441,7 +434,7 @@
   padding: 0.6rem 0.7rem;
   border: 1px solid var(--gcr-line);
   border-radius: 12px;
-  background: rgba(246, 242, 251, 0.015);
+  background: rgba(28, 26, 36, 0.013);
 }
 
 .gcr-agent-icon {
@@ -463,13 +456,13 @@
 
 .gcr-agent-copy b {
   display: block;
-  font-size: 0.8rem;
+  font-size: 0.8125rem;
   font-weight: 600;
 }
 
 .gcr-agent-copy span {
   color: var(--gcr-dim);
-  font-size: 0.67rem;
+  font-size: 0.8125rem;
 }
 
 .gcr-agent-copy em {
@@ -479,7 +472,7 @@
 
 .gcr-agent-stat {
   color: var(--gcr-muted);
-  font-size: 0.7rem;
+  font-size: 0.8125rem;
   text-align: end;
   white-space: nowrap;
 }
@@ -487,11 +480,11 @@
 .gcr-note {
   margin-block-start: 0.85rem !important;
   padding: 0.65rem 0.8rem;
-  border: 1px solid rgba(124, 92, 255, 0.24);
+  border: 1px solid rgba(107, 47, 224, 0.192);
   border-radius: 11px;
-  background: rgba(124, 92, 255, 0.08);
+  background: rgba(107, 47, 224, 0.064);
   color: var(--gcr-muted);
-  font-size: 0.72rem;
+  font-size: 0.8125rem;
   line-height: 1.55;
 }
 
@@ -500,8 +493,8 @@
 }
 
 .gcr-note.is-mint {
-  border-color: rgba(47, 224, 168, 0.22);
-  background: rgba(47, 224, 168, 0.07);
+  border-color: rgba(18, 128, 92, 0.242);
+  background: rgba(18, 128, 92, 0.077);
 }
 
 .gcr-note.is-mint b {
@@ -521,7 +514,7 @@
   display: flex;
   gap: 0.7rem;
   padding: 0.68rem 0;
-  border-block-end: 1px dashed var(--gcr-line);
+  border-block-end: 1px solid var(--gcr-line);
 }
 
 .gcr-finding:last-child {
@@ -556,22 +549,21 @@
   padding: 0.16rem 0.42rem;
   border: 1px solid var(--gcr-line);
   border-radius: 6px;
-  font-size: 0.58rem;
+  font-size: 0.8125rem;
   font-weight: 700;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
+  letter-spacing: 0;
   white-space: nowrap;
 }
 
-.gcr-agent-badge.is-violet { color: var(--gcr-lavender); background: rgba(124, 92, 255, 0.1); border-color: rgba(124, 92, 255, 0.25); }
-.gcr-agent-badge.is-lavender { color: #c7b6f2; background: rgba(164, 140, 255, 0.1); border-color: rgba(164, 140, 255, 0.24); }
-.gcr-agent-badge.is-mint { color: var(--gcr-mint); background: rgba(47, 224, 168, 0.08); border-color: rgba(47, 224, 168, 0.22); }
-.gcr-agent-badge.is-amber { color: var(--gcr-amber); background: rgba(255, 176, 32, 0.08); border-color: rgba(255, 176, 32, 0.22); }
-.gcr-agent-badge.is-sky { color: var(--gcr-sky); background: rgba(76, 201, 255, 0.08); border-color: rgba(76, 201, 255, 0.22); }
+.gcr-agent-badge.is-violet { color: var(--gcr-lavender); background: rgba(107, 47, 224, 0.08); border-color: rgba(107, 47, 224, 0.2); }
+.gcr-agent-badge.is-lavender { color: #5b3fb8; background: rgba(107, 47, 224, 0.07); border-color: rgba(107, 47, 224, 0.168); }
+.gcr-agent-badge.is-mint { color: var(--gcr-mint); background: rgba(18, 128, 92, 0.088); border-color: rgba(18, 128, 92, 0.242); }
+.gcr-agent-badge.is-amber { color: var(--gcr-amber); background: rgba(196, 128, 18, 0.088); border-color: rgba(196, 128, 18, 0.242); }
+.gcr-agent-badge.is-sky { color: var(--gcr-sky); background: rgba(31, 122, 184, 0.088); border-color: rgba(31, 122, 184, 0.242); }
 
 .gcr-finding-copy > b {
   display: block;
-  font-size: 0.79rem;
+  font-size: 0.8125rem;
   font-weight: 600;
   line-height: 1.4;
 }
@@ -580,23 +572,22 @@
   display: block;
   margin-block-start: 0.15rem;
   color: var(--gcr-mint);
-  font-size: 0.7rem;
+  font-size: 0.8125rem;
   line-height: 1.45;
 }
 
 .gcr-sev {
   padding: 0.16rem 0.4rem;
   border-radius: 5px;
-  font-size: 0.56rem;
+  font-size: 0.8125rem;
   font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
+  letter-spacing: 0;
 }
 
-.gcr-sev.is-critical { color: #ff8f8f; background: rgba(255, 107, 107, 0.13); border: 1px solid rgba(255, 107, 107, 0.3); }
-.gcr-sev.is-high { color: #ffc257; background: rgba(255, 176, 32, 0.12); border: 1px solid rgba(255, 176, 32, 0.28); }
-.gcr-sev.is-medium { color: #7dd8ff; background: rgba(76, 201, 255, 0.11); border: 1px solid rgba(76, 201, 255, 0.26); }
-.gcr-sev.is-low { color: var(--gcr-mint); background: rgba(47, 224, 168, 0.1); border: 1px solid rgba(47, 224, 168, 0.26); }
+.gcr-sev.is-critical { color: #c2412d; background: rgba(204, 74, 52, 0.143); border: 1px solid rgba(204, 74, 52, 0.33); }
+.gcr-sev.is-high { color: #9a5b00; background: rgba(196, 128, 18, 0.132); border: 1px solid rgba(196, 128, 18, 0.308); }
+.gcr-sev.is-medium { color: #1a5f91; background: rgba(31, 122, 184, 0.121); border: 1px solid rgba(31, 122, 184, 0.286); }
+.gcr-sev.is-low { color: var(--gcr-mint); background: rgba(18, 128, 92, 0.11); border: 1px solid rgba(18, 128, 92, 0.286); }
 
 /* ── SEO ────────────────────────────────────────────────────── */
 .gcr-issues {
@@ -611,7 +602,7 @@
   gap: 0.45rem;
   margin-block-end: 0.25rem;
   color: var(--gcr-ink);
-  font-size: 0.73rem;
+  font-size: 0.8125rem;
   line-height: 1.35;
 }
 
@@ -620,7 +611,7 @@
 }
 
 .gcr-issues .gcr-mono {
-  font-size: 0.65rem;
+  font-size: 0.8125rem;
   color: var(--gcr-dim);
 }
 
@@ -635,7 +626,7 @@
   gap: 0.5rem;
   align-items: center;
   color: var(--gcr-muted);
-  font-size: 0.7rem;
+  font-size: 0.8125rem;
 }
 
 .gcr-keyword span:first-child {
@@ -646,7 +637,7 @@
 
 .gcr-keyword b {
   color: var(--gcr-ink);
-  font-size: 0.7rem;
+  font-size: 0.8125rem;
   text-align: end;
   font-variant-numeric: tabular-nums;
 }
@@ -658,19 +649,19 @@
   align-items: flex-start;
   margin-block-end: 0.9rem;
   padding: 0.6rem 0.75rem;
-  border: 1px solid rgba(255, 107, 107, 0.24);
+  border: 1px solid rgba(204, 74, 52, 0.264);
   border-radius: 11px;
-  background: rgba(255, 107, 107, .07);
+  background: rgba(204, 74, 52, 0.077);
 }
 
 .gcr-alert svg {
   flex: none;
   margin-block-start: 2px;
-  color: #ff8f8f;
+  color: #c2412d;
 }
 
 .gcr-alert p {
-  font-size: 0.76rem;
+  font-size: 0.8125rem;
   line-height: 1.5;
 }
 
@@ -694,26 +685,26 @@
   border: 1px solid var(--gcr-line);
   border-radius: 999px;
   color: var(--gcr-muted);
-  font-size: 0.66rem;
+  font-size: 0.8125rem;
   line-height: 1.4;
 }
 
 .gcr-pill.is-violet {
-  border-color: rgba(124, 92, 255, 0.32);
-  background: rgba(124, 92, 255, 0.1);
+  border-color: rgba(107, 47, 224, 0.256);
+  background: rgba(107, 47, 224, 0.08);
   color: var(--gcr-violet-2);
 }
 
 .gcr-pill.is-mint {
-  border-color: rgba(47, 224, 168, 0.3);
-  background: rgba(47, 224, 168, 0.08);
+  border-color: rgba(18, 128, 92, 0.33);
+  background: rgba(18, 128, 92, 0.088);
   color: var(--gcr-mint);
 }
 
 .gcr-prose {
   margin-block-end: 0.8rem !important;
   color: var(--gcr-muted);
-  font-size: 0.75rem;
+  font-size: 0.8125rem;
   line-height: 1.6;
 }
 
@@ -726,7 +717,7 @@
   display: flex;
   gap: 0.5rem;
   align-items: flex-start;
-  font-size: 0.72rem;
+  font-size: 0.8125rem;
   line-height: 1.5;
 }
 
@@ -780,16 +771,15 @@
 
 .gcr-donut-center b {
   display: block;
-  font-family: var(--font-display, 'Bricolage Grotesque'), system-ui, sans-serif;
+  font-family: var(--font-display, 'Cabinet Grotesk'), system-ui, sans-serif;
   font-size: 1.25rem;
   line-height: 1.1;
 }
 
 .gcr-donut-center small {
   color: var(--gcr-dim);
-  font-size: 0.6rem;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  font-size: 0.8125rem;
+  letter-spacing: 0;
 }
 
 .gcr-legend {
@@ -804,7 +794,7 @@
   align-items: center;
   gap: 0.5rem;
   color: var(--gcr-muted);
-  font-size: 0.72rem;
+  font-size: 0.8125rem;
 }
 
 .gcr-legend-row b {
@@ -830,14 +820,14 @@
 .gcr-quote {
   margin-block-end: 0.85rem !important;
   padding-inline-start: 0.65rem;
-  border-inline-start: 2px solid rgba(124, 92, 255, 0.45);
+  border-inline-start: 2px solid rgba(107, 47, 224, 0.36);
   color: var(--gcr-muted);
-  font-size: 0.73rem;
+  font-size: 0.8125rem;
   line-height: 1.6;
 }
 
 .gcr-quote.is-amber {
-  border-inline-start-color: rgba(255, 176, 32, 0.5);
+  border-inline-start-color: rgba(196, 128, 18, 0.55);
 }
 
 .gcr-channels {
@@ -851,7 +841,7 @@
   grid-template-columns: minmax(84px, 0.8fr) 1fr auto;
   gap: 0.55rem;
   align-items: center;
-  font-size: 0.72rem;
+  font-size: 0.8125rem;
 }
 
 .gcr-channel-name {
@@ -860,7 +850,7 @@
 
 .gcr-channel-meta {
   color: var(--gcr-muted);
-  font-size: 0.68rem;
+  font-size: 0.8125rem;
   text-align: end;
   white-space: nowrap;
 }
@@ -874,7 +864,7 @@
   display: flex;
   gap: 0.5rem;
   color: var(--gcr-muted);
-  font-size: 0.72rem;
+  font-size: 0.8125rem;
   line-height: 1.45;
 }
 
@@ -901,14 +891,14 @@
 
 .gcr-mini-stats b {
   display: block;
-  font-family: var(--font-display, 'Bricolage Grotesque'), system-ui, sans-serif;
+  font-family: var(--font-display, 'Cabinet Grotesk'), system-ui, sans-serif;
   font-size: 0.95rem;
   letter-spacing: -0.02em;
 }
 
 .gcr-mini-stats span {
   color: var(--gcr-dim);
-  font-size: 0.6rem;
+  font-size: 0.8125rem;
 }
 
 /* ── Creators ───────────────────────────────────────────────── */
@@ -924,7 +914,7 @@
   padding: 0.55rem 0.65rem;
   border: 1px solid var(--gcr-line);
   border-radius: 11px;
-  background: rgba(246, 242, 251, 0.015);
+  background: rgba(28, 26, 36, 0.013);
 }
 
 .gcr-avatar {
@@ -934,8 +924,8 @@
   block-size: 32px;
   flex: none;
   border-radius: 50%;
-  color: #0c0911;
-  font-size: 0.8rem;
+  color: #fbf7f0;
+  font-size: 0.8125rem;
   font-weight: 700;
 }
 
@@ -946,25 +936,25 @@
 
 .gcr-creator b {
   display: block;
-  font-size: 0.76rem;
+  font-size: 0.8125rem;
   font-weight: 600;
 }
 
 .gcr-creator > div > span {
   display: block;
   color: var(--gcr-dim);
-  font-size: 0.66rem;
+  font-size: 0.8125rem;
 }
 
 .gcr-handle {
   color: var(--gcr-dim);
   font-weight: 400;
-  font-size: 0.68rem;
+  font-size: 0.8125rem;
 }
 
 .gcr-price {
   color: var(--gcr-ink);
-  font-size: 0.74rem;
+  font-size: 0.8125rem;
   font-weight: 600;
 }
 
@@ -983,7 +973,7 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  font-size: 0.73rem;
+  font-size: 0.8125rem;
 }
 
 .gcr-funnel-top > span:first-child {
@@ -995,9 +985,9 @@
 .gcr-funnel-top em {
   padding: 0.1rem 0.4rem;
   border-radius: 999px;
-  background: rgba(246, 242, 251, 0.12);
+  background: rgba(28, 26, 36, 0.102);
   color: var(--gcr-ink);
-  font-size: 0.6rem;
+  font-size: 0.8125rem;
   font-style: normal;
   font-weight: 700;
   white-space: nowrap;
@@ -1005,7 +995,7 @@
 
 .gcr-funnel-top b {
   color: var(--gcr-muted);
-  font-size: 0.7rem;
+  font-size: 0.8125rem;
   font-weight: 500;
   white-space: nowrap;
   font-variant-numeric: tabular-nums;
@@ -1048,7 +1038,7 @@
   flex-wrap: wrap;
   margin-block-start: 0.6rem;
   color: var(--gcr-muted);
-  font-size: 0.66rem;
+  font-size: 0.8125rem;
 }
 
 .gcr-chart-legend > span {
@@ -1081,7 +1071,7 @@
   padding-block-start: 0.6rem;
   border-block-start: 1px solid var(--gcr-line);
   color: var(--gcr-muted);
-  font-size: 0.68rem;
+  font-size: 0.8125rem;
   line-height: 1.5;
 }
 
@@ -1117,10 +1107,9 @@
   padding-block-end: 0.4rem;
   border-block-end: 1px solid var(--gcr-line);
   color: var(--gcr-violet-2);
-  font-size: 0.62rem;
+  font-size: 0.8125rem;
   font-weight: 700;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
+  letter-spacing: 0;
 }
 
 .gcr-week-items {
@@ -1139,14 +1128,14 @@
 
 .gcr-plan-item p {
   color: var(--gcr-dim);
-  font-size: 0.67rem;
+  font-size: 0.8125rem;
   line-height: 1.5;
 }
 
 .gcr-plan-item b {
   display: block;
   color: var(--gcr-ink);
-  font-size: 0.71rem;
+  font-size: 0.8125rem;
   font-weight: 600;
   line-height: 1.4;
 }
@@ -1164,7 +1153,7 @@
   padding: 0.55rem 0.65rem;
   border: 1px solid var(--gcr-line);
   border-radius: 11px;
-  background: rgba(246, 242, 251, 0.015);
+  background: rgba(28, 26, 36, 0.013);
 }
 
 .gcr-toggle-icon {
@@ -1174,7 +1163,7 @@
   block-size: 32px;
   flex: none;
   border-radius: 9px;
-  background: rgba(47, 224, 168, 0.12);
+  background: rgba(18, 128, 92, 0.132);
   color: var(--gcr-mint);
 }
 
@@ -1186,13 +1175,13 @@
 }
 
 .gcr-toggle-copy b {
-  font-size: 0.74rem;
+  font-size: 0.8125rem;
   font-weight: 600;
 }
 
 .gcr-toggle-copy span {
   color: var(--gcr-dim);
-  font-size: 0.66rem;
+  font-size: 0.8125rem;
   line-height: 1.4;
 }
 
@@ -1220,8 +1209,8 @@
 }
 
 .gcr-switch.is-on {
-  border-color: rgba(47, 224, 168, 0.4);
-  background: rgba(47, 224, 168, 0.22);
+  border-color: rgba(18, 128, 92, 0.44);
+  background: rgba(18, 128, 92, 0.242);
 }
 
 .gcr-switch.is-on span {
@@ -1235,7 +1224,7 @@
   gap: 0.45rem;
   padding: 0.65rem 0.2rem 0.1rem;
   color: var(--gcr-dim);
-  font-size: 0.68rem;
+  font-size: 0.8125rem;
   line-height: 1.5;
 }
 

@@ -5,38 +5,37 @@
     into the workspace, Lead Gen or Social Studio shells.
 
     Brand: near-black plum, In2Peta violet, lavender and a small mint
-    accent. Bricolage Grotesque for display, Hanken Grotesk for text.      */
+    accent. Cabinet Grotesk for display, Satoshi for text.      */
 
 .gcl-root {
-  --gcl-bg: var(--brand-bg, #0c0911);
-  --gcl-surface: var(--brand-surface, #15111d);
-  --gcl-raised: var(--brand-raised, #20192b);
-  --gcl-ink: var(--brand-ink, #f6f2fb);
-  --gcl-muted: var(--brand-muted, #b7adca);
-  --gcl-dim: #817792;
-  --gcl-purple: #8b5cf6;
-  --gcl-violet: #7c5cff;
-  --gcl-lavender: #b69cde;
-  --gcl-mint: #2fe0a8;
-  --gcl-amber: #ffb020;
-  --gcl-coral: #ff6b6b;
-  --gcl-sky: #4cc9ff;
-  --gcl-line: rgba(246, 242, 251, 0.09);
-  --gcl-line-strong: rgba(246, 242, 251, 0.17);
-  --gcl-inset: #0a070f;
+  --gcl-bg: var(--brand-bg, #fbf7f0);
+  --gcl-surface: var(--brand-surface, #ffffff);
+  --gcl-raised: var(--brand-raised, #f4ede1);
+  --gcl-ink: var(--brand-ink, #1c1a24);
+  --gcl-muted: var(--brand-muted, #57515f);
+  --gcl-dim: #81788a;
+  --gcl-purple: var(--brand-purple, #6b2fe0);
+  --gcl-purple-hover: var(--brand-purple-hover, #5a22c9);
+  --gcl-purple-soft: #efe8ff;
+  --gcl-violet: var(--gcl-purple);
+  --gcl-lavender: #6b3fd6;
+  --gcl-mint: #12805c;
+  --gcl-amber: #b7700c;
+  --gcl-coral: #c9452f;
+  --gcl-sky: #1f74b0;
+  --gcl-line: rgba(28, 26, 36, 0.08);
+  --gcl-line-strong: rgba(28, 26, 36, 0.14);
+  --gcl-inset: #f6f0e6;
   --gcl-gutter: clamp(1.1rem, 0.4rem + 2.6vw, 2.5rem);
   --gcl-radius: 20px;
   --gcl-ease-out: cubic-bezier(0.23, 1, 0.32, 1);
   --gcl-ease-soft: cubic-bezier(0.33, 1, 0.68, 1);
 
-  color-scheme: dark;
+  color-scheme: light;
   min-block-size: 100svh;
-  background:
-    radial-gradient(60% 42% at 74% -4%, rgba(124, 92, 255, 0.16), transparent 70%),
-    radial-gradient(42% 30% at 12% 8%, rgba(47, 224, 168, 0.05), transparent 70%),
-    var(--gcl-bg);
+  background: var(--gcl-bg);
   color: var(--gcl-ink);
-  font-family: var(--font-body, 'Hanken Grotesk'), system-ui, sans-serif;
+  font-family: var(--font-body, 'Satoshi'), system-ui, sans-serif;
   font-size: 1rem;
   line-height: 1.55;
   font-synthesis: none;
@@ -56,7 +55,7 @@
 }
 
 .gcl-root :where(h1, h2, h3) {
-  font-family: var(--font-display, 'Bricolage Grotesque'), system-ui, sans-serif;
+  font-family: var(--font-display, 'Cabinet Grotesk'), system-ui, sans-serif;
   line-height: 1.05;
   letter-spacing: -0.035em;
   text-wrap: balance;
@@ -145,20 +144,19 @@
 
 .gcl-btn-ghost {
   border-color: var(--gcl-line-strong);
-  background: rgba(246, 242, 251, 0.03);
+  background: rgba(28, 26, 36, 0.025);
   color: var(--gcl-ink);
 }
 
 .gcl-btn-primary {
-  border-color: rgba(255, 255, 255, 0.12);
-  background: linear-gradient(135deg, var(--gcl-purple), var(--gcl-violet));
+  border-color: rgba(28, 26, 36, 0.102);
+  background: var(--gcl-purple);
   color: white;
-  box-shadow: 0 12px 30px -16px rgba(124, 92, 255, 0.9);
 }
 
 .gcl-btn-light {
   background: var(--gcl-ink);
-  color: #160c22;
+  color: #fbf7f0;
 }
 
 .gcl-btn-lg {
@@ -173,12 +171,12 @@
 
 @media (hover: hover) and (pointer: fine) {
   .gcl-btn-ghost:hover {
-    border-color: rgba(246, 242, 251, 0.3);
-    background: rgba(246, 242, 251, 0.07);
+    border-color: rgba(28, 26, 36, 0.255);
+    background: rgba(28, 26, 36, 0.06);
   }
 
   .gcl-btn-primary:hover {
-    background: linear-gradient(135deg, #9d70ff, #8b6bff);
+    background: var(--gcl-purple-hover);
   }
 
   .gcl-btn-light:hover {
@@ -196,17 +194,15 @@
   inset-block-start: 0;
   z-index: 60;
   border-block-end: 1px solid transparent;
-  background: rgba(12, 9, 17, 0.35);
+  background: rgba(255, 253, 249, 0.35);
   transition:
     background-color 220ms ease,
-    border-color 220ms ease,
-    backdrop-filter 220ms ease;
+    border-color 220ms ease;
 }
 
 .gcl-header.is-scrolled {
   border-block-end-color: var(--gcl-line);
-  background: rgba(12, 9, 17, 0.82);
-  backdrop-filter: blur(16px) saturate(130%);
+  background: var(--gcl-bg);
 }
 
 .gcl-header-in {
@@ -227,7 +223,7 @@
   border: 0;
   background: none;
   color: var(--gcl-ink);
-  font-family: var(--font-display, 'Bricolage Grotesque'), system-ui, sans-serif;
+  font-family: var(--font-display, 'Cabinet Grotesk'), system-ui, sans-serif;
   font-size: 1.06rem;
   font-weight: 700;
   letter-spacing: -0.03em;
@@ -272,7 +268,7 @@
   padding: 0;
   border: 1px solid var(--gcl-line-strong);
   border-radius: 10px;
-  background: rgba(246, 242, 251, 0.04);
+  background: rgba(28, 26, 36, 0.034);
 }
 
 .gcl-mobile-nav {
@@ -280,7 +276,7 @@
   gap: 0.2rem;
   padding: 0.5rem var(--gcl-gutter) 1.1rem;
   border-block-start: 1px solid var(--gcl-line);
-  background: rgba(12, 9, 17, 0.98);
+  background: rgba(255, 253, 249, 0.98);
 }
 
 .gcl-mobile-nav a {
@@ -307,7 +303,7 @@
 
 .gcl-hero-grid {
   display: grid;
-  grid-template-columns: minmax(0, 1.02fr) minmax(0, 0.98fr);
+  grid-template-columns: minmax(0, 1.12fr) minmax(0, 0.88fr);
   gap: clamp(2rem, 4vw, 4rem);
   align-items: center;
 }
@@ -317,11 +313,10 @@
   align-items: center;
   gap: 0.5rem;
   color: var(--gcl-lavender);
-  font-size: 0.68rem;
+  font-size: 0.8125rem;
   font-weight: 700;
-  letter-spacing: 0.1em;
+  letter-spacing: 0;
   line-height: 1.4;
-  text-transform: uppercase;
 }
 
 .gcl-eyebrow.is-mint { color: var(--gcl-mint); }
@@ -334,14 +329,14 @@
   flex: none;
   border-radius: 50%;
   background: var(--gcl-mint);
-  box-shadow: 0 0 0 4px rgba(47, 224, 168, 0.12);
+  box-shadow: 0 0 0 4px rgba(18, 128, 92, 0.132);
 }
 
 .gcl-pulse::after {
   content: '';
   position: absolute;
   inset: -3px;
-  border: 1px solid rgba(47, 224, 168, 0.5);
+  border: 1px solid rgba(18, 128, 92, 0.55);
   border-radius: 50%;
   animation: gcl-pulse 2.4s ease-out infinite;
 }
@@ -352,8 +347,8 @@
 }
 
 .gcl-hero h1 {
-  margin-block: 1.15rem 1.25rem;
-  font-size: clamp(2.85rem, 1.2rem + 4.6vw, 5rem);
+  margin-block: 0 1.25rem;
+  font-size: clamp(2.6rem, 1rem + 3.9vw, 4.25rem);
   font-weight: 700;
   line-height: 0.96;
   letter-spacing: -0.055em;
@@ -361,10 +356,7 @@
 
 .gcl-grad {
   display: inline;
-  background: linear-gradient(100deg, #d8c8ff 0%, var(--gcl-lavender) 38%, var(--gcl-mint) 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+  color: inherit;
 }
 
 .gcl-lede {
@@ -399,7 +391,7 @@
   flex-wrap: wrap;
   margin-block-start: 1.35rem;
   color: var(--gcl-dim);
-  font-size: 0.74rem;
+  font-size: 0.8125rem;
 }
 
 .gcl-trust li {
@@ -423,8 +415,7 @@
   inset: 8% -6% -8% 8%;
   z-index: -1;
   border-radius: 40px;
-  background: radial-gradient(circle at 60% 40%, rgba(124, 92, 255, 0.22), transparent 68%);
-  filter: blur(20px);
+  display: none;
 }
 
 .gcl-console {
@@ -432,12 +423,7 @@
   overflow: hidden;
   border: 1px solid var(--gcl-line-strong);
   border-radius: var(--gcl-radius);
-  background:
-    radial-gradient(90% 70% at 100% 0%, rgba(124, 92, 255, 0.11), transparent 70%),
-    linear-gradient(180deg, #17101f 0%, #0e0914 100%);
-  box-shadow:
-    0 40px 90px -46px rgba(0, 0, 0, 0.95),
-    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  background: var(--gcl-surface);
 }
 
 .gcl-console-bar {
@@ -446,7 +432,7 @@
   gap: 0.6rem;
   padding: 0.65rem 0.85rem;
   border-block-end: 1px solid var(--gcl-line);
-  background: rgba(10, 7, 15, 0.45);
+  background: rgba(255, 253, 249, 0.45);
 }
 
 .gcl-window-dots {
@@ -459,18 +445,18 @@
   inline-size: 7px;
   block-size: 7px;
   border-radius: 50%;
-  background: #33264a;
+  background: #e4d8c4;
 }
 
-.gcl-window-dots i:first-child { background: #5d3b5d; }
-.gcl-window-dots i:nth-child(2) { background: #5c4a2c; }
-.gcl-window-dots i:last-child { background: #26533f; }
+.gcl-window-dots i:first-child { background: #f1b4a6; }
+.gcl-window-dots i:nth-child(2) { background: #f2d48a; }
+.gcl-window-dots i:last-child { background: #a7dcbf; }
 
 .gcl-console-title {
   overflow: hidden;
   color: var(--gcl-muted);
-  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-  font-size: 0.68rem;
+  font-family: inherit;
+  font-size: 0.8125rem;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -481,14 +467,13 @@
   gap: 0.35rem;
   margin-inline-start: auto;
   padding: 0.2rem 0.55rem;
-  border: 1px solid rgba(47, 224, 168, 0.25);
+  border: 1px solid rgba(18, 128, 92, 0.275);
   border-radius: 999px;
-  background: rgba(47, 224, 168, 0.07);
+  background: rgba(18, 128, 92, 0.077);
   color: var(--gcl-mint);
-  font-size: 0.6rem;
+  font-size: 0.8125rem;
   font-weight: 700;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
+  letter-spacing: 0;
   white-space: nowrap;
 }
 
@@ -500,8 +485,8 @@
 }
 
 .gcl-console-status.is-running {
-  border-color: rgba(255, 176, 32, 0.3);
-  background: rgba(255, 176, 32, 0.08);
+  border-color: rgba(196, 128, 18, 0.33);
+  background: rgba(196, 128, 18, 0.088);
   color: var(--gcl-amber);
 }
 
@@ -529,7 +514,7 @@
   padding: 0.55rem 0.9rem;
   border-block-start: 1px solid var(--gcl-line);
   color: var(--gcl-dim);
-  font-size: 0.64rem;
+  font-size: 0.8125rem;
 }
 
 .gcl-console-foot span {
@@ -549,7 +534,7 @@
 }
 
 .gcl-console-empty-title {
-  font-family: var(--font-display, 'Bricolage Grotesque'), system-ui, sans-serif;
+  font-family: var(--font-display, 'Cabinet Grotesk'), system-ui, sans-serif;
   font-size: 1.02rem;
   font-weight: 600;
   letter-spacing: -0.02em;
@@ -557,7 +542,7 @@
 
 .gcl-console-empty-copy {
   color: var(--gcl-muted);
-  font-size: 0.8rem;
+  font-size: 0.8125rem;
   line-height: 1.55;
 }
 
@@ -571,16 +556,16 @@
 
 .gcl-samples > span {
   color: var(--gcl-dim);
-  font-size: 0.68rem;
+  font-size: 0.8125rem;
 }
 
 .gcl-sample {
   padding: 0.28rem 0.55rem;
-  border: 1px dashed rgba(124, 92, 255, 0.4);
+  border: 1px solid transparent;
   border-radius: 999px;
-  background: rgba(124, 92, 255, 0.07);
+  background: rgba(107, 47, 224, 0.056);
   color: var(--gcl-lavender);
-  font-size: 0.68rem;
+  font-size: 0.8125rem;
   transition: background-color 150ms ease, border-color 150ms ease;
 }
 
@@ -592,7 +577,7 @@
   padding-block-start: 0.6rem;
   border-block-start: 1px solid var(--gcl-line);
   color: var(--gcl-dim);
-  font-size: 0.64rem;
+  font-size: 0.8125rem;
 }
 
 .gcl-console-hints span {
@@ -611,7 +596,7 @@
   border: 0;
   background: none;
   color: var(--gcl-lavender);
-  font-size: 0.74rem;
+  font-size: 0.8125rem;
   font-weight: 600;
 }
 
@@ -625,7 +610,7 @@
   display: block;
   margin-block-end: 0.35rem;
   color: var(--gcl-ink);
-  font-size: 0.72rem;
+  font-size: 0.8125rem;
   font-weight: 600;
 }
 
@@ -648,13 +633,13 @@
 }
 
 .gcl-root .gc-ui-input::placeholder {
-  color: #6c627c;
+  color: #958c9c;
 }
 
 .gcl-root .gc-ui-input:focus {
-  border-color: rgba(182, 156, 222, 0.6);
+  border-color: rgba(107, 47, 224, 0.36);
   outline: none;
-  box-shadow: 0 0 0 3px rgba(124, 92, 255, 0.16);
+  box-shadow: 0 0 0 3px rgba(107, 47, 224, 0.128);
 }
 
 .gcl-root .gc-describe-row,
@@ -688,7 +673,7 @@
 }
 
 .gcl-root .gc-btn-accent {
-  background: linear-gradient(135deg, var(--gcl-purple), var(--gcl-violet));
+  background: var(--gcl-purple);
   color: white;
 }
 
@@ -713,7 +698,7 @@
 
 @media (hover: hover) and (pointer: fine) {
   .gcl-root .gc-btn-accent:hover:not(:disabled) {
-    background: linear-gradient(135deg, #9d70ff, #8b6bff);
+    background: var(--gcl-purple-hover);
   }
 }
 
@@ -723,7 +708,7 @@
   border: 0;
   background: none;
   color: var(--gcl-lavender);
-  font-size: 0.72rem;
+  font-size: 0.8125rem;
   font-weight: 600;
 }
 
@@ -736,7 +721,7 @@
 
 .gcl-root .gc-ui-note {
   color: var(--gcl-dim);
-  font-size: 0.66rem;
+  font-size: 0.8125rem;
 }
 
 .gcl-root .gc-preview {
@@ -746,7 +731,7 @@
 
 .gcl-root .gc-understood {
   color: var(--gcl-lavender);
-  font-size: 0.72rem;
+  font-size: 0.8125rem;
   font-weight: 600;
 }
 
@@ -756,7 +741,7 @@
   justify-content: space-between;
   gap: 0.75rem;
   color: var(--gcl-muted);
-  font-size: 0.72rem;
+  font-size: 0.8125rem;
 }
 
 .gcl-root .gc-progress span {
@@ -774,7 +759,7 @@
   padding: 0.65rem 0.75rem;
   border: 1px solid var(--gcl-line);
   border-radius: 11px;
-  background: rgba(246, 242, 251, 0.025);
+  background: rgba(28, 26, 36, 0.021);
 }
 
 .gcl-root .gc-lead-card {
@@ -791,7 +776,7 @@
 
 .gcl-root .gc-lead-card h3 {
   color: var(--gcl-ink);
-  font-family: var(--font-body, 'Hanken Grotesk'), system-ui, sans-serif;
+  font-family: var(--font-body, 'Satoshi'), system-ui, sans-serif;
   font-size: 0.84rem;
   font-weight: 700;
   letter-spacing: 0;
@@ -801,12 +786,12 @@
 .gcl-root .gc-lead-card-top span,
 .gcl-root .gc-lead-meta {
   color: var(--gcl-dim);
-  font-size: 0.66rem;
+  font-size: 0.8125rem;
 }
 
 .gcl-root .gc-lead-why {
   color: var(--gcl-muted);
-  font-size: 0.7rem;
+  font-size: 0.8125rem;
   line-height: 1.45;
 }
 
@@ -839,7 +824,7 @@
   padding: 0.85rem;
   border: 1px solid var(--gcl-line);
   border-radius: 11px;
-  background: rgba(246, 242, 251, 0.025);
+  background: rgba(28, 26, 36, 0.021);
 }
 
 .gcl-root .gc-state-message h2,
@@ -851,7 +836,7 @@
 .gcl-root .gc-state-message p,
 .gcl-root .gc-save > div p {
   color: var(--gcl-muted);
-  font-size: 0.74rem;
+  font-size: 0.8125rem;
   line-height: 1.5;
 }
 
@@ -867,7 +852,7 @@
   border: 1px solid var(--gcl-line-strong);
   border-radius: 7px;
   background: var(--gcl-raised);
-  font-size: 0.7rem;
+  font-size: 0.8125rem;
   font-weight: 600;
   text-align: start;
 }
@@ -876,9 +861,9 @@
   display: grid;
   gap: 0.75rem;
   padding: 0.85rem;
-  border: 1px solid rgba(124, 92, 255, 0.28);
+  border: 1px solid rgba(107, 47, 224, 0.224);
   border-radius: 12px;
-  background: rgba(124, 92, 255, 0.08);
+  background: rgba(107, 47, 224, 0.064);
 }
 
 .gcl-root .gc-save > div {
@@ -897,13 +882,13 @@
 
 .gcl-root .gc-save-confirmation {
   color: var(--gcl-ink);
-  font-size: 0.76rem;
+  font-size: 0.8125rem;
   font-weight: 600;
 }
 
 .gcl-root .gc-form-error {
-  color: #ff8f8f;
-  font-size: 0.68rem;
+  color: #c2412d;
+  font-size: 0.8125rem;
 }
 
 .gcl-root .gc-landing:has(.gc-save) .gc-find-button {
@@ -913,7 +898,7 @@
 /* ── State strip ────────────────────────────────────────────── */
 .gcl-state-strip {
   border-block: 1px solid var(--gcl-line);
-  background: rgba(21, 17, 29, 0.5);
+  background: rgba(255, 253, 249, 0.5);
 }
 
 .gcl-state-grid {
@@ -931,7 +916,7 @@
 
 .gcl-state-copy p:last-child {
   color: var(--gcl-dim);
-  font-size: 0.76rem;
+  font-size: 0.8125rem;
   line-height: 1.5;
   max-inline-size: 36rem;
 }
@@ -946,10 +931,9 @@
 
 .gcl-state-label {
   color: var(--gcl-dim);
-  font-size: 0.62rem;
+  font-size: 0.8125rem;
   font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  letter-spacing: 0;
 }
 
 .gcl-state-module {
@@ -957,11 +941,11 @@
   align-items: center;
   gap: 0.3rem;
   padding: 0.24rem 0.5rem;
-  border: 1px solid rgba(47, 224, 168, 0.25);
+  border: 1px solid rgba(18, 128, 92, 0.275);
   border-radius: 999px;
-  background: rgba(47, 224, 168, 0.06);
+  background: rgba(18, 128, 92, 0.066);
   color: var(--gcl-mint);
-  font-size: 0.66rem;
+  font-size: 0.8125rem;
   font-weight: 600;
 }
 
@@ -976,7 +960,7 @@
   position: relative;
   overflow: hidden;
   border-block-end: 1px solid var(--gcl-line);
-  background: #0a070f;
+  background: #f4ede1;
 }
 
 .gcl-ticker-track {
@@ -1001,7 +985,7 @@
   align-items: center;
   gap: 0.4rem;
   color: var(--gcl-dim);
-  font-size: 0.72rem;
+  font-size: 0.8125rem;
   white-space: nowrap;
 }
 
@@ -1018,13 +1002,12 @@
   margin-inline-start: 0.15rem;
   padding: 0.1rem 0.35rem;
   border-radius: 4px;
-  background: rgba(246, 242, 251, 0.07);
+  background: rgba(28, 26, 36, 0.06);
   color: var(--gcl-dim);
-  font-size: 0.54rem;
+  font-size: 0.8125rem;
   font-style: normal;
   font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
+  letter-spacing: 0;
 }
 
 @keyframes gcl-ticker {
@@ -1042,9 +1025,9 @@
   padding: 0 0.8rem;
   border: 0;
   border-inline-start: 1px solid var(--gcl-line);
-  background: #0a070f;
+  background: #f4ede1;
   color: var(--gcl-dim);
-  font-size: 0.6rem;
+  font-size: 0.8125rem;
   font-weight: 600;
 }
 
@@ -1106,8 +1089,8 @@
 
 .gcl-flow-num {
   color: var(--gcl-violet);
-  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-  font-size: 0.7rem;
+  font-family: inherit;
+  font-size: 0.8125rem;
   font-weight: 700;
 }
 
@@ -1120,7 +1103,7 @@
 
 .gcl-flow-step p {
   color: var(--gcl-muted);
-  font-size: 0.78rem;
+  font-size: 0.8125rem;
   line-height: 1.55;
 }
 
@@ -1131,10 +1114,9 @@
   border: 1px solid var(--gcl-line);
   border-radius: 5px;
   color: var(--gcl-dim);
-  font-size: 0.58rem;
+  font-size: 0.8125rem;
   font-weight: 700;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
+  letter-spacing: 0;
 }
 
 .gcl-flow-foot {
@@ -1143,7 +1125,7 @@
   gap: 0.5rem;
   margin-block-start: 1.25rem;
   color: var(--gcl-dim);
-  font-size: 0.78rem;
+  font-size: 0.8125rem;
   line-height: 1.55;
 }
 
@@ -1157,8 +1139,7 @@
 .gcl-report-section {
   border-block: 1px solid var(--gcl-line);
   background:
-    radial-gradient(50% 40% at 50% 0%, rgba(124, 92, 255, 0.1), transparent 70%),
-    rgba(10, 7, 15, 0.45);
+    var(--gcl-surface);
 }
 
 .gcl-report-section .gcl-section-head {
@@ -1173,7 +1154,7 @@
   flex-wrap: wrap;
   margin-block-start: 1.25rem;
   color: var(--gcl-dim);
-  font-size: 0.76rem;
+  font-size: 0.8125rem;
 }
 
 .gcl-report-foot b {
@@ -1204,7 +1185,7 @@
   gap: 1rem;
   padding: 0.72rem 1rem;
   border-block-start: 1px solid var(--gcl-line);
-  font-size: 0.78rem;
+  font-size: 0.8125rem;
 }
 
 /* Rows share the card's height so the table lines up with the pricing card. */
@@ -1219,12 +1200,11 @@
 
 .gcl-th {
   padding-block: 0.6rem;
-  background: rgba(246, 242, 251, 0.03);
+  background: rgba(28, 26, 36, 0.025);
   color: var(--gcl-dim);
-  font-size: 0.6rem;
+  font-size: 0.8125rem;
   font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  letter-spacing: 0;
 }
 
 .gcl-tr [role='rowheader'] {
@@ -1245,11 +1225,10 @@
   align-content: start;
   gap: 0.8rem;
   padding: 1.35rem;
-  border: 1px solid rgba(124, 92, 255, 0.32);
+  border: 1px solid rgba(107, 47, 224, 0.256);
   border-radius: var(--gcl-radius);
   background:
-    radial-gradient(80% 55% at 100% 0%, rgba(124, 92, 255, 0.22), transparent 70%),
-    var(--gcl-surface);
+    var(--gcl-purple-soft);
 }
 
 .gcl-cost-main {
@@ -1259,7 +1238,7 @@
 }
 
 .gcl-cost-main b {
-  font-family: var(--font-display, 'Bricolage Grotesque'), system-ui, sans-serif;
+  font-family: var(--font-display, 'Cabinet Grotesk'), system-ui, sans-serif;
   font-size: 2.6rem;
   line-height: 1;
   letter-spacing: -0.05em;
@@ -1267,12 +1246,12 @@
 
 .gcl-cost-main span {
   color: var(--gcl-dim);
-  font-size: 0.76rem;
+  font-size: 0.8125rem;
 }
 
 .gcl-cost-card > p {
   color: var(--gcl-muted);
-  font-size: 0.78rem;
+  font-size: 0.8125rem;
   line-height: 1.55;
 }
 
@@ -1287,7 +1266,7 @@
   gap: 0.4rem;
   align-items: flex-start;
   color: var(--gcl-muted);
-  font-size: 0.74rem;
+  font-size: 0.8125rem;
   line-height: 1.4;
 }
 
@@ -1332,7 +1311,7 @@
   gap: 1rem;
   padding: 1rem 0;
   color: var(--gcl-ink);
-  font-family: var(--font-display, 'Bricolage Grotesque'), system-ui, sans-serif;
+  font-family: var(--font-display, 'Cabinet Grotesk'), system-ui, sans-serif;
   font-size: 0.96rem;
   font-weight: 600;
   letter-spacing: -0.02em;
@@ -1349,7 +1328,7 @@
   content: '+';
   margin-inline-start: auto;
   color: var(--gcl-lavender);
-  font-family: var(--font-body, 'Hanken Grotesk'), system-ui, sans-serif;
+  font-family: var(--font-body, 'Satoshi'), system-ui, sans-serif;
   font-size: 1.2rem;
   font-weight: 400;
   line-height: 1;
@@ -1410,16 +1389,16 @@
   inline-size: 170px;
   block-size: 170px;
   border-radius: 50%;
-  background: radial-gradient(circle, color-mix(in oklab, var(--gcl-agent-color) 24%, transparent), transparent 70%);
+  display: none;
   pointer-events: none;
 }
 
-.gcl-agent-violet { --gcl-agent-color: #7c5cff; }
-.gcl-agent-lavender { --gcl-agent-color: #a48cff; }
-.gcl-agent-mint { --gcl-agent-color: #2fe0a8; }
-.gcl-agent-amber { --gcl-agent-color: #ffb020; }
-.gcl-agent-sky { --gcl-agent-color: #4cc9ff; }
-.gcl-agent-coral { --gcl-agent-color: #ff6b6b; }
+.gcl-agent-violet { --gcl-agent-color: #6b2fe0; }
+.gcl-agent-lavender { --gcl-agent-color: #8a63ec; }
+.gcl-agent-mint { --gcl-agent-color: #12805c; }
+.gcl-agent-amber { --gcl-agent-color: #c48012; }
+.gcl-agent-sky { --gcl-agent-color: #1f7ab8; }
+.gcl-agent-coral { --gcl-agent-color: #cc4a34; }
 
 .gcl-agent-top {
   display: flex;
@@ -1446,22 +1425,21 @@
   gap: 0.25rem;
   padding: 0.18rem 0.45rem;
   border-radius: 999px;
-  font-size: 0.56rem;
+  font-size: 0.8125rem;
   font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
+  letter-spacing: 0;
   white-space: nowrap;
 }
 
 .gcl-badge.is-live {
-  border: 1px solid rgba(47, 224, 168, 0.28);
-  background: rgba(47, 224, 168, 0.08);
+  border: 1px solid rgba(18, 128, 92, 0.308);
+  background: rgba(18, 128, 92, 0.088);
   color: var(--gcl-mint);
 }
 
 .gcl-badge.is-soon {
   border: 1px solid var(--gcl-line);
-  background: rgba(246, 242, 251, 0.03);
+  background: rgba(28, 26, 36, 0.025);
   color: var(--gcl-dim);
 }
 
@@ -1473,13 +1451,13 @@
 
 .gcl-agent-tagline {
   color: var(--gcl-agent-color);
-  font-size: 0.7rem;
+  font-size: 0.8125rem;
   font-weight: 600;
 }
 
 .gcl-agent-summary {
   color: var(--gcl-muted);
-  font-size: 0.78rem;
+  font-size: 0.8125rem;
   line-height: 1.55;
 }
 
@@ -1495,7 +1473,7 @@
   gap: 0.4rem;
   align-items: flex-start;
   color: var(--gcl-muted);
-  font-size: 0.71rem;
+  font-size: 0.8125rem;
   line-height: 1.45;
 }
 
@@ -1515,7 +1493,7 @@
   border: 0;
   background: none;
   color: var(--gcl-ink);
-  font-size: 0.74rem;
+  font-size: 0.8125rem;
   font-weight: 600;
 }
 
@@ -1551,10 +1529,9 @@
 
 .gcl-agent-preview > p:first-child {
   color: var(--gcl-dim);
-  font-size: 0.6rem;
+  font-size: 0.8125rem;
   font-weight: 700;
-  letter-spacing: 0.09em;
-  text-transform: uppercase;
+  letter-spacing: 0;
 }
 
 .gcl-agent-stats {
@@ -1569,25 +1546,25 @@
   padding: 0.55rem 0.65rem;
   border: 1px solid var(--gcl-line);
   border-radius: 9px;
-  background: rgba(246, 242, 251, 0.02);
+  background: rgba(28, 26, 36, 0.017);
 }
 
 .gcl-agent-stats b {
-  font-family: var(--font-display, 'Bricolage Grotesque'), system-ui, sans-serif;
+  font-family: var(--font-display, 'Cabinet Grotesk'), system-ui, sans-serif;
   font-size: 1.1rem;
   letter-spacing: -0.03em;
 }
 
 .gcl-agent-stats small {
   color: var(--gcl-dim);
-  font-size: 0.6rem;
+  font-size: 0.8125rem;
 }
 
 .gcl-agent-note {
   padding-block-start: 0.6rem;
   border-block-start: 1px solid var(--gcl-line);
   color: var(--gcl-dim);
-  font-size: 0.68rem;
+  font-size: 0.8125rem;
   line-height: 1.5;
 }
 
@@ -1606,12 +1583,10 @@
   justify-items: center;
   gap: 0.9rem;
   padding: clamp(2rem, 6vw, 4.5rem) clamp(1.25rem, 5vw, 4rem);
-  border: 1px solid rgba(124, 92, 255, 0.25);
+  border: 1px solid rgba(107, 47, 224, 0.2);
   border-radius: calc(var(--gcl-radius) + 6px);
-  background:
-    radial-gradient(70% 90% at 50% 0%, rgba(124, 92, 255, 0.22), transparent 70%),
-    radial-gradient(50% 60% at 80% 100%, rgba(47, 224, 168, 0.1), transparent 70%),
-    var(--gcl-surface);
+  background: var(--gcl-purple);
+  color: #fffaf2;
   text-align: center;
 }
 
@@ -1633,7 +1608,7 @@
 /* ── Footer ─────────────────────────────────────────────────── */
 .gcl-footer {
   border-block-start: 1px solid var(--gcl-line);
-  background: #0a070f;
+  background: var(--gcl-raised);
   padding-block: 3rem 1.5rem;
 }
 
@@ -1656,7 +1631,7 @@
 .gcl-footer-brand p {
   max-inline-size: 23rem;
   color: var(--gcl-dim);
-  font-size: 0.78rem;
+  font-size: 0.8125rem;
   line-height: 1.6;
 }
 
@@ -1669,11 +1644,10 @@
 .gcl-footer-col h3 {
   margin-block-end: 0.2rem;
   color: var(--gcl-ink);
-  font-family: var(--font-body, 'Hanken Grotesk'), system-ui, sans-serif;
-  font-size: 0.62rem;
+  font-family: var(--font-body, 'Satoshi'), system-ui, sans-serif;
+  font-size: 0.8125rem;
   font-weight: 700;
-  letter-spacing: 0.09em;
-  text-transform: uppercase;
+  letter-spacing: 0;
 }
 
 .gcl-footer-col a,
@@ -1683,7 +1657,7 @@
   border: 0;
   background: none;
   color: var(--gcl-dim);
-  font-size: 0.76rem;
+  font-size: 0.8125rem;
   text-align: start;
   transition: color 150ms ease;
 }
@@ -1698,7 +1672,7 @@
   padding-block-start: 1.2rem;
   border-block-start: 1px solid var(--gcl-line);
   color: var(--gcl-dim);
-  font-size: 0.66rem;
+  font-size: 0.8125rem;
 }
 
 @media (hover: hover) and (pointer: fine) {
@@ -1859,7 +1833,7 @@
     grid-column: 1 / -1;
     padding-inline-start: 0;
     color: var(--gcl-dim);
-    font-size: 0.72rem;
+    font-size: 0.8125rem;
   }
 
   .gcl-th > *:last-child {
@@ -1973,5 +1947,33 @@
   .js .gcl-root [data-reveal] {
     opacity: 1;
     transform: none;
+  }
+}
+
+/* The closing band is the page's one purple field; its text and buttons invert. */
+.gcl-cta > p {
+  color: rgba(255, 250, 242, 0.85);
+  font-size: 1.05rem;
+}
+
+.gcl-cta .gcl-btn-primary {
+  background: #fffaf2;
+  color: var(--gcl-purple);
+}
+
+.gcl-cta .gcl-btn-ghost {
+  border-color: rgba(255, 250, 242, 0.45);
+  background: transparent;
+  color: #fffaf2;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .gcl-cta .gcl-btn-primary:hover {
+    background: #ffffff;
+  }
+
+  .gcl-cta .gcl-btn-ghost:hover {
+    border-color: #fffaf2;
+    background: rgba(255, 250, 242, 0.1);
   }
 }

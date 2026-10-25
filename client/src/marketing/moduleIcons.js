@@ -1,11 +1,14 @@
-import { BarChart3, LayoutGrid, Megaphone, Search, Share2, Star, Users } from 'lucide-react';
+import { ChartColumn, Handshake, LayoutDashboard, Megaphone, Send, TrendingUp, UserSearch } from 'lucide-react';
 
+// One icon per module, chosen for what the module does rather than a
+// generic shape: find people, send posts, climb search, partner with
+// creators, run ads, read the numbers.
 export const MODULE_ICONS = {
-  workspace: LayoutGrid,
-  leads: Users,
-  social: Share2,
-  seo: Search,
-  influencer: Star,
+  workspace: LayoutDashboard,
+  leads: UserSearch,
+  social: Send,
+  seo: TrendingUp,
+  influencer: Handshake,
   ads: Megaphone,
-  reports: BarChart3,
+  reports: ChartColumn,
 };

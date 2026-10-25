@@ -1,17 +1,5 @@
 import React, { useEffect, useId, useRef, useState } from 'react';
-import {
-  ArrowRight,
-  ArrowUpRight,
-  Check,
-  Clock3,
-  Layers,
-  Menu,
-  Pause,
-  Play,
-  ShieldCheck,
-  Sparkles,
-  X,
-} from 'lucide-react';
+import { ArrowDown, ArrowRight, ArrowUpRight, Check, Clock3, Menu, Search, X } from 'lucide-react';
 import DescribeBox from './finder/DescribeBox';
 import PreviewList from './finder/PreviewList';
 import SaveStep from './finder/SaveStep';
@@ -29,27 +17,22 @@ const STEPS = [
   {
     title: 'Describe who you want',
     body: 'One sentence and, if you like, your website. No filters, no boolean strings, no spreadsheet to clean.',
-    tag: 'About a minute',
   },
   {
     title: 'We read it like a brief',
     body: 'GrowthCrew works out the trade, the place and the intent, then searches business records and live listings.',
-    tag: 'Real records',
   },
   {
     title: 'See up to five matches',
     body: 'Each person comes with a reason they fit. You see them before we ask for an email address.',
-    tag: 'No card',
   },
   {
     title: 'Keep or skip each one',
     body: 'You make one decision per person. Nothing is saved to your list unless you keep it.',
-    tag: 'You decide',
   },
   {
     title: 'Get a first message',
     body: 'Every kept lead gets a short, personal first message you can copy into your own Gmail.',
-    tag: 'Written for them',
   },
 ];
 
@@ -131,56 +114,6 @@ const StatusBadge = ({ live }) => (
   </span>
 );
 
-function Ticker() {
-  const [paused, setPaused] = useState(false);
-  const items = MODULES.map((module) => ({
-    id: module.id,
-    label: module.name,
-    copy:
-      module.id === 'leads'
-        ? 'finds people who match a plain-English brief'
-        : module.id === 'social'
-          ? 'writes, previews, schedules and publishes'
-          : module.id === 'seo'
-            ? 'audits, writes and ships safe fixes'
-            : module.id === 'influencer'
-              ? 'finds, checks and briefs creators'
-              : module.id === 'ads'
-                ? 'plans, tests and reallocates spend'
-                : 'reports every agent back in one place',
-    live: module.status === 'live',
-  }));
-
-  return (
-    <div className={`gcl-ticker${paused ? ' is-paused' : ''}`} aria-label="What each agent does">
-      <div className="gcl-ticker-track">
-        {[0, 1].map((copyIndex) => (
-          <div className="gcl-ticker-group" aria-hidden={copyIndex === 1} key={copyIndex}>
-            {items.map((item) => (
-              <span className="gcl-ticker-item" key={`${copyIndex}-${item.id}`}>
-                <ModuleIcon id={item.id} size={16} />
-                <b>{item.label}</b>
-                {item.copy}
-                <em>{item.live ? 'Live' : 'Soon'}</em>
-              </span>
-            ))}
-          </div>
-        ))}
-      </div>
-      <button
-        type="button"
-        className="gcl-ticker-pause"
-        onClick={() => setPaused((value) => !value)}
-        aria-pressed={paused}
-        aria-label={paused ? 'Resume the agent ticker' : 'Pause the agent ticker'}
-      >
-        {paused ? <Play size={11} aria-hidden="true" /> : <Pause size={11} aria-hidden="true" />}
-        {paused ? 'Play' : 'Pause'}
-      </button>
-    </div>
-  );
-}
-
 function AgentCard({ module, onNavigate }) {
   const live = module.status === 'live';
   return (
@@ -191,7 +124,6 @@ function AgentCard({ module, onNavigate }) {
       </div>
       <h3>{module.name}</h3>
       <p className="gcl-agent-tagline">{module.tagline}</p>
-      <p className="gcl-agent-summary">{module.summary}</p>
       <ul className="gcl-agent-list">
         {module.capabilities.map((capability) => (
           <li key={capability}>
@@ -201,7 +133,7 @@ function AgentCard({ module, onNavigate }) {
         ))}
       </ul>
       <button type="button" className="gcl-agent-link" onClick={() => onNavigate(module.id)}>
-        {live ? `Open ${module.name}` : 'See what is planned'}
+        {live ? `Open ${module.name}` : 'See the plan'}
         <ArrowRight size={15} aria-hidden="true" />
       </button>
     </article>
@@ -333,7 +265,7 @@ export default function LandingPage({ onLoginClick, onSignedIn, onNavigate }) {
               <>
                 <button type="button" className="gcl-btn gcl-btn-ghost" onClick={onLoginClick}>Sign in</button>
                 <button type="button" className="gcl-btn gcl-btn-primary" onClick={goToConsole}>
-                  <Sparkles size={16} aria-hidden="true" /> Try a search
+                  <Search size={16} aria-hidden="true" /> Try a search
                 </button>
               </>
             )}
@@ -373,30 +305,25 @@ export default function LandingPage({ onLoginClick, onSignedIn, onNavigate }) {
         <section className="gcl-hero" aria-labelledby={`${idBase}-hero`}>
           <div className="gcl-wrap gcl-hero-grid">
             <div className="gcl-hero-copy">
-              <p className="gcl-eyebrow" data-reveal>
-                <span className="gcl-pulse" aria-hidden="true" />
-                AI growth team · 5 agents · 1 shared brief
-              </p>
               <h1 id={`${idBase}-hero`} data-reveal style={{ '--i': 1 }}>
-                The growth team you <span className="gcl-grad">could never afford</span>.
+                The growth team you could never afford.
               </h1>
               <p className="gcl-lede" data-reveal style={{ '--i': 2 }}>
-                GrowthCrew gives founder-led businesses five AI agents on one shared context:
-                lead generation, social, SEO, influencers and paid ads. <b>Two are working in your
-                workspace today.</b> The other three are being built in the open.
+                Five AI agents for founder-led businesses, working from one brief. Lead Gen and
+                Social Studio are ready today.
               </p>
 
               <div className="gcl-hero-ctas" data-reveal style={{ '--i': 3 }}>
                 <button type="button" className="gcl-btn gcl-btn-primary gcl-btn-lg" onClick={goToConsole}>
-                  <Sparkles size={17} aria-hidden="true" /> Find your first ten leads
+                  Find your first leads <ArrowRight size={17} aria-hidden="true" />
                 </button>
                 <a className="gcl-btn gcl-btn-ghost gcl-btn-lg" href="#report">
-                  <Play size={15} aria-hidden="true" /> See an example report
+                  See an example report <ArrowDown size={16} aria-hidden="true" />
                 </a>
               </div>
 
               <ul className="gcl-trust" data-reveal style={{ '--i': 4 }}>
-                {['Up to five matches before sign-up', 'Real business records', 'You approve every message', 'No card to start'].map((item) => (
+                {['Five matches before sign-up', 'You approve every message', 'No card needed'].map((item) => (
                   <li key={item}><Check size={13} aria-hidden="true" /> {item}</li>
                 ))}
               </ul>
@@ -406,10 +333,10 @@ export default function LandingPage({ onLoginClick, onSignedIn, onNavigate }) {
               <div className="gcl-console">
                 <div className="gcl-console-bar">
                   <span className="gcl-window-dots" aria-hidden="true"><i /><i /><i /></span>
-                  <span className="gcl-console-title">growthcrew / find-people</span>
+                  <span className="gcl-console-title">Find people</span>
                   <span className={`gcl-console-status${status === 'running' ? ' is-running' : ''}`}>
                     <i aria-hidden="true" />
-                    {status === 'running' ? 'searching real records' : 'live search'}
+                    {status === 'running' ? 'Searching' : 'Live search'}
                   </span>
                 </div>
 
@@ -423,11 +350,6 @@ export default function LandingPage({ onLoginClick, onSignedIn, onNavigate }) {
 
                   {status === 'idle' ? (
                     <div className="gcl-console-empty">
-                      <p className="gcl-console-empty-title">Type one sentence. See who fits.</p>
-                      <p className="gcl-console-empty-copy">
-                        No filters, no long form. We search business records and live listings, then
-                        show up to five people with the reason each one matches.
-                      </p>
                       <div className="gcl-samples" aria-label="Example searches">
                         <span>Try:</span>
                         {SAMPLE_SEARCHES.map((sample) => (
@@ -435,11 +357,6 @@ export default function LandingPage({ onLoginClick, onSignedIn, onNavigate }) {
                             {sample}
                           </button>
                         ))}
-                      </div>
-                      <div className="gcl-console-hints">
-                        <span><Check size={12} aria-hidden="true" /> No card</span>
-                        <span><ShieldCheck size={12} aria-hidden="true" /> Nothing sent without you</span>
-                        <span><Clock3 size={12} aria-hidden="true" /> Usually under a minute</span>
                       </div>
                     </div>
                   ) : (
@@ -464,10 +381,6 @@ export default function LandingPage({ onLoginClick, onSignedIn, onNavigate }) {
                   )}
                 </div>
 
-                <div className="gcl-console-foot">
-                  <span><ShieldCheck size={13} aria-hidden="true" /> Real search, real records — not a mock-up</span>
-                  <span>Lead Gen · live</span>
-                </div>
               </div>
             </div>
           </div>
@@ -475,13 +388,6 @@ export default function LandingPage({ onLoginClick, onSignedIn, onNavigate }) {
 
         <section className="gcl-state-strip" aria-label="What is live">
           <div className="gcl-wrap gcl-state-grid">
-            <div className="gcl-state-copy">
-              <p className="gcl-eyebrow"><Layers size={14} aria-hidden="true" /> One brief, one workspace</p>
-              <p>
-                Every agent reads the same context: your offer, your buyer, your proof and your
-                budget. That is how five specialists disagree less than five separate tools.
-              </p>
-            </div>
             <div className="gcl-state-live">
               <span className="gcl-state-label">Live now</span>
               {LIVE_MODULES.map((module) => (
@@ -501,58 +407,34 @@ export default function LandingPage({ onLoginClick, onSignedIn, onNavigate }) {
           </div>
         </section>
 
-        <Ticker />
-
         <section className="gcl-section" id="how" aria-labelledby={`${idBase}-how`}>
           <div className="gcl-wrap">
             <div className="gcl-section-head is-center" data-reveal>
-              <p className="gcl-eyebrow">How it works</p>
               <h2 id={`${idBase}-how`}>One sentence in. A list worth acting on out.</h2>
-              <p>
-                The working half of GrowthCrew is deliberately small: describe the people you want,
-                see the matches, decide who belongs, and leave with a first message. No new CRM to
-                learn.
-              </p>
             </div>
 
             <div className="gcl-flow" data-reveal>
-              {STEPS.map((step, index) => (
+              {STEPS.map((step) => (
                 <article className="gcl-flow-step" key={step.title}>
-                  <span className="gcl-flow-num">{String(index + 1).padStart(2, '0')}</span>
                   <h3>{step.title}</h3>
                   <p>{step.body}</p>
-                  <span className="gcl-flow-tag">{step.tag}</span>
                 </article>
               ))}
             </div>
-
-            <p className="gcl-flow-foot" data-reveal>
-              <Sparkles size={14} aria-hidden="true" />
-              The SEO, Influencers and Paid ads agents will follow the same brief — and you will
-              approve anything that spends money.
-            </p>
           </div>
         </section>
 
         <section className="gcl-section gcl-report-section" id="report" aria-labelledby={`${idBase}-report`}>
           <div className="gcl-wrap">
             <div className="gcl-section-head is-center" data-reveal>
-              <p className="gcl-eyebrow is-amber">Example report · sample business</p>
-              <h2 id={`${idBase}-report`}>Here is what the full team will hand back.</h2>
-              <p>
-                A diagnosis, a ranked list of fixes, a dollar allocation with the reasoning shown,
-                and a 30-day projection. Everything below is sample data for a fictional business —
-                it shows the shape of the output, not a customer result.
-              </p>
+              <h2 id={`${idBase}-report`}>What the full team will hand back.</h2>
+              <p>Sample data for a fictional business, so you can see the shape of the output.</p>
             </div>
             <div data-reveal>
               <DemoReport initialKey="gym" />
             </div>
             <div className="gcl-report-foot" data-reveal>
-              <p>
-                <b>The top of this page is the real product.</b> The report is the destination for
-                the three agents still in build.
-              </p>
+              <p>The lead search at the top of this page is the real product.</p>
               <button type="button" className="gcl-btn gcl-btn-ghost" onClick={goToConsole}>
                 Run a real lead search <ArrowRight size={15} aria-hidden="true" />
               </button>
@@ -563,13 +445,7 @@ export default function LandingPage({ onLoginClick, onSignedIn, onNavigate }) {
         <section className="gcl-section" id="compare" aria-labelledby={`${idBase}-compare`}>
           <div className="gcl-wrap">
             <div className="gcl-section-head is-center" data-reveal>
-              <p className="gcl-eyebrow">Compared with hiring</p>
               <h2 id={`${idBase}-compare`}>A shorter way to a useful list.</h2>
-              <p>
-                Not a claim that two live agents replace a whole marketing department. A claim that
-                the first, most repetitive job — finding people and starting the conversation — can
-                be much smaller than it is today.
-              </p>
             </div>
 
             <div className="gcl-compare" data-reveal>
@@ -589,15 +465,10 @@ export default function LandingPage({ onLoginClick, onSignedIn, onNavigate }) {
               </div>
 
               <aside className="gcl-cost-card">
-                <p className="gcl-eyebrow is-mint">Early access</p>
                 <div className="gcl-cost-main">
                   <b>Free</b>
-                  <span>to start, no card</span>
+                  <span>during early access</span>
                 </div>
-                <p>
-                  Lead Gen and Social Studio are free while they are in early access. There is no
-                  pricing promise for the agents that have not shipped.
-                </p>
                 <ul>
                   <li><Check size={14} aria-hidden="true" /> Five lead matches before sign-up</li>
                   <li><Check size={14} aria-hidden="true" /> Keep or skip every person</li>
@@ -607,10 +478,6 @@ export default function LandingPage({ onLoginClick, onSignedIn, onNavigate }) {
                 <button type="button" className="gcl-btn gcl-btn-light gcl-btn-block" onClick={goToConsole}>
                   Start with one sentence <ArrowRight size={15} aria-hidden="true" />
                 </button>
-                <p className="gcl-cost-fineprint">
-                  When SEO, Influencers, Paid ads and Reports ship, their price will be published
-                  first. Ad spend and creator fees will be billed at cost.
-                </p>
               </aside>
             </div>
           </div>
@@ -619,12 +486,7 @@ export default function LandingPage({ onLoginClick, onSignedIn, onNavigate }) {
         <section className="gcl-section" id="faq" aria-labelledby={`${idBase}-faq`}>
           <div className="gcl-wrap gcl-faq-wrap">
             <div className="gcl-section-head" data-reveal>
-              <p className="gcl-eyebrow">Questions</p>
               <h2 id={`${idBase}-faq`}>The honest answers.</h2>
-              <p>
-                What is live, what is not, and what happens to your list. If something is missing,
-                ask and we will add it.
-              </p>
             </div>
             <div className="gcl-faq" data-reveal>
               {FAQ.map((item, index) => (
@@ -640,12 +502,7 @@ export default function LandingPage({ onLoginClick, onSignedIn, onNavigate }) {
         <section className="gcl-section" id="agents" aria-labelledby={`${idBase}-agents`}>
           <div className="gcl-wrap">
             <div className="gcl-section-head" data-reveal>
-              <p className="gcl-eyebrow">The agent team</p>
               <h2 id={`${idBase}-agents`}>Two live. Three in build. One shared brief.</h2>
-              <p>
-                Each agent gets its own playbook and its own measure. The roadmap is public because
-                you should know exactly what you are signing up for.
-              </p>
             </div>
 
             <div className="gcl-agent-grid">
@@ -656,22 +513,18 @@ export default function LandingPage({ onLoginClick, onSignedIn, onNavigate }) {
               <article className="gcl-agent gcl-agent-wide">
                 <div className="gcl-agent-wide-copy">
                   <div className="gcl-agent-top">
-                    <span className="gcl-agent-icon"><Layers size={21} aria-hidden="true" /></span>
+                    <span className="gcl-agent-icon"><ModuleIcon id="reports" size={21} /></span>
                     <StatusBadge live={false} />
                   </div>
-                  <h3>One context. One budget. One dashboard.</h3>
-                  <p className="gcl-agent-summary">
-                    Reports is the sixth view: what every agent did, what it cost, and what it
-                    brought back. It stays on the roadmap until there is more than one live agent
-                    spending money.
-                  </p>
+                  <h3>Reports</h3>
+                  <p className="gcl-agent-tagline">What every agent did, what it cost, what it brought back</p>
                   <ul className="gcl-agent-list">
                     <li><Check size={14} aria-hidden="true" /> One approval queue for anything that spends money</li>
                     <li><Check size={14} aria-hidden="true" /> Shared cost per customer across every channel</li>
                     <li><Check size={14} aria-hidden="true" /> A short weekly note, not a forty-slide deck</li>
                   </ul>
                   <button type="button" className="gcl-agent-link" onClick={() => navigate('reports')}>
-                    See what is planned <ArrowRight size={15} aria-hidden="true" />
+                    See the plan <ArrowRight size={15} aria-hidden="true" />
                   </button>
                 </div>
                 <div className="gcl-agent-preview" aria-hidden="true">
@@ -682,10 +535,7 @@ export default function LandingPage({ onLoginClick, onSignedIn, onNavigate }) {
                     <span><b>$2.54</b><small>Blended CAC</small></span>
                     <span><b>14.2h</b><small>Your time saved</small></span>
                   </div>
-                  <p className="gcl-agent-note">
-                    <b>Sample report —</b> numbers are illustrative. This view has no live data until
-                    the paid agents ship.
-                  </p>
+                  <p className="gcl-agent-note">Sample numbers</p>
                 </div>
               </article>
             </div>
@@ -695,15 +545,11 @@ export default function LandingPage({ onLoginClick, onSignedIn, onNavigate }) {
         <section className="gcl-cta-section" aria-labelledby={`${idBase}-cta`}>
           <div className="gcl-wrap">
             <div className="gcl-cta" data-reveal>
-              <p className="gcl-eyebrow is-mint">Free early access · no card</p>
-              <h2 id={`${idBase}-cta`}>Find out who you should talk to next.</h2>
-              <p>
-                Type one sentence. See up to five matches before we ask for your email. Keep the
-                people who fit, and leave with a first message for each one.
-              </p>
+              <h2 id={`${idBase}-cta`}>Find out who to talk to next.</h2>
+              <p>Five matches before sign-up. No card.</p>
               <div className="gcl-hero-ctas is-centered">
                 <button type="button" className="gcl-btn gcl-btn-primary gcl-btn-lg" onClick={goToConsole}>
-                  <Sparkles size={17} aria-hidden="true" /> Find people
+                  <Search size={17} aria-hidden="true" /> Find people
                 </button>
                 <a className="gcl-btn gcl-btn-ghost gcl-btn-lg" href="#agents">Meet the agents</a>
               </div>
@@ -717,7 +563,7 @@ export default function LandingPage({ onLoginClick, onSignedIn, onNavigate }) {
           <div className="gcl-footer-grid">
             <div className="gcl-footer-brand">
               <span className="gcl-brand"><Logo /> <span>GrowthCrew</span></span>
-              <p>The growth team for businesses that cannot afford one yet. Built one working agent at a time.</p>
+              <p>The growth team for businesses that cannot afford one yet.</p>
             </div>
             <div className="gcl-footer-col">
               <h3>Product</h3>
@@ -742,8 +588,7 @@ export default function LandingPage({ onLoginClick, onSignedIn, onNavigate }) {
             </div>
           </div>
           <div className="gcl-footer-bottom">
-            <span>GrowthCrew, a product by In2Peta · &copy; {YEAR}</span>
-            <span>Sample data is labelled. Nothing on this page promises a result.</span>
+            <span>GrowthCrew by In2Peta · &copy; {YEAR}</span>
           </div>
         </div>
       </footer>

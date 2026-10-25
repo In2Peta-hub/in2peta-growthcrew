@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { ArrowRight, Check, Clock3, Loader2, RefreshCw, Sparkles, Users } from 'lucide-react';
+import { ArrowRight, Loader2, RefreshCw, Users } from 'lucide-react';
 import { LIVE_MODULES, SOON_MODULES } from '../features';
 import { listLeads, me } from '../finder/finderApi';
 import { ModuleIcon } from './ModuleIcon';
@@ -32,15 +32,12 @@ function ModuleCard({ module, onOpen, counts }) {
     >
       <div className="ws-card-top">
         <span className="ws-card-icon"><ModuleIcon id={module.id} size={21} /></span>
-        <span className={`ws-status ${live ? 'is-live' : 'is-soon'}`}>
-          {live ? <><Check size={12} aria-hidden="true" /> Live</> : <><Clock3 size={12} aria-hidden="true" /> Coming soon</>}
-        </span>
       </div>
       <h3>{module.name}</h3>
       <p>{module.tagline}</p>
-      <span className="ws-card-note">{live ? liveNote(module.id, counts) : 'See what is planned'}</span>
+      {live && <span className="ws-card-note">{liveNote(module.id, counts)}</span>}
       <span className="ws-card-action">
-        {live ? (module.id === 'leads' ? 'Open your list' : 'Open Social Studio') : 'View the plan'}
+        {live ? (module.id === 'leads' ? 'Open your list' : 'Open Social Studio') : 'See the plan'}
         <ArrowRight size={15} aria-hidden="true" />
       </span>
     </button>
@@ -113,9 +110,6 @@ export default function WorkspaceHome({
     );
   }, [account, leads]);
 
-  const liveCount = LIVE_MODULES.length;
-  // Reports is a view across agents, not an agent, so it is not counted here.
-  const soonCount = SOON_MODULES.filter((module) => module.id !== 'reports').length;
   const pending = counts.pending;
   const recent = leads.filter((lead) => lead.status === 'pending').slice(0, 3);
   const displayCounts = status === 'loading' ? null : counts;
@@ -138,14 +132,8 @@ export default function WorkspaceHome({
       <main className="ws-main">
         <section className="ws-hero">
           <div className="ws-hero-copy">
-            <span className="ws-eyebrow"><Sparkles size={14} aria-hidden="true" /> Your growth workspace</span>
-            <h1>
-              Welcome back, <span>{firstName(session?.email)}</span>.
-            </h1>
-            <p>
-              {liveCount} agents are live and {soonCount} more are in build. Start with the people you want to
-              talk to, then write the posts that keep you in front of them.
-            </p>
+            <h1>Welcome back, {firstName(session?.email)}.</h1>
+            <p>Start with the people you want to talk to, then write the posts that keep you in front of them.</p>
             <div className="ws-hero-actions">
               <button type="button" className="ui-btn ui-btn-primary ui-btn-lg" onClick={() => open('leads')}>
                 {pending > 0 ? `Review ${pending} ${pending === 1 ? 'person' : 'people'}` : 'Find people to talk to'}
@@ -227,11 +215,7 @@ export default function WorkspaceHome({
 
         <section className="ws-section" aria-labelledby="ws-live-title">
           <div className="ws-section-head">
-            <div>
-              <span className="ws-section-eyebrow">Live now</span>
-              <h2 id="ws-live-title">The agents you can use today</h2>
-            </div>
-            <p>Both work from the same account. No setup between them.</p>
+            <h2 id="ws-live-title">Ready to use</h2>
           </div>
           <div className="ws-grid ws-grid-live">
             {LIVE_MODULES.map((module) => (
@@ -242,11 +226,7 @@ export default function WorkspaceHome({
 
         <section className="ws-section" aria-labelledby="ws-soon-title">
           <div className="ws-section-head">
-            <div>
-              <span className="ws-section-eyebrow">Coming next</span>
-              <h2 id="ws-soon-title">The rest of the growth team</h2>
-            </div>
-            <p>Each one arrives in this workspace. Nothing you already use moves.</p>
+            <h2 id="ws-soon-title">Coming soon</h2>
           </div>
           <div className="ws-grid ws-grid-soon">
             {SOON_MODULES.map((module) => (
@@ -255,59 +235,10 @@ export default function WorkspaceHome({
           </div>
         </section>
 
-        <section className="ws-flow" aria-labelledby="ws-flow-title">
-          <div className="ws-flow-copy">
-            <span className="ws-section-eyebrow">How it fits</span>
-            <h2 id="ws-flow-title">One list. One voice. One place to look.</h2>
-            <p>
-              Lead Gen answers who to talk to. Social Studio turns what you learn into posts. As each new
-              agent arrives, it reads the same context and reports back here.
-            </p>
-          </div>
-          <ol className="ws-flow-steps">
-            <li>
-              <span>01</span>
-              <div>
-                <b>Find the right people</b>
-                <p>Describe them once. Keep or skip each match, then get a first message you can edit.</p>
-              </div>
-            </li>
-            <li>
-              <span>02</span>
-              <div>
-                <b>Say something worth reading</b>
-                <p>Turn the same offer into posts for the channels where those people already are.</p>
-              </div>
-            </li>
-            <li>
-              <span>03</span>
-              <div>
-                <b>Add the next agent</b>
-                <p>SEO, influencers, paid ads and reports join without a second login or another tool.</p>
-              </div>
-            </li>
-          </ol>
-        </section>
-
-        <section className="ws-roadmap" aria-labelledby="ws-roadmap-title">
-          <div>
-            <span className="ws-section-eyebrow">Roadmap</span>
-            <h2 id="ws-roadmap-title">What comes next, in plain words</h2>
-          </div>
-          <div className="ws-roadmap-list">
-            {SOON_MODULES.map((module) => (
-              <button key={module.id} type="button" className="ws-roadmap-item" onClick={() => open(module.id)}>
-                <ModuleIcon id={module.id} size={17} />
-                <span><b>{module.name}</b><small>{module.tagline}</small></span>
-                <ArrowRight size={15} aria-hidden="true" />
-              </button>
-            ))}
-          </div>
-        </section>
       </main>
 
       <footer className="ws-footer">
-        <span>GrowthCrew, a product by In2Peta</span>
+        <span>GrowthCrew by In2Peta</span>
         <button type="button" className="ui-link" onClick={onBackToSite}>Back to the site</button>
       </footer>
     </div>
