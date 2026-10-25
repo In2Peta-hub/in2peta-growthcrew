@@ -8,8 +8,9 @@
 // the autopilot card at the bottom.
 
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Loader2, LogOut, Sparkles } from 'lucide-react';
+import { Layers, Loader2, LogOut, Sparkles } from 'lucide-react';
 import Segmented from '../ui/Segmented';
+import WorkspaceNav from '../marketing/WorkspaceNav';
 import LeadRow from './LeadRow';
 import RefineLink from './RefineLink';
 import AutopilotCard from './AutopilotCard';
@@ -47,6 +48,7 @@ export default function ReviewScreen({
   onAutopilotHandled,
   onHome,
   onOpenSocial,
+  onNavigate,
   onSignOut,
   onSessionExpired,
 }) {
@@ -386,6 +388,17 @@ export default function ReviewScreen({
                   className="ui-menu-item"
                   onClick={() => {
                     setMenuOpen(false);
+                    onNavigate?.('workspace');
+                  }}
+                >
+                  <Layers aria-hidden="true" /> Workspace
+                </button>
+                <button
+                  type="button"
+                  role="menuitem"
+                  className="ui-menu-item"
+                  onClick={() => {
+                    setMenuOpen(false);
                     onOpenSocial();
                   }}
                 >
@@ -407,6 +420,8 @@ export default function ReviewScreen({
           </div>
         </div>
       </header>
+
+      <WorkspaceNav active="leads" onNavigate={onNavigate} sticky={false} width="68rem" pad="1.25rem" />
 
       <main className="fn-main">
         <div className="fn-head">

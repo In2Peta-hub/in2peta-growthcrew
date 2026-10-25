@@ -35,6 +35,10 @@ import {
 import LoginPage from './LoginPage';
 import LandingPage from './LandingPage';
 import ReviewScreen from './finder/ReviewScreen';
+import WorkspaceHome from './marketing/WorkspaceHome';
+import ComingSoon from './marketing/ComingSoon';
+import WorkspaceNav from './marketing/WorkspaceNav';
+import { getModule } from './features';
 import { clearSession, getSession, verifySignIn, setSession } from './finder/finderApi';
 import { API_BASE } from './api';
 import Segmented from './ui/Segmented';
@@ -124,7 +128,7 @@ const SAMPLE_IN2PETA_MEDIA = [
 ];
 
 // Social Studio. Reached only from the account menu on the review screen.
-function SocialStudio({ currentUser, onBack, onLogout, defaultTab = 'studio' }) {
+function SocialStudio({ currentUser, onBack, onLogout, onNavigate, defaultTab = 'studio' }) {
   const [activeTab, setActiveTab] = useState(defaultTab); // 'studio' | 'queue' | 'history'
   const [showBeginnerGuide, setShowBeginnerGuide] = useState(true);
   const [accountMenuOpen, setAccountMenuOpen] = useState(false);
@@ -669,6 +673,9 @@ function SocialStudio({ currentUser, onBack, onLogout, defaultTab = 'studio' }) 
                   <div className="px-3 py-2">
                     <p className="ui-hint truncate">{currentUser.email}</p>
                   </div>
+                  <button type="button" role="menuitem" onClick={() => { setAccountMenuOpen(false); onNavigate?.('workspace'); }} className="ui-menu-item">
+                    <Layers aria-hidden="true" className="w-4 h-4" /> Workspace
+                  </button>
                   <button type="button" role="menuitem" onClick={() => { setAccountMenuOpen(false); onBack(); }} className="ui-menu-item">
                     <ArrowRight className="rotate-180 w-4 h-4" aria-hidden="true" /> Back to your leads
                   </button>
@@ -682,8 +689,10 @@ function SocialStudio({ currentUser, onBack, onLogout, defaultTab = 'studio' }) 
         </div>
       </header>
 
-      <nav className="px-4 sm:px-8" aria-label="Workspace">
-        <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-2 py-2">
+      <WorkspaceNav active="social" onNavigate={onNavigate} sticky={false} width="80rem" />
+
+      <nav aria-label="Social Studio">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-wrap items-center justify-between gap-2 py-2">
           <div className="ui-tabs max-w-full" aria-label="Social Studio views">
               <button type="button" onClick={() => setActiveTab('studio')} className="ui-tab" aria-selected={activeTab === 'studio'}><Sparkles aria-hidden="true" /> Create post</button>
               <button type="button" onClick={() => setActiveTab('queue')} className="ui-tab" aria-selected={activeTab === 'queue'}><Layers aria-hidden="true" /> Review & queue {pendingCount > 0 && <span className="ui-badge">{pendingCount}</span>}</button>
@@ -1990,10 +1999,12 @@ function SocialStudio({ currentUser, onBack, onLogout, defaultTab = 'studio' }) 
 
 /* ── Routing ─────────────────────────────────────────────────────
    The finder session is the signed-in state:
-     landing  → (LandingPage calls onSignedIn) → review
+     landing  → sign-in → workspace
      ?signin=<code>&email=<email> → verify → review
+     SaveStep (after a preview) → review, because the list is the next task
      ?autopilot=off → remembered, applied once signed in
-   Social Studio is reachable only from the account menu on review. */
+   The workspace is the hub; Lead Gen, Social Studio and every coming-soon
+   agent are one click from it. No route ever dead-ends. */
 
 const AUTOPILOT_OFF_KEY = 'gc_finder_autopilot_off';
 
@@ -2031,7 +2042,7 @@ export default function App() {
   );
   const [view, setView] = useState(() => {
     if (entry.signin && entry.email) return 'verifying';
-    if (getSession()) return 'review';
+    if (getSession()) return 'workspace';
     return entry.autopilotOff ? 'login' : 'landing';
   });
   const verifyStarted = useRef(false);
@@ -2067,6 +2078,15 @@ export default function App() {
     setSessionState(getSession());
     setSignedInAccount(account || null);
     setLoginNotice('');
+    setView('workspace');
+  };
+
+  // Signing in after keeping a preview should land on the list the person
+  // just built, not on the hub. Everything else starts at the workspace.
+  const handlePreviewSignedIn = (account) => {
+    setSessionState(getSession());
+    setSignedInAccount(account || null);
+    setLoginNotice('');
     setView('review');
   };
 
@@ -2091,10 +2111,23 @@ export default function App() {
     setAutopilotOff(false);
   };
 
+  // Module IDs are the app's navigation language. Live modules open their
+  // working screen; coming-soon modules open an honest roadmap page.
+  const handleNavigate = (id) => {
+    if (id === 'workspace') setView('workspace');
+    else if (id === 'leads') setView('review');
+    else if (id === 'social') setView('social');
+    else if (getModule(id)?.status === 'soon') setView(`soon:${id}`);
+    else setView('workspace');
+  };
+
   const currentUser = session ? userFromEmail(session.email) : null;
 
-  // The session can disappear (cleared in another tab); never show the review screen without one.
-  const activeView = !session && (view === 'review' || view === 'social') ? 'login' : view;
+  // The session can disappear (cleared in another tab); never show an
+  // account screen without one.
+  const needsSession =
+    view === 'review' || view === 'social' || view === 'workspace' || view.startsWith('soon:');
+  const activeView = !session && needsSession ? 'login' : view;
 
   if (activeView === 'verifying') return <SigningIn />;
 
@@ -2108,6 +2141,31 @@ export default function App() {
     );
   }
 
+  if (activeView === 'workspace') {
+    return (
+      <WorkspaceHome
+        key={session.email}
+        session={session}
+        onNavigate={handleNavigate}
+        onBackToSite={() => setView('landing')}
+        onSignOut={handleSignOut}
+        onSessionExpired={handleSessionExpired}
+      />
+    );
+  }
+
+  if (activeView.startsWith('soon:')) {
+    return (
+      <ComingSoon
+        moduleId={activeView.slice('soon:'.length)}
+        session={session}
+        onNavigate={handleNavigate}
+        onBackToSite={() => setView('landing')}
+        onSignOut={handleSignOut}
+      />
+    );
+  }
+
   if (activeView === 'review') {
     return (
       <ReviewScreen
@@ -2116,8 +2174,9 @@ export default function App() {
         initialAccount={signedInAccount}
         turnAutopilotOff={autopilotOff}
         onAutopilotHandled={handleAutopilotHandled}
-        onHome={() => setView('landing')}
+        onHome={() => setView('workspace')}
         onOpenSocial={() => setView('social')}
+        onNavigate={handleNavigate}
         onSignOut={handleSignOut}
         onSessionExpired={handleSessionExpired}
       />
@@ -2130,15 +2189,16 @@ export default function App() {
         currentUser={currentUser}
         onBack={() => setView('review')}
         onLogout={handleSignOut}
+        onNavigate={handleNavigate}
       />
     );
   }
 
   return (
     <LandingPage
-      onLoginClick={() => setView(session ? 'review' : 'login')}
-      onSignedIn={handleSignedIn}
-      onOpenList={() => setView('review')}
+      onLoginClick={() => setView(session ? 'workspace' : 'login')}
+      onSignedIn={handlePreviewSignedIn}
+      onNavigate={handleNavigate}
     />
   );
 }
