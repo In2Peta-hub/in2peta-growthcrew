@@ -34,3 +34,6 @@ Thumbs.db
 # Local lead dataset — Parquet mirror of the MotherDuck business_leads database.
 # The ~10.6M rows live in MotherDuck; this ~700 MB folder must never be committed.
 USA Database Business Leads 9,979,021/
+
+# Design-inspector output
+.taste-skill/

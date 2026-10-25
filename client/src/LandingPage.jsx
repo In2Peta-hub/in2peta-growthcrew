@@ -1,5 +1,19 @@
 import React, { useEffect, useId, useRef, useState } from 'react';
-import { ArrowDown, ArrowRight, ArrowUpRight, Check, Clock3, Menu, Search, X } from 'lucide-react';
+import {
+  ArrowDown,
+  ArrowRight,
+  ArrowUpRight,
+  Check,
+  CircleCheckBig,
+  Clock3,
+  Contact,
+  FileSearch,
+  Mail,
+  Menu,
+  Search,
+  TextCursorInput,
+  X,
+} from 'lucide-react';
 import DescribeBox from './finder/DescribeBox';
 import PreviewList from './finder/PreviewList';
 import SaveStep from './finder/SaveStep';
@@ -13,27 +27,13 @@ const YEAR = new Date().getFullYear();
 
 const SAMPLE_SEARCHES = ['dentists in Austin', 'SaaS founders in Austin', 'independent cafés near Bristol'];
 
+// Icons name the action in each step: type, read, review, decide, send.
 const STEPS = [
-  {
-    title: 'Describe who you want',
-    body: 'One sentence and, if you like, your website. No filters, no boolean strings, no spreadsheet to clean.',
-  },
-  {
-    title: 'We read it like a brief',
-    body: 'GrowthCrew works out the trade, the place and the intent, then searches business records and live listings.',
-  },
-  {
-    title: 'See up to five matches',
-    body: 'Each person comes with a reason they fit. You see them before we ask for an email address.',
-  },
-  {
-    title: 'Keep or skip each one',
-    body: 'You make one decision per person. Nothing is saved to your list unless you keep it.',
-  },
-  {
-    title: 'Get a first message',
-    body: 'Every kept lead gets a short, personal first message you can copy into your own Gmail.',
-  },
+  { icon: TextCursorInput, title: 'Describe who you want', body: 'One sentence and your URL. No filters or spreadsheets.' },
+  { icon: FileSearch, title: 'We read it like a brief', body: 'We pull out the trade, place and intent, then search live listings.' },
+  { icon: Contact, title: 'See up to five matches', body: 'Each with a reason it fits, before you give an email.' },
+  { icon: CircleCheckBig, title: 'Keep or skip each one', body: 'One decision per lead. Only the ones you keep are saved.' },
+  { icon: Mail, title: 'Get a first message', body: 'A short, personal intro to copy into your Gmail.' },
 ];
 
 const COMPARISON = [
@@ -414,10 +414,11 @@ export default function LandingPage({ onLoginClick, onSignedIn, onNavigate }) {
             </div>
 
             <div className="gcl-flow" data-reveal>
-              {STEPS.map((step) => (
-                <article className="gcl-flow-step" key={step.title}>
-                  <h3>{step.title}</h3>
-                  <p>{step.body}</p>
+              {STEPS.map(({ icon: Icon, title, body }) => (
+                <article className="gcl-flow-step" key={title}>
+                  <Icon className="gcl-flow-icon" size={30} strokeWidth={1.5} aria-hidden="true" />
+                  <h3>{title}</h3>
+                  <p>{body}</p>
                 </article>
               ))}
             </div>
