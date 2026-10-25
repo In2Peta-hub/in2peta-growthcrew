@@ -131,10 +131,16 @@ class MultiPlatformPublisher:
         results: Dict[str, Any] = {}
         target_platforms = [p.lower().strip() for p in (platforms or cls.SUPPORTED_PLATFORMS)]
 
-        page_id = (fb_page_id or CONFIG.FB_PAGE_ID).strip()
-        access_token = (fb_access_token or CONFIG.FB_PAGE_ACCESS_TOKEN).strip()
+        # Distinguish between system default credentials vs custom client credentials
+        is_default_system = (
+            (fb_page_id is None or fb_page_id == CONFIG.FB_PAGE_ID) and
+            (fb_access_token is None or fb_access_token == CONFIG.FB_PAGE_ACCESS_TOKEN)
+        )
+
+        page_id = (fb_page_id or (CONFIG.FB_PAGE_ID if is_default_system else "")).strip()
+        access_token = (fb_access_token or (CONFIG.FB_PAGE_ACCESS_TOKEN if is_default_system else "")).strip()
         discord_url = (discord_webhook_url or CONFIG.DISCORD_WEBHOOK_URL).strip()
-        ig_user_id = (ig_business_account_id or os.getenv("IG_BUSINESS_ACCOUNT_ID") or CONFIG.IG_BUSINESS_ACCOUNT_ID or "17841415311653642").strip()
+        ig_user_id = (ig_business_account_id or (CONFIG.IG_BUSINESS_ACCOUNT_ID if is_default_system else "")).strip()
 
         # 1. FACEBOOK
         if "facebook" in target_platforms:
@@ -161,6 +167,12 @@ class MultiPlatformPublisher:
         # 2. INSTAGRAM (Direct Meta Graph API Container & Publish)
         if "instagram" in target_platforms:
             try:
+                if not access_token or not ig_user_id:
+                    raise Exception(
+                        "Channel is not authenticated with Meta (no Page Access Token or Instagram Business Account ID). "
+                        "Please connect this Instagram account using '1-Click Connect with Facebook & Instagram' or provide valid Meta credentials."
+                    )
+
                 clean_img_url = media_url or "https://images.unsplash.com/photo-1621905251189-08b45d6a269e?w=1080&auto=format&fit=crop&q=80"
                 # Automatically format image if aspect ratio is incompatible with Instagram
                 clean_img_url = cls.format_image_for_instagram(clean_img_url)
@@ -198,12 +210,26 @@ class MultiPlatformPublisher:
                     raise Exception(err_msg)
                 
                 ig_post_id = p_json["id"]
+
+                # Fetch real permalink directly from Instagram
+                ig_permalink = None
+                try:
+                    p_info = requests.get(
+                        f"https://graph.facebook.com/v21.0/{ig_post_id}?fields=permalink,shortcode&access_token={access_token}",
+                        timeout=10
+                    ).json()
+                    ig_permalink = p_info.get("permalink")
+                    if not ig_permalink and p_info.get("shortcode"):
+                        ig_permalink = f"https://www.instagram.com/p/{p_info['shortcode']}/"
+                except Exception:
+                    pass
+
                 results["instagram"] = {
                     "status": "success",
                     "platform": "Instagram",
                     "id": ig_post_id,
-                    "url": f"https://www.instagram.com/_mytestpage_/",
-                    "message": "Published live to Instagram feed (@_mytestpage_)"
+                    "url": ig_permalink or "https://www.instagram.com/",
+                    "message": "Published live to Instagram feed"
                 }
             except Exception as e:
                 results["instagram"] = {
@@ -272,14 +298,28 @@ class MultiPlatformPublisher:
             }
 
         # Summary
+        has_ig = "instagram" in target_platforms
+        ig_failed = has_ig and results.get("instagram", {}).get("status") == "error"
+        has_fb = "facebook" in target_platforms
+        fb_failed = has_fb and results.get("facebook", {}).get("status") == "error"
+
         successful = [k for k, v in results.items() if v.get("status") == "success"]
         failed = [k for k, v in results.items() if v.get("status") == "error"]
 
+        # If primary platforms (Instagram / Facebook) were selected and failed, DO NOT report overall success
+        overall_success = (len(successful) > 0) and not ig_failed and not fb_failed
+
+        err_parts = []
+        if ig_failed:
+            err_parts.append(f"Instagram: {results['instagram'].get('error')}")
+        if fb_failed:
+            err_parts.append(f"Facebook: {results['facebook'].get('error')}")
+
         return {
-            "success": len(successful) > 0,
+            "success": overall_success,
             "totalRequested": len(target_platforms),
             "successfulCount": len(successful),
             "failedCount": len(failed),
             "platforms": results,
-            "summary": f"Published to {len(successful)} of {len(target_platforms)} platforms: {', '.join([cls.PLATFORM_LABELS.get(p, p) for p in successful])}"
+            "summary": f"Published to {len(successful)} platforms: {', '.join([cls.PLATFORM_LABELS.get(p, p) for p in successful])}" if overall_success else (" | ".join(err_parts) if err_parts else "Publishing failed to destination channels.")
         }

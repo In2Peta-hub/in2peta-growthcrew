@@ -291,17 +291,42 @@ function SocialStudio({ currentUser, onBack, onLogout, onNavigate, defaultTab = 
     return () => clearInterval(interval);
   }, []);
 
+  // Handle Deleting / Disconnecting Channel
+  const handleDeleteChannel = async (channelId, e) => {
+    if (e) e.stopPropagation();
+    try {
+      await fetch(`${API_BASE}/api/channels/${channelId}`, { method: 'DELETE' });
+    } catch {
+      // ignore
+    }
+    setChannels((prev) => {
+      const rem = prev.filter((c) => c.id !== channelId);
+      if (activeChannel?.id === channelId) {
+        setActiveChannel(rem[0] || null);
+      }
+      return rem;
+    });
+    showToast('Channel removed.', 'info');
+  };
+
   // Handle Connecting Custom Channel & Credentials
   const handleConnectInstagram = async (e) => {
     e.preventDefault();
-    if (!customHandleInput.trim() && !customFbPageId.trim() && !customDiscordWebhook.trim()) {
-      showToast('Please provide a handle, Page ID, or Webhook URL to connect.', 'error');
-      return;
-    }
-    const formatted = customHandleInput.trim().replace(/^@/, '');
     const cleanPlatform = customPlatform.toLowerCase();
     const platName = ALL_PLATFORMS.find((p) => p.id === cleanPlatform)?.name || cleanPlatform;
-    
+
+    if (cleanPlatform === 'instagram' || cleanPlatform === 'facebook') {
+      if (!customFbPageId.trim() || !customFbToken.trim()) {
+        showToast('Meta requires authorization. Please click the "1-Click Connect with Facebook & Instagram" button above, or enter both Page ID and Page Access Token.', 'error');
+        return;
+      }
+    } else if (!customHandleInput.trim() && !customDiscordWebhook.trim()) {
+      showToast('Please provide a handle or Webhook URL to connect.', 'error');
+      return;
+    }
+
+    const formatted = customHandleInput.trim().replace(/^@/, '');
+
     try {
       const res = await fetch(`${API_BASE}/api/channels/custom-connect`, {
         method: 'POST',
@@ -317,22 +342,14 @@ function SocialStudio({ currentUser, onBack, onLogout, onNavigate, defaultTab = 
       });
 
       const data = await res.json();
+      if (!res.ok) {
+        showToast(data.detail || data.error || 'Connection failed. Please check credentials.', 'error');
+        return;
+      }
+
       if (data.channels && Array.isArray(data.channels)) {
         setChannels(data.channels);
         setActiveChannel(data.channel || data.channels[data.channels.length - 1]);
-      } else {
-        const fallbackChan = {
-          id: `custom_${Date.now()}`,
-          name: formatted ? `${formatted} (${platName})` : `My ${platName}`,
-          handle: formatted ? `@${formatted}` : `@${cleanPlatform}`,
-          platform: cleanPlatform,
-          platforms: [cleanPlatform],
-          avatar: attachedMediaUrl || SAMPLE_IN2PETA_MEDIA[0].url,
-          connected: true,
-          provider: 'Custom Connected',
-        };
-        setChannels((prev) => [...prev, fallbackChan]);
-        setActiveChannel(fallbackChan);
       }
 
       setShowConnectModal(false);
@@ -342,9 +359,8 @@ function SocialStudio({ currentUser, onBack, onLogout, onNavigate, defaultTab = 
       setCustomDiscordWebhook('');
       fetchData();
       showToast(`Connected ${platName} channel successfully!`, 'success');
-    } catch {
-      showToast(`Connected ${cleanPlatform} channel.`, 'success');
-      setShowConnectModal(false);
+    } catch (err) {
+      showToast(`Connection failed: ${err.message}`, 'error');
     }
   };
 
@@ -1644,15 +1660,24 @@ function SocialStudio({ currentUser, onBack, onLogout, onNavigate, defaultTab = 
                             <CheckCircle2 className="w-3 h-3" />
                             Published
                           </span>
-                          <a
-                            href="https://facebook.com/profile.php?id=61594485176950&sk=photos"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="ui-btn ui-btn-ghost ui-btn-sm"
-                          >
-                            <span>View Facebook photos</span>
-                            <ExternalLink className="w-3 h-3" />
-                          </a>
+                          {(() => {
+                            const igUrl = post.broadcastResult?.platforms?.instagram?.url;
+                            const fbUrl = post.broadcastResult?.platforms?.facebook?.url;
+                            const liveUrl = igUrl || fbUrl || post.liveUrl || (post.channelHandle ? `https://www.instagram.com/${post.channelHandle.replace('@', '')}/` : null);
+                            const isIg = Boolean(igUrl) || post.platform === 'instagram';
+                            return liveUrl ? (
+                              <a
+                                href={liveUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="ui-btn ui-btn-ghost ui-btn-sm"
+                              >
+                                {isIg ? <InstagramIcon className="w-3 h-3 text-[#FF5376]" /> : <FacebookIcon className="w-3 h-3 text-[#38BDF8]" />}
+                                <span>{isIg ? 'View on Instagram' : 'View on Facebook'}</span>
+                                <ExternalLink className="w-3 h-3" />
+                              </a>
+                            ) : null;
+                          })()}
                         </div>
                       </div>
                     );
@@ -1685,37 +1710,56 @@ function SocialStudio({ currentUser, onBack, onLogout, onNavigate, defaultTab = 
               <p className="ui-label">Connected channels</p>
               <div className="space-y-2">
                 {channels.map((chan) => (
-                  <button
-                    type="button"
-                    key={chan.id}
-                    onClick={() => {
-                      setActiveChannel(chan);
-                      setShowConnectModal(false);
-                      showToast(`Active channel set to ${chan.name}!`, 'success');
-                    }}
-                    className="ui-chip w-full justify-between !h-auto !py-2"
-                    aria-pressed={activeChannel?.id === chan.id}
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className="w-9 h-9 rounded-full">
-                        <img src={chan.avatar} alt="avatar" className="w-full h-full rounded-full object-cover" />
-                      </div>
-                      <div>
-                        <span className="text-[13px] font-bold text-[var(--ui-ink)] block">{chan.name}</span>
-                        <span className="text-[13px] text-[var(--ui-muted)] flex items-center gap-1.5">
-                          {chan.platform === 'facebook' ? (
-                            <FacebookIcon className="w-3 h-3 text-[#38BDF8]" />
+                  <div key={chan.id} className="ui-chip w-full justify-between !h-auto !py-2">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setActiveChannel(chan);
+                        setShowConnectModal(false);
+                        showToast(`Active channel set to ${chan.name}!`, 'success');
+                      }}
+                      className="ui-btn ui-btn-ghost flex-1 min-w-0 justify-start !h-auto text-left"
+                      aria-pressed={activeChannel?.id === chan.id}
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="w-9 h-9 rounded-full">
+                          <img src={chan.avatar} alt="avatar" className="w-full h-full rounded-full object-cover" />
+                        </div>
+                        <div>
+                          <span className="text-[13px] font-bold text-[var(--ui-ink)] block">{chan.name}</span>
+                          <span className="text-[13px] text-[var(--ui-muted)] flex items-center gap-1.5">
+                            {chan.platform === 'facebook' ? (
+                              <FacebookIcon className="w-3 h-3 text-[#38BDF8]" />
+                            ) : (
+                              <InstagramIcon className="w-3 h-3 text-[var(--ui-lavender)]" />
+                            )}
+                            <span>{chan.handle}</span>
+                          </span>
+                          {(chan.fbPageId && (chan.fbAccessToken || chan.provider === 'Meta Graph API' || chan.provider === 'Meta 1-Click OAuth')) ? (
+                            <span className="text-[9px] text-emerald-400 font-semibold block">✓ Meta Verified</span>
                           ) : (
-                            <InstagramIcon className="w-3 h-3 text-[var(--ui-lavender)]" />
+                            <span className="text-[9px] text-amber-400 font-semibold block">⚠️ No Meta Token (Cannot Publish)</span>
                           )}
-                          <span>{chan.handle}</span>
-                        </span>
+                        </div>
                       </div>
+                    </button>
+                    <div className="flex items-center gap-2">
+                      {activeChannel?.id === chan.id && (
+                        <CheckCircle2 className="w-4 h-4 text-[var(--ui-lavender)]" />
+                      )}
+                      {chan.id !== 'cmu2huh5o0001p0aq03ly15ud' && (
+                        <button
+                          type="button"
+                          onClick={(e) => handleDeleteChannel(chan.id, e)}
+                          title="Remove channel"
+                          aria-label={`Remove ${chan.name}`}
+                          className="ui-btn ui-btn-ghost ui-btn-icon ui-btn-sm"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      )}
                     </div>
-                    {activeChannel?.id === chan.id && (
-                      <CheckCircle2 className="w-4 h-4 text-[var(--ui-lavender)]" />
-                    )}
-                  </button>
+                  </div>
                 ))}
               </div>
             </div>
@@ -1779,7 +1823,7 @@ function SocialStudio({ currentUser, onBack, onLogout, onNavigate, defaultTab = 
 
               {(customPlatform === 'facebook' || customPlatform === 'instagram') && (
                 <div className="ui-panel-raised space-y-2">
-                  <p className="ui-label">Meta Graph API credentials (optional)</p>
+                  <p className="ui-label">Meta Graph API credentials (required)</p>
                   <div>
                     <input
                       type="text"
@@ -1801,7 +1845,7 @@ function SocialStudio({ currentUser, onBack, onLogout, onNavigate, defaultTab = 
                     />
                   </div>
                   <p className="text-[13px] text-[var(--ui-faint)]">
-                    Leave blank to use pre-configured system token, or paste your own Page ID & Token.
+                    Enter your Facebook Page ID and Meta Page access token, or use Connect Facebook &amp; Instagram above.
                   </p>
                 </div>
               )}
