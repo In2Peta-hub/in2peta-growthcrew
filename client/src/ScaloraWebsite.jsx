@@ -41,9 +41,9 @@ export default function ScaloraWebsite({ onLaunchStudio }) {
   };
 
   return (
-    <div className="flex flex-col h-[calc(100vh-73px)] bg-[#07080d] text-slate-100 overflow-hidden">
+    <div className="flex flex-col h-[calc(100vh-73px)] bg-[var(--brand-bg)] text-slate-100 overflow-hidden">
       {/* Interactive Control Toolbar */}
-      <div className="bg-[#0e1019] border-b border-white/10 px-4 py-2.5 flex items-center justify-between shrink-0 gap-3">
+      <div className="bg-[var(--brand-surface)] border-b border-white/10 px-4 py-2.5 flex items-center justify-between shrink-0 gap-3">
         {/* Left: Subpage Navigation Tabs */}
         <div className="flex items-center gap-1.5 overflow-x-auto py-0.5 scrollbar-thin">
           <div className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-white/[0.04] text-xs font-semibold text-slate-300 border border-white/5 mr-1">

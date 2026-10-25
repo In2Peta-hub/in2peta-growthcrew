@@ -56,5 +56,16 @@ services:
         value: https://code.in2peta.com/v1
       - key: LITELLM_MASTER_KEY
         sync: false
+      - key: LITELLM_MODEL
+        value: kimi-k3
       - key: API_KEY_ENCRYPTION_KEY
         sync: false
+      # GrowthCrew lead finder (docs/lead-finder-spec.md)
+      - key: FINDER_FROM_INBOX
+        sync: false
+      - key: FINDER_DIGEST_SECRET
+        sync: false
+      - key: FRONTEND_URL
+        value: http://localhost:5173
+      - key: FINDER_SCHEDULER
+        value: "1"

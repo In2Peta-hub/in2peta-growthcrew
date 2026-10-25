@@ -12,6 +12,7 @@ from config import CONFIG
 from growthcrew.errors import GrowthcrewError
 from growthcrew.normalize import normalize_csv_leads
 from growthcrew import service
+from growthcrew.lead_chat import LeadChatBody, chat_search
 
 router = APIRouter(prefix="/api/growthcrew", tags=["GrowthCrew Outreach"])
 RUN_SLUG = re.compile(r"^[a-zA-Z0-9][a-zA-Z0-9_.~-]*$")
@@ -179,6 +180,14 @@ def inboxes():
 @router.post("/inboxes")
 def create_inbox(body: InboxBody):
     return _guard(lambda: service.create_inbox(body.displayName, body.username))
+
+
+@router.post("/leads/chat")
+async def lead_chat(body: LeadChatBody):
+    try:
+        return await chat_search(body, service.get_settings())
+    except GrowthcrewError as exc:
+        return _fail(exc.status, str(exc), exc.code)
 
 
 @router.post("/leads/search/start")

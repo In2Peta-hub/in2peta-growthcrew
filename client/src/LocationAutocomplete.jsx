@@ -1,8 +1,7 @@
 import React, { useEffect, useId, useRef, useState } from 'react';
 import { suggestIndiaLocations } from './indiaLocations';
 
-const FIELD =
-  'w-full bg-[#07080b] border border-white/10 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder:text-slate-600 focus:outline-none focus:border-[#FF6B4A]/60 focus:ring-2 focus:ring-[#FF6B4A]/15 transition-all disabled:opacity-50';
+const FIELD = 'ui-input';
 
 /**
  * Location autocomplete for GrowthCrew outreach. Curated India locations show
@@ -143,7 +142,8 @@ export default function LocationAutocomplete({
         <ul
           id={listId}
           role="listbox"
-          className="absolute z-30 mt-1.5 max-h-56 w-full overflow-auto rounded-xl border border-white/10 bg-[#10141c] py-1 shadow-2xl"
+          className="ui-menu absolute z-30 mt-1.5 max-h-56 w-full overflow-auto"
+          style={{ '--ui-origin': 'top left' }}
         >
           {items.map((label, index) => (
             <li
@@ -151,11 +151,8 @@ export default function LocationAutocomplete({
               id={`${listId}-opt-${index}`}
               role="option"
               aria-selected={index === activeIndex}
-              className={`cursor-pointer px-3.5 py-2 text-xs transition-colors ${
-                index === activeIndex
-                  ? 'bg-[#FFA84A]/15 text-white'
-                  : 'text-slate-300 hover:bg-white/[0.06] hover:text-white'
-              }`}
+              className="ui-menu-item cursor-pointer"
+              style={index === activeIndex ? { background: 'var(--ui-accent-soft)' } : undefined}
               onMouseEnter={() => setActiveIndex(index)}
               onMouseDown={(event) => {
                 event.preventDefault();
@@ -166,7 +163,7 @@ export default function LocationAutocomplete({
             </li>
           ))}
           {remoteNote && (
-            <li className="border-t border-white/[0.06] px-3.5 py-1.5 text-[10px] text-slate-500" role="presentation">
+            <li className="ui-hint px-3 py-1.5" role="presentation">
               Some results © OpenStreetMap
             </li>
           )}

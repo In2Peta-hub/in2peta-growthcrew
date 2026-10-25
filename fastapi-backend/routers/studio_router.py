@@ -8,6 +8,7 @@ from fastapi import APIRouter, UploadFile, File, Form, Body, HTTPException, Requ
 from pydantic import BaseModel, Field
 
 from config import CONFIG
+from growthcrew.frontend_urls import dashboard_url
 from services.gemini_service import GeminiService
 from services.ai_caption_service import AICaptionService
 from services.s3_service import S3Service
@@ -640,7 +641,7 @@ async def meta_oauth_callback(
     error: Optional[str] = None,
     error_description: Optional[str] = None
 ):
-    frontend_base = CONFIG.FRONTEND_URL.rstrip('/')
+    frontend_base = dashboard_url('/social')
     if error or not code:
         err_msg = error_description or error or "Authorization canceled by user"
         return RedirectResponse(url=f"{frontend_base}?oauth_error={requests.utils.quote(err_msg)}")

@@ -1,0 +1,783 @@
+/* GrowthCrew workspace home and roadmap.
+   Same brand as the landing page, tuned for a screen people use every day:
+   surfaces separate by tone, violet is reserved for the one primary action,
+   and every card says what it does and whether it is available now. */
+
+.ws-app {
+  min-block-size: 100svh;
+  background: var(--brand-bg);
+  color: var(--brand-ink);
+  font-family: var(--font-body);
+  display: flex;
+  flex-direction: column;
+}
+
+.ws-app *,
+.ws-app *::before,
+.ws-app *::after {
+  box-sizing: border-box;
+}
+
+.ws-app :where(button, input, textarea) {
+  font: inherit;
+}
+
+.ws-app :where(button) {
+  cursor: pointer;
+}
+
+.ws-app :where(h1, h2, h3, p, ul, ol) {
+  margin: 0;
+}
+
+.ws-app :where(h1, h2, h3) {
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1.04;
+}
+
+.ws-app :where(ul, ol) {
+  padding: 0;
+  list-style: none;
+}
+
+.ws-app :focus-visible {
+  outline: 2px solid var(--brand-lavender);
+  outline-offset: 3px;
+}
+
+/* ── Header ─────────────────────────────────────────────────── */
+.ws-header {
+  position: sticky;
+  inset-block-start: 0;
+  z-index: 45;
+  background: var(--brand-surface);
+}
+
+.ws-header-in {
+  max-inline-size: 78rem;
+  margin-inline: auto;
+  padding: 0.7rem clamp(1rem, 3vw, 2rem);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.ws-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+  border: 0;
+  background: none;
+  color: inherit;
+  padding: 0;
+  transition: transform 140ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.ws-brand:active { transform: scale(0.97); }
+
+.ws-brand-logo {
+  inline-size: 2.25rem;
+  block-size: 2.25rem;
+  border-radius: 6px;
+  background: white;
+  padding: 0.1rem;
+  object-fit: contain;
+}
+
+.ws-brand-word {
+  font-family: var(--font-display);
+  font-size: 1.125rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.ws-brand-tag {
+  padding-inline-start: 0.7rem;
+  border-inline-start: 1px solid var(--ui-line, rgb(255 255 255 / 0.14));
+  color: var(--brand-muted);
+  font-size: 0.8125rem;
+}
+
+.ws-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.ws-header-mail {
+  max-inline-size: 15rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--brand-muted);
+  font-size: 0.8125rem;
+  padding-inline-end: 0.5rem;
+}
+
+/* ── Main ───────────────────────────────────────────────────── */
+.ws-main {
+  inline-size: min(100%, 78rem);
+  margin-inline: auto;
+  padding: clamp(1.5rem, 4vw, 3rem) clamp(1rem, 3vw, 2rem) 3rem;
+  display: grid;
+  align-content: start;
+  gap: clamp(2.5rem, 6vw, 4.5rem);
+  flex: 1;
+}
+
+.ws-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  color: var(--brand-lavender);
+  font-size: 0.8125rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.ws-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(20rem, 0.85fr);
+  gap: clamp(1.5rem, 4vw, 3.5rem);
+  align-items: center;
+  padding-block-start: clamp(1rem, 3vw, 2.5rem);
+}
+
+.ws-hero-copy {
+  display: grid;
+  justify-items: start;
+  gap: 1.15rem;
+}
+
+.ws-hero h1 {
+  font-size: clamp(2.2rem, 1.4rem + 2.8vw, 3.6rem);
+  max-inline-size: 16ch;
+}
+
+
+.ws-hero p {
+  max-inline-size: 58ch;
+  color: var(--brand-muted);
+  font-size: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+  line-height: 1.55;
+}
+
+.ws-hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  padding-block-start: 0.35rem;
+}
+
+.ws-today {
+  display: grid;
+  gap: 1.1rem;
+  padding: 1.35rem;
+  border-radius: 12px;
+  background: var(--brand-surface);
+}
+
+.ws-today-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  color: var(--brand-muted);
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+
+.ws-refresh {
+  display: grid;
+  place-items: center;
+  inline-size: 1.8rem;
+  block-size: 1.8rem;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--brand-muted);
+  transition: background-color 150ms ease, color 150ms ease;
+}
+
+.ws-refresh:hover { background: var(--brand-raised); color: var(--brand-ink); }
+
+.ws-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.5rem;
+}
+
+.ws-stats > div {
+  display: grid;
+  gap: 0.1rem;
+  padding: 0.75rem 0.65rem;
+  border-radius: 8px;
+  background: var(--brand-bg);
+}
+
+.ws-stats b {
+  font-family: var(--font-display);
+  font-size: 1.75rem;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+.ws-stats span {
+  color: var(--brand-muted);
+  font-size: 0.75rem;
+}
+
+.ws-today-list {
+  display: grid;
+  gap: 0.55rem;
+}
+
+.ws-today-label {
+  color: var(--brand-muted);
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.ws-today-list ul {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.ws-today-list li {
+  display: grid;
+  grid-template-columns: 8px minmax(0, 1fr);
+  gap: 0.6rem;
+  align-items: start;
+}
+
+.ws-lead-dot {
+  inline-size: 6px;
+  block-size: 6px;
+  border-radius: 50%;
+  background: var(--brand-lavender);
+  margin-block-start: 0.42rem;
+}
+
+.ws-today-list b {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.ws-today-list li span:last-child {
+  display: block;
+  color: var(--brand-muted);
+  font-size: 0.75rem;
+  overflow-wrap: anywhere;
+}
+
+.ws-today-empty {
+  display: flex;
+  gap: 0.6rem;
+  align-items: flex-start;
+  color: var(--brand-muted);
+  font-size: 0.8125rem;
+  line-height: 1.5;
+}
+
+.ws-today-empty svg { flex: none; margin-block-start: 0.1rem; }
+
+.ws-today-action {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  inline-size: 100%;
+  min-block-size: 2.6rem;
+  padding: 0 0.85rem;
+  border: 0;
+  border-radius: 4px;
+  background: var(--brand-raised);
+  color: var(--brand-ink);
+  font-size: 0.875rem;
+  font-weight: 600;
+  transition: background-color 150ms ease, transform 140ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.ws-today-action:active { transform: scale(0.98); }
+.ws-today-action:hover { background: var(--brand-lavender); color: #160c22; }
+
+.ws-inline-error {
+  color: var(--brand-muted);
+  font-size: 0.8125rem;
+  line-height: 1.5;
+}
+
+/* ── Sections ───────────────────────────────────────────────── */
+.ws-section {
+  display: grid;
+  gap: 1.25rem;
+}
+
+.ws-section-head {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+
+.ws-section-eyebrow {
+  color: var(--brand-lavender);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.ws-section-head h2,
+.ws-flow h2,
+.ws-roadmap h2,
+.ws-soon-today h2 {
+  margin-block-start: 0.3rem;
+  font-size: clamp(1.6rem, 1.2rem + 1.4vw, 2.25rem);
+}
+
+.ws-section-head > p {
+  max-inline-size: 34ch;
+  color: var(--brand-muted);
+  font-size: 0.9375rem;
+}
+
+.ws-grid {
+  display: grid;
+  gap: 0.85rem;
+}
+
+.ws-grid-live { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.ws-grid-soon { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+
+.ws-card {
+  --ws-accent: var(--brand-lavender);
+  display: grid;
+  gap: 0.55rem;
+  padding: 1.35rem;
+  border: 0;
+  border-radius: 12px;
+  background: var(--brand-surface);
+  color: var(--brand-ink);
+  text-align: start;
+  transition:
+    background-color 160ms ease,
+    transform 140ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.ws-card:active { transform: scale(0.99); }
+
+@media (hover: hover) and (pointer: fine) {
+  .ws-card:hover { background: var(--brand-raised); }
+}
+
+.ws-card-violet { --ws-accent: #6b2fe0; }
+.ws-card-lavender { --ws-accent: var(--brand-lavender); }
+.ws-card-mint { --ws-accent: #12805c; }
+.ws-card-amber { --ws-accent: #b7700c; }
+.ws-card-sky { --ws-accent: #1f74b0; }
+.ws-card-coral { --ws-accent: #c9452f; }
+
+.ws-card.is-soon { background: color-mix(in oklch, var(--brand-surface) 76%, var(--brand-bg)); }
+
+.ws-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.ws-card-icon {
+  display: grid;
+  place-items: center;
+  inline-size: 2.75rem;
+  block-size: 2.75rem;
+  border-radius: 8px;
+  background: color-mix(in oklch, var(--ws-accent, var(--brand-lavender)) 16%, var(--brand-surface));
+  color: var(--ws-accent, var(--brand-lavender));
+}
+
+.ws-card h3 {
+  font-size: 1.25rem;
+}
+
+.ws-card p {
+  color: var(--brand-muted);
+  font-size: 0.875rem;
+  line-height: 1.5;
+  max-inline-size: 46ch;
+}
+
+.ws-card-note {
+  margin-block-start: 0.4rem;
+  color: color-mix(in oklch, var(--brand-ink) 80%, var(--brand-muted));
+  font-size: 0.8125rem;
+}
+
+.ws-card-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin-block-start: 0.25rem;
+  color: var(--ws-accent);
+  font-size: 0.8125rem;
+  font-weight: 700;
+}
+
+.ws-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.ws-status.is-live {
+  background: color-mix(in oklch, #12805c 15%, transparent);
+  color: #0f6b4c;
+}
+
+.ws-status.is-soon {
+  background: color-mix(in oklch, var(--brand-lavender) 14%, transparent);
+  color: var(--brand-lavender);
+}
+
+/* ── Flow ───────────────────────────────────────────────────── */
+.ws-flow {
+  display: grid;
+  grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+  gap: clamp(1.5rem, 4vw, 3rem);
+  padding: clamp(1.5rem, 4vw, 2.5rem);
+  border-radius: 12px;
+  background: var(--brand-surface);
+}
+
+.ws-flow-copy {
+  display: grid;
+  align-content: start;
+  gap: 0.75rem;
+}
+
+.ws-flow-copy p {
+  color: var(--brand-muted);
+  font-size: 0.9375rem;
+  line-height: 1.55;
+  max-inline-size: 40ch;
+}
+
+.ws-flow-steps {
+  display: grid;
+  gap: 0.9rem;
+}
+
+.ws-flow-steps li {
+  display: grid;
+  grid-template-columns: 2.25rem minmax(0, 1fr);
+  gap: 0.8rem;
+  align-items: start;
+  padding-block-start: 0.9rem;
+  border-block-start: 1px solid color-mix(in oklch, var(--brand-ink) 9%, transparent);
+}
+
+.ws-flow-steps li:first-child {
+  padding-block-start: 0;
+  border-block-start: 0;
+}
+
+.ws-flow-steps li > span {
+  font-family: var(--font-display);
+  color: var(--brand-lavender);
+  font-size: 0.875rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.ws-flow-steps b {
+  display: block;
+  font-size: 0.9375rem;
+}
+
+.ws-flow-steps p {
+  margin-block-start: 0.2rem;
+  color: var(--brand-muted);
+  font-size: 0.8125rem;
+  line-height: 1.5;
+}
+
+/* ── Roadmap ────────────────────────────────────────────────── */
+.ws-roadmap {
+  display: grid;
+  grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+  gap: clamp(1.5rem, 4vw, 3rem);
+  align-items: start;
+}
+
+.ws-roadmap-list {
+  display: grid;
+  gap: 0.4rem;
+}
+
+.ws-roadmap-item {
+  display: grid;
+  grid-template-columns: 1.4rem minmax(0, 1fr) auto;
+  gap: 0.75rem;
+  align-items: center;
+  padding: 0.8rem 0.9rem;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--brand-ink);
+  text-align: start;
+  transition: background-color 150ms ease;
+}
+
+.ws-roadmap-item:hover { background: var(--brand-surface); }
+.ws-roadmap-item svg:first-child { color: var(--brand-lavender); }
+.ws-roadmap-item svg:last-child { color: var(--brand-muted); }
+.ws-roadmap-item b { display: block; font-size: 0.875rem; }
+.ws-roadmap-item small { display: block; color: var(--brand-muted); font-size: 0.75rem; }
+
+/* ── Coming soon ────────────────────────────────────────────── */
+.ws-soon-main {
+  align-content: start;
+  gap: 2rem;
+}
+
+.ws-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  justify-self: start;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--brand-muted);
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+
+.ws-back:hover { color: var(--brand-ink); }
+
+.ws-soon-hero {
+  --ws-accent: var(--brand-lavender);
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(18rem, 0.85fr);
+  gap: clamp(1.5rem, 4vw, 3rem);
+  align-items: start;
+  padding: clamp(1.5rem, 4vw, 3rem);
+  border-radius: 12px;
+  background: var(--brand-surface);
+}
+
+.ws-soon-mint { --ws-accent: #12805c; }
+.ws-soon-amber { --ws-accent: #b7700c; }
+.ws-soon-sky { --ws-accent: #1f74b0; }
+.ws-soon-coral { --ws-accent: #c9452f; }
+
+.ws-soon-copy {
+  display: grid;
+  justify-items: start;
+  gap: 0.85rem;
+}
+
+.ws-soon-icon {
+  display: grid;
+  place-items: center;
+  inline-size: 3.5rem;
+  block-size: 3.5rem;
+  border-radius: 10px;
+  background: color-mix(in oklch, var(--ws-accent) 16%, var(--brand-surface));
+  color: var(--ws-accent);
+}
+
+.ws-soon-copy h1 {
+  font-size: clamp(2rem, 1.4rem + 2.6vw, 3.5rem);
+  max-inline-size: 15ch;
+}
+
+.ws-soon-copy p {
+  max-inline-size: 52ch;
+  color: var(--brand-muted);
+  font-size: 1rem;
+  line-height: 1.55;
+}
+
+.ws-soon-card {
+  display: grid;
+  gap: 0.8rem;
+  padding: 1.25rem;
+  border-radius: 8px;
+  background: var(--brand-bg);
+}
+
+.ws-soon-card ul {
+  display: grid;
+  gap: 0.65rem;
+}
+
+.ws-soon-card li {
+  display: grid;
+  grid-template-columns: 1.1rem minmax(0, 1fr);
+  gap: 0.5rem;
+  align-items: start;
+  color: var(--brand-muted);
+  font-size: 0.8125rem;
+  line-height: 1.5;
+}
+
+.ws-soon-card li svg {
+  color: var(--ws-accent);
+  margin-block-start: 0.15rem;
+}
+
+.ws-soon-note {
+  padding-block-start: 0.8rem;
+  border-block-start: 1px solid color-mix(in oklch, var(--brand-ink) 9%, transparent);
+  color: var(--brand-muted);
+  font-size: 0.75rem;
+  line-height: 1.55;
+}
+
+.ws-soon-today {
+  display: grid;
+  grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+  gap: clamp(1.5rem, 4vw, 3rem);
+  align-items: start;
+}
+
+.ws-soon-today p {
+  margin-block-start: 0.4rem;
+  color: var(--brand-muted);
+  font-size: 0.875rem;
+}
+
+.ws-soon-links {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.ws-soon-link {
+  --ws-accent: var(--brand-lavender);
+  display: grid;
+  grid-template-columns: 2.75rem minmax(0, 1fr) auto;
+  gap: 0.85rem;
+  align-items: center;
+  padding: 0.85rem;
+  border: 0;
+  border-radius: 8px;
+  background: var(--brand-surface);
+  color: var(--brand-ink);
+  text-align: start;
+  transition: background-color 150ms ease;
+}
+
+.ws-soon-link:hover { background: var(--brand-raised); }
+.ws-soon-link b { display: block; font-size: 0.9375rem; }
+.ws-soon-link small { display: block; color: var(--brand-muted); font-size: 0.75rem; }
+.ws-soon-link > svg { color: var(--brand-muted); }
+
+.ws-soon-roadmap {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.7rem;
+  flex-wrap: wrap;
+  padding: 1rem 1.15rem;
+  border-radius: 8px;
+  background: var(--brand-surface);
+  color: var(--brand-muted);
+  font-size: 0.8125rem;
+  line-height: 1.5;
+}
+
+.ws-soon-roadmap svg { color: var(--brand-lavender); flex: none; margin-block-start: 0.1rem; }
+.ws-soon-roadmap p { flex: 1 1 24rem; }
+.ws-soon-roadmap .ui-link { flex: none; }
+
+.ws-soon-panel {
+  display: grid;
+  justify-items: start;
+  gap: 0.8rem;
+  padding: 2rem;
+  border-radius: 12px;
+  background: var(--brand-surface);
+}
+
+.ws-soon-panel h1 { font-size: 2rem; }
+.ws-soon-panel p { color: var(--brand-muted); }
+
+/* ── Footer ─────────────────────────────────────────────────── */
+.ws-footer {
+  inline-size: min(100%, 78rem);
+  margin-inline: auto;
+  padding: 1.5rem clamp(1rem, 3vw, 2rem) 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  color: var(--brand-muted);
+  font-size: 0.75rem;
+}
+
+/* ── Responsive ─────────────────────────────────────────────── */
+@media (max-width: 980px) {
+  .ws-hero,
+  .ws-soon-hero {
+    grid-template-columns: 1fr;
+    align-items: start;
+  }
+
+  .ws-hero h1 { max-inline-size: 18ch; }
+
+  .ws-flow,
+  .ws-roadmap,
+  .ws-soon-today {
+    grid-template-columns: 1fr;
+  }
+
+  .ws-grid-live,
+  .ws-grid-soon {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 720px) {
+  .ws-header-in {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .ws-header-mail { display: none; }
+  .ws-brand-tag { display: none; }
+  .ws-header-actions { margin-inline-start: auto; }
+  .ws-switcher { inset-block-start: 3.5rem; }
+  .ws-main { padding-block-start: 1.25rem; }
+  .ws-hero h1 { font-size: clamp(2.1rem, 10vw, 3rem); }
+  .ws-hero p { font-size: 1rem; }
+  .ws-hero-actions .ui-btn { inline-size: 100%; }
+  .ws-today { padding: 1.1rem; }
+  .ws-stats b { font-size: 1.5rem; }
+  .ws-section-head { gap: 0.5rem; }
+  .ws-section-head > p { max-inline-size: none; }
+  .ws-flow { padding: 1.25rem; }
+  .ws-soon-hero { padding: 1.25rem; }
+  .ws-soon-copy .ws-hero-actions { inline-size: 100%; }
+  .ws-soon-roadmap { flex-direction: column; }
+  .ws-footer { flex-direction: column; align-items: flex-start; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ws-app *,
+  .ws-app *::before,
+  .ws-app *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

@@ -18,26 +18,25 @@ import {
   Plus,
 } from 'lucide-react';
 import LocationAutocomplete from './LocationAutocomplete';
+import Segmented from './ui/Segmented';
 import { outreachApi } from './api';
 
-const FIELD =
-  'w-full bg-[#07080b] border border-white/10 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder:text-slate-600 focus:outline-none focus:border-[#FF6B4A]/60 focus:ring-2 focus:ring-[#FF6B4A]/15 transition-all disabled:opacity-50';
-const LABEL = 'text-xs font-bold text-slate-300 block';
-const GHOST_BTN =
-  'text-xs font-semibold text-slate-300 rounded-xl px-3.5 py-2 bg-white/[0.04] border border-white/10 inline-flex items-center justify-center gap-1.5 cursor-pointer hover:bg-white/[0.08] hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-[#FFA84A]/40 disabled:opacity-50 disabled:cursor-not-allowed transition-all';
-const PRIMARY_BTN =
-  'scalora-btn-primary text-slate-950 text-xs font-bold rounded-xl px-4 py-2 inline-flex items-center justify-center gap-1.5 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[#FFA84A]/50 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0e1118] disabled:opacity-50 disabled:cursor-not-allowed shadow-lg';
-const CARD = 'scalora-card-glow rounded-3xl p-6 shadow-2xl space-y-5';
-const CARD_HEADER = 'flex items-center justify-between gap-3 border-b border-white/[0.06] pb-3.5';
+const FIELD = 'ui-input';
+const LABEL = 'ui-label';
+const GHOST_BTN = 'ui-btn ui-btn-ghost ui-btn-sm';
+const PRIMARY_BTN = 'ui-btn ui-btn-primary';
+const DANGER_BTN = 'ui-btn ui-btn-danger';
+const CARD = 'ui-panel space-y-5';
+const CARD_HEADER = 'flex items-center justify-between gap-3';
 
 const STATUS_META = {
-  NEW: { label: 'New', tone: 'border-slate-500/30 bg-slate-500/10 text-slate-300' },
-  SAVED: { label: 'Saved', tone: 'border-sky-500/30 bg-sky-500/10 text-sky-300' },
-  SENT: { label: 'Sent', tone: 'border-emerald-500/30 bg-emerald-500/10 text-emerald-300' },
-  REPLIED: { label: 'Replied', tone: 'border-[#FFA84A]/35 bg-[#FFA84A]/10 text-[#FFA84A]' },
-  FAILED: { label: 'Failed', tone: 'border-rose-500/30 bg-rose-500/10 text-rose-300' },
-  DRAFT: { label: 'Draft', tone: 'border-violet-500/30 bg-violet-500/10 text-violet-300' },
-  PENDING_REPLY: { label: 'Awaiting reply', tone: 'border-amber-500/30 bg-amber-500/10 text-amber-300' },
+  NEW: { label: 'New', tone: '' },
+  SAVED: { label: 'Saved', tone: 'ui-badge-accent' },
+  SENT: { label: 'Sent', tone: 'ui-badge-good' },
+  REPLIED: { label: 'Replied', tone: 'ui-badge-accent' },
+  FAILED: { label: 'Failed', tone: 'ui-badge-bad' },
+  DRAFT: { label: 'Draft', tone: 'ui-badge-warn' },
+  PENDING_REPLY: { label: 'Awaiting reply', tone: 'ui-badge-warn' },
 };
 
 // All outreach requests go through the shared API client: one base URL and one
@@ -92,33 +91,28 @@ function formatWhen(value) {
 function StatusChip({ status }) {
   const meta = statusMeta(status);
   return (
-    <span className={`inline-flex shrink-0 items-center rounded-md border px-1.5 py-0.5 text-[10px] font-bold tracking-wide ${meta.tone}`}>
-      {meta.label}
-    </span>
+    <span className={`ui-badge shrink-0 ${meta.tone}`}>{meta.label}</span>
   );
 }
 
 function NoticeBanner({ notice, onDismiss }) {
   if (!notice?.text) return null;
   const isError = notice.tone === 'error';
+  const tone =
+    notice.tone === 'error' ? 'var(--ui-bad)' : notice.tone === 'success' ? 'var(--ui-good)' : 'var(--ui-muted)';
   return (
     <div
       role={isError ? 'alert' : 'status'}
       aria-live={isError ? 'assertive' : 'polite'}
-      className={`mt-4 flex items-start gap-3 rounded-xl border px-3 py-2.5 text-xs ${
-        isError
-          ? 'border-rose-500/25 bg-rose-500/10 text-rose-200'
-          : notice.tone === 'success'
-            ? 'border-emerald-500/25 bg-emerald-500/10 text-emerald-200'
-            : 'border-white/10 bg-white/[0.04] text-slate-300'
-      }`}
+      className="ui-panel-inset mt-4 flex items-start gap-3 text-sm"
+      style={{ color: tone }}
     >
-      {isError && <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0" aria-hidden="true" />}
+      {isError && <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />}
       <p className="min-w-0 flex-1 leading-relaxed">{notice.text}</p>
       <button
         type="button"
         onClick={onDismiss}
-        className="shrink-0 rounded-lg p-1 text-current/70 hover:bg-white/10 hover:text-current focus:outline-none focus-visible:ring-2 focus-visible:ring-[#FFA84A]/40 cursor-pointer"
+        className="ui-btn ui-btn-ghost ui-btn-icon ui-btn-sm shrink-0"
         aria-label="Dismiss notice"
       >
         <X className="h-3.5 w-3.5" />
@@ -144,16 +138,16 @@ function ConfirmDialog({ open, title, body, confirmLabel, danger, busy, onCancel
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm" role="presentation" onClick={() => !busy && onCancel()}>
+    <div className="ui-scrim" role="presentation" onClick={() => !busy && onCancel()}>
       <div
         role="dialog"
         aria-modal="true"
         aria-labelledby={titleId}
-        className="w-full max-w-md rounded-2xl border border-white/10 bg-[#10141c] p-6 shadow-2xl"
+        className="ui-dialog"
         onClick={(event) => event.stopPropagation()}
       >
-        <h3 id={titleId} className="text-base font-extrabold text-white tracking-tight">{title}</h3>
-        <p className="mt-2 text-sm leading-relaxed text-slate-400">{body}</p>
+        <h3 id={titleId} className="ui-panel-title">{title}</h3>
+        <p className="ui-sub mt-2">{body}</p>
         <div className="mt-6 flex justify-end gap-2">
           <button ref={cancelRef} type="button" disabled={busy} onClick={onCancel} className={GHOST_BTN}>
             Cancel
@@ -162,11 +156,7 @@ function ConfirmDialog({ open, title, body, confirmLabel, danger, busy, onCancel
             type="button"
             disabled={busy}
             onClick={onConfirm}
-            className={
-              danger
-                ? 'rounded-xl bg-rose-600 px-4 py-2 text-xs font-bold text-white hover:bg-rose-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-rose-400 disabled:opacity-50 cursor-pointer'
-                : PRIMARY_BTN
-            }
+            className={danger ? DANGER_BTN : PRIMARY_BTN}
           >
             {busy ? 'Working…' : confirmLabel}
           </button>
@@ -198,12 +188,12 @@ function InboxCreateDialog({ open, busy, onCancel, onCreate }) {
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm" role="presentation" onClick={() => !busy && onCancel()}>
+    <div className="ui-scrim" role="presentation" onClick={() => !busy && onCancel()}>
       <form
         role="dialog"
         aria-modal="true"
         aria-labelledby={titleId}
-        className="w-full max-w-md rounded-2xl border border-white/10 bg-[#10141c] p-6 shadow-2xl space-y-4"
+        className="ui-dialog space-y-4"
         onClick={(event) => event.stopPropagation()}
         onSubmit={(event) => {
           event.preventDefault();
@@ -213,8 +203,8 @@ function InboxCreateDialog({ open, busy, onCancel, onCreate }) {
         }}
       >
         <div>
-          <h3 id={titleId} className="text-base font-extrabold text-white tracking-tight">New sending inbox</h3>
-          <p className="mt-2 text-sm leading-relaxed text-slate-400">
+          <h3 id={titleId} className="ui-panel-title">New sending inbox</h3>
+          <p className="ui-sub mt-2">
             Name the address emails send from. Replies still go to your central inbox.
           </p>
         </div>
@@ -238,7 +228,7 @@ function InboxCreateDialog({ open, busy, onCancel, onCreate }) {
           <button type="submit" disabled={busy || !displayName.trim()} className={PRIMARY_BTN}>
             {busy ? (
               <>
-                <Loader2 className="h-3.5 w-3.5 animate-spin" /> Creating…
+                <Loader2 className="ui-spin h-3.5 w-3.5" /> Creating…
               </>
             ) : (
               'Create inbox'
@@ -252,38 +242,22 @@ function InboxCreateDialog({ open, busy, onCancel, onCreate }) {
 
 function EmptyState({ children }) {
   return (
-    <div className="rounded-2xl border border-dashed border-white/10 bg-[#090b10]/40 px-4 py-8 text-center text-xs leading-relaxed text-slate-500 min-h-[7.5rem] flex items-center justify-center">
-      {children}
+    <div className="ui-panel-inset flex min-h-[7.5rem] items-center justify-center text-center">
+      <p className="ui-hint max-w-sm">{children}</p>
     </div>
   );
 }
 
 function LoadingRows({ label }) {
   return (
-    <div className="space-y-2 min-h-[7.5rem]" aria-live="polite" aria-busy="true">
-      {[0, 1, 2].map((row) => (
-        <div key={row} className="animate-pulse rounded-2xl border border-white/[0.06] bg-[#090b10]/60 px-3 py-3">
-          <div className="mb-2 h-3 w-2/5 rounded bg-white/10" />
-          <div className="h-2.5 w-3/5 rounded bg-white/[0.06]" />
-        </div>
-      ))}
-      <p className="flex items-center justify-center gap-2 pt-1 text-[11px] text-slate-500">
-        <Loader2 className="h-3.5 w-3.5 animate-spin text-[#FFA84A]" /> {label}
-      </p>
+    <div
+      className="ui-panel-inset flex min-h-[7.5rem] flex-col items-center justify-center gap-3"
+      aria-live="polite"
+      aria-busy="true"
+    >
+      <Loader2 className="ui-spin h-6 w-6 text-[var(--ui-lavender)]" aria-hidden="true" />
+      <p className="ui-hint">{label}</p>
     </div>
-  );
-}
-
-function StepBadge({ n, tone = 'emerald' }) {
-  const tones = {
-    emerald: 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30',
-    violet: 'bg-[#A855F7]/20 text-[#C4B5FD] border-[#A855F7]/30',
-    amber: 'bg-[#FF6B4A]/20 text-[#FFA84A] border-[#FF6B4A]/30',
-  };
-  return (
-    <span className={`w-6 h-6 rounded-lg flex items-center justify-center font-extrabold text-xs border ${tones[tone]}`}>
-      {n}
-    </span>
   );
 }
 
@@ -721,46 +695,35 @@ export default function OutreachPanel() {
       <div className={CARD}>
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
-            <h2 className="text-lg font-extrabold text-white tracking-tight">
-              Find leads <span className="font-serif-accent italic font-normal text-[#FFA84A]">& send</span>
+            <h2 className="ui-title">
+              Find leads &amp; send
             </h2>
-            <p className="text-xs text-slate-400 mt-1">Search, draft, and manage replies.</p>
+            <p className="ui-sub mt-1">Search, draft, and manage replies.</p>
           </div>
-          <div className="flex items-center gap-3 self-start md:self-center">
-            <div className="text-right leading-tight">
-              <span className="text-[9px] uppercase tracking-wider font-bold text-slate-400 block">Sending mode</span>
-              <span className={`text-[11px] font-extrabold ${reviewFirst ? 'text-[#FFA84A]' : 'text-emerald-400'}`}>
-                {reviewFirst ? 'Review first' : 'Send immediately'}
-              </span>
-            </div>
-            <button
-              type="button"
-              role="switch"
-              aria-checked={!reviewFirst}
-              aria-label={reviewFirst ? 'Review first. Switch to send immediately.' : 'Send immediately. Switch to review first.'}
-              disabled={busy === 'mode' || booting}
-              onClick={() => saveSendingMode(reviewFirst ? 'auto' : 'manual')}
-              className={`relative inline-flex h-7 w-12 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#FFA84A]/50 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0e1118] disabled:opacity-50 disabled:cursor-not-allowed ${
-                reviewFirst ? 'bg-slate-800 border border-white/10' : 'bg-emerald-500'
-              }`}
-            >
-              <span
-                aria-hidden="true"
-                className={`pointer-events-none inline-block h-6 w-6 transform rounded-full bg-white shadow-md transition ${
-                  reviewFirst ? 'translate-x-0' : 'translate-x-5'
-                }`}
-              />
-            </button>
+          <div className="self-start md:self-center">
+            <Segmented
+              name="sending-mode"
+              label="Sending mode"
+              value={reviewFirst ? 'review' : 'auto'}
+              onChange={(value) => {
+                if (busy === 'mode' || booting) return;
+                saveSendingMode(value === 'review' ? 'manual' : 'auto');
+              }}
+              options={[
+                { value: 'review', label: 'Review first' },
+                { value: 'auto', label: 'Send immediately' },
+              ]}
+            />
           </div>
         </div>
         <NoticeBanner notice={notice} onDismiss={clearNotice} />
         {booting && (
-          <p className="flex items-center gap-2 text-xs text-slate-400">
-            <Loader2 className="h-3.5 w-3.5 animate-spin text-[#FFA84A]" /> Loading…
+          <p className="flex items-center gap-2 text-sm ui-hint">
+            <Loader2 className="h-4 w-4 ui-spin" style={{ color: 'var(--ui-lavender)' }} /> Loading…
           </p>
         )}
         {bootError && !booting && (
-          <div className="rounded-xl border border-rose-500/25 bg-rose-500/10 px-3 py-2.5 text-xs text-rose-200" role="alert">
+          <div className="ui-panel-inset flex items-center gap-2 text-sm" role="alert" style={{ color: 'var(--ui-bad)' }}>
             Couldn’t load Outreach. {bootError}
           </div>
         )}
@@ -771,10 +734,9 @@ export default function OutreachPanel() {
           <form onSubmit={runSearch} className={CARD}>
             <div className={CARD_HEADER}>
               <div className="flex items-center gap-2.5 min-w-0">
-                <StepBadge n={1} tone="emerald" />
                 <div className="min-w-0">
-                  <h3 className="text-sm font-extrabold text-white tracking-tight">Find leads</h3>
-                  <p className="text-[11px] text-slate-400">Your lead database + live web search, or upload a CSV</p>
+                  <h3 className="ui-panel-title">1. Find leads</h3>
+                  <p className="ui-hint mt-0.5">Search your lead database and the live web, or upload a CSV</p>
                 </div>
               </div>
             </div>
@@ -820,11 +782,11 @@ export default function OutreachPanel() {
               <button type="submit" disabled={isBusy} className={PRIMARY_BTN}>
                 {busy === 'search' ? (
                   <>
-                    <Loader2 className="w-3.5 h-3.5 animate-spin" /> Searching…
+                    <Loader2 className="ui-spin w-4 h-4" /> Searching…
                   </>
                 ) : (
                   <>
-                    <Search className="w-3.5 h-3.5" /> Search leads
+                    <Search className="w-4 h-4" /> Search leads
                   </>
                 )}
               </button>
@@ -834,11 +796,11 @@ export default function OutreachPanel() {
               >
                 {busy === 'upload' ? (
                   <>
-                    <Loader2 className="w-3.5 h-3.5 animate-spin" /> Uploading…
+                    <Loader2 className="ui-spin w-4 h-4" /> Uploading…
                   </>
                 ) : (
                   <>
-                    <Upload className="w-3.5 h-3.5" /> Upload CSV
+                    <Upload className="w-4 h-4" /> Upload CSV
                   </>
                 )}
                 <input
@@ -851,8 +813,8 @@ export default function OutreachPanel() {
               </label>
             </div>
 
-            <div className="flex flex-wrap items-center justify-between gap-2 border-t border-white/[0.06] pt-4">
-              <p className="text-[11px] text-slate-400">
+            <div className="flex flex-wrap items-center justify-between gap-2 pt-1">
+              <p className="ui-hint">
                 {found.length === 0 ? 'No leads yet' : `${selectedCount} of ${found.length} selected`}
               </p>
               {found.length > 0 && (
@@ -867,7 +829,7 @@ export default function OutreachPanel() {
               )}
             </div>
 
-            <div className="max-h-64 overflow-auto space-y-2">
+            <div className="ui-panel-inset max-h-64 overflow-auto space-y-1">
               {busy === 'search' || busy === 'upload' ? (
                 <LoadingRows label={busy === 'upload' ? 'Reading CSV…' : 'Searching…'} />
               ) : found.length === 0 ? (
@@ -875,26 +837,28 @@ export default function OutreachPanel() {
                   {searchAttempted ? 'No leads found. Adjust the search or upload a CSV.' : 'Search or upload a CSV to get started.'}
                 </EmptyState>
               ) : (
-                found.map((lead) => {
+                found.map((lead, index) => {
                   const checked = Boolean(selected[lead.email]);
+                  const rowBg = checked
+                    ? 'var(--ui-accent-soft)'
+                    : index % 2
+                      ? 'var(--ui-raised)'
+                      : 'transparent';
                   return (
                     <label
                       key={lead.email}
-                      className={`flex items-start gap-3 rounded-2xl border px-3 py-2.5 cursor-pointer transition-colors focus-within:ring-2 focus-within:ring-[#FFA84A]/30 ${
-                        checked
-                          ? 'border-[#FFA84A]/30 bg-[#FFA84A]/[0.06]'
-                          : 'border-white/[0.06] bg-[#090b10]/60 hover:border-white/15'
-                      }`}
+                      className="flex items-start gap-3 rounded-md px-3 py-2.5 cursor-pointer transition-colors focus-within:ring-2 focus-within:ring-[var(--ui-lavender)]/40"
+                      style={{ background: rowBg }}
                     >
                       <input
                         type="checkbox"
                         checked={checked}
                         onChange={() => toggleLead(lead.email)}
-                        className="mt-1 h-3.5 w-3.5 rounded border-white/20 bg-black/40 text-[#FFA84A] focus:ring-[#FFA84A]/40"
+                        className="mt-1 h-4 w-4 rounded focus:ring-[var(--ui-lavender)]/40"
                       />
                       <span className="min-w-0">
-                        <span className="block text-sm font-semibold text-white truncate">{lead.company || lead.name || 'Lead'}</span>
-                        <span className="block text-[11px] text-slate-400 truncate">
+                        <span className="block text-sm font-semibold truncate">{lead.company || lead.name || 'Lead'}</span>
+                        <span className="block ui-hint truncate">
                           {lead.email}
                           {lead.city ? ` · ${lead.city}` : ''}
                           {lead.source === 'lead-database' ? ' · DB' : lead.source === 'live-search' ? ' · Live' : ''}
@@ -910,19 +874,18 @@ export default function OutreachPanel() {
           <div className={CARD}>
             <div className={CARD_HEADER}>
               <div className="flex items-center gap-2.5 min-w-0">
-                <StepBadge n={2} tone="violet" />
                 <div className="min-w-0">
-                  <h3 className="text-sm font-extrabold text-white tracking-tight">Sending inbox</h3>
-                  <p className="text-[11px] text-slate-400">Where emails send from</p>
+                  <h3 className="ui-panel-title">2. Sending inbox</h3>
+                  <p className="ui-hint mt-0.5">Where emails send from</p>
                 </div>
               </div>
               <button
                 type="button"
                 onClick={() => setShowInboxDialog(true)}
                 disabled={isBusy}
-                className="text-xs font-semibold text-[#FFA84A] hover:text-[#ffb96a] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#FFA84A]/40 rounded-lg px-2 py-1 cursor-pointer disabled:opacity-50 shrink-0"
+                className={`${GHOST_BTN} shrink-0`}
               >
-                New inbox
+                <Plus className="h-3.5 w-3.5" /> New inbox
               </button>
             </div>
 
@@ -933,7 +896,7 @@ export default function OutreachPanel() {
                 value={inboxId}
                 onChange={(event) => setInboxId(event.target.value)}
                 disabled={isBusy}
-                className={FIELD}
+                className="ui-select"
               >
                 <option value="">Select an inbox</option>
                 {inboxes.map((inbox) => (
@@ -943,7 +906,7 @@ export default function OutreachPanel() {
             </div>
 
             {inboxLoadError && (
-              <p className="text-xs text-rose-300" role="alert">{inboxLoadError}</p>
+              <p className="ui-panel-inset text-sm" role="alert" style={{ color: 'var(--ui-bad)' }}>{inboxLoadError}</p>
             )}
             {!inboxLoadError && !booting && inboxes.length === 0 && (
               <EmptyState>No inboxes yet — create one to continue.</EmptyState>
@@ -990,11 +953,11 @@ export default function OutreachPanel() {
             >
               {busy === 'draft' ? (
                 <>
-                  <Loader2 className="w-3.5 h-3.5 animate-spin" /> Working…
+                  <Loader2 className="ui-spin w-4 h-4" /> Working…
                 </>
               ) : (
                 <>
-                  <Sparkles className="w-3.5 h-3.5" /> {draftLabel}
+                  <Sparkles className="w-4 h-4" /> {draftLabel}
                 </>
               )}
             </button>
@@ -1005,18 +968,18 @@ export default function OutreachPanel() {
           <div className={CARD}>
             <div className={CARD_HEADER}>
               <div className="flex items-center gap-2.5">
-                <Mail className="w-4 h-4 text-[#FFA84A]" aria-hidden="true" />
-                <h3 className="text-sm font-extrabold text-white tracking-tight">Email review</h3>
+                <Mail className="w-4 h-4" style={{ color: 'var(--ui-lavender)' }} aria-hidden="true" />
+                <h3 className="ui-panel-title">Email review</h3>
               </div>
               {drafts.length > 0 && (
-                <span className="text-[10px] font-bold tabular-nums text-slate-400">
+                <span className="ui-badge tabular-nums">
                   {Math.min(activeDraft + 1, drafts.length)} of {drafts.length}
                 </span>
               )}
             </div>
 
-            <form onSubmit={addManualLead} className="rounded-2xl border border-white/[0.06] bg-[#090b10]/60 px-3 py-3 space-y-2.5">
-              <p className="text-[11px] font-bold text-slate-300">Add lead manually</p>
+            <form onSubmit={addManualLead} className="ui-panel-inset space-y-2.5">
+              <p className="ui-label" style={{ marginBlockEnd: 0 }}>Add lead manually</p>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                 <input
                   type="email"
@@ -1041,7 +1004,7 @@ export default function OutreachPanel() {
                 <Plus className="w-3.5 h-3.5" /> Add to review
               </button>
               {!inboxId && (
-                <p className="text-[11px] text-slate-500">Choose a sending inbox below to enable manual entry.</p>
+                <p className="ui-hint">Choose a sending inbox first to enable manual entry.</p>
               )}
             </form>
 
@@ -1053,14 +1016,14 @@ export default function OutreachPanel() {
               <div className="space-y-4">
                 <div className="flex items-start justify-between gap-2">
                   <div className="min-w-0">
-                    <p className="text-sm font-semibold text-white truncate">{draft.company || draft.name || 'Lead'}</p>
-                    <p className="text-[11px] text-slate-400 truncate">{draft.email}</p>
+                    <p className="text-sm font-semibold truncate">{draft.company || draft.name || 'Lead'}</p>
+                    <p className="ui-hint truncate">{draft.email}</p>
                   </div>
                   {draft.status === 'failed' && <StatusChip status="FAILED" />}
                 </div>
 
                 {draft.status === 'failed' ? (
-                  <p className="rounded-xl border border-rose-500/25 bg-rose-500/10 px-3 py-2 text-xs text-rose-200" role="alert">
+                  <p className="ui-panel-inset text-sm" role="alert" style={{ color: 'var(--ui-bad)' }}>
                     {friendlyError(draft.error || 'This draft failed.')}
                   </p>
                 ) : (
@@ -1083,7 +1046,7 @@ export default function OutreachPanel() {
                         onChange={(event) => updateDraft({ body: event.target.value })}
                         rows={12}
                         disabled={busy === 'send'}
-                        className={`${FIELD} leading-relaxed resize-y min-h-[220px]`}
+                        className="ui-textarea min-h-[220px]"
                       />
                     </div>
                   </>
@@ -1107,11 +1070,11 @@ export default function OutreachPanel() {
                   >
                     {busy === 'send' ? (
                       <>
-                        <Loader2 className="w-3.5 h-3.5 animate-spin" /> Sending…
+                        <Loader2 className="ui-spin w-4 h-4" /> Sending…
                       </>
                     ) : (
                       <>
-                        <Check className="w-3.5 h-3.5" /> Approve & send
+                        <Check className="w-4 h-4" /> Approve &amp; send
                       </>
                     )}
                   </button>
@@ -1134,14 +1097,14 @@ export default function OutreachPanel() {
                 </div>
 
                 {drafts.length > 1 && (
-                  <div className="flex items-center justify-between gap-2 border-t border-white/[0.06] pt-4">
+                  <div className="flex items-center justify-between gap-2 pt-2">
                     <button
                       type="button"
                       onClick={() => setActiveDraft((index) => Math.max(0, index - 1))}
                       disabled={activeDraft === 0 || isBusy}
                       className={GHOST_BTN}
                     >
-                      <ChevronLeft className="w-3.5 h-3.5" /> Previous
+                      <ChevronLeft className="w-4 h-4" /> Previous
                     </button>
                     <button
                       type="button"
@@ -1149,7 +1112,7 @@ export default function OutreachPanel() {
                       disabled={activeDraft >= drafts.length - 1 || isBusy}
                       className={GHOST_BTN}
                     >
-                      Next <ChevronRight className="w-3.5 h-3.5" />
+                      Next <ChevronRight className="w-4 h-4" />
                     </button>
                   </div>
                 )}
@@ -1164,8 +1127,8 @@ export default function OutreachPanel() {
           <div className={`${CARD} h-full`}>
             <div className={CARD_HEADER}>
               <div className="flex items-center gap-2.5">
-                <Inbox className="w-4 h-4 text-emerald-400" aria-hidden="true" />
-                <h3 className="text-sm font-extrabold text-white tracking-tight">Sent & replies</h3>
+                <Inbox className="w-4 h-4" style={{ color: 'var(--ui-lavender)' }} aria-hidden="true" />
+                <h3 className="ui-panel-title">Sent &amp; replies</h3>
               </div>
               <button
                 type="button"
@@ -1174,7 +1137,7 @@ export default function OutreachPanel() {
                 className={GHOST_BTN}
               >
                 {busy === 'relay' ? (
-                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                  <Loader2 className="ui-spin h-3.5 w-3.5" />
                 ) : (
                   <RefreshCw className="w-3.5 h-3.5" />
                 )}
@@ -1182,34 +1145,36 @@ export default function OutreachPanel() {
               </button>
             </div>
 
-            <div className="max-h-[28rem] overflow-auto space-y-2">
+            <div className="ui-panel-inset max-h-[28rem] overflow-auto space-y-1">
               {booting ? (
                 <LoadingRows label="Loading leads…" />
               ) : leads.length === 0 ? (
                 <EmptyState>Leads show up here after you draft or send.</EmptyState>
               ) : (
-                leads.map((lead) => {
+                leads.map((lead, index) => {
                   const active = thread?.lead?.id === lead.id;
+                  const rowBg = active
+                    ? 'var(--ui-accent-soft)'
+                    : index % 2
+                      ? 'var(--ui-raised)'
+                      : 'transparent';
                   return (
                     <div
                       key={lead.id}
-                      className={`rounded-2xl border px-3 py-2.5 flex items-center justify-between gap-2 transition-colors ${
-                        active
-                          ? 'border-[#FFA84A]/35 bg-[#FFA84A]/[0.07]'
-                          : 'border-white/[0.06] bg-[#090b10]/60'
-                      }`}
+                      className="flex items-center justify-between gap-2 rounded-md px-3 py-2.5 transition-colors focus-within:ring-2 focus-within:ring-[var(--ui-lavender)]/40"
+                      style={{ background: rowBg }}
                     >
                       <button
                         type="button"
                         onClick={() => openThread(lead)}
                         disabled={busy === 'thread'}
-                        className="text-left min-w-0 flex-1 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[#FFA84A]/40 rounded-lg disabled:opacity-60"
+                        className="text-left min-w-0 flex-1 cursor-pointer focus:outline-none disabled:opacity-60"
                       >
                         <span className="flex items-center gap-2 min-w-0">
-                          <span className="block text-sm font-semibold text-white truncate">{lead.company || lead.name || lead.email}</span>
+                          <span className="block text-sm font-semibold truncate">{lead.company || lead.name || lead.email}</span>
                           <StatusChip status={lead.status} />
                         </span>
-                        <span className="block text-[11px] text-slate-400 truncate mt-0.5">
+                        <span className="block ui-hint truncate mt-0.5">
                           {lead.email}
                           {lead.replyCount > 0 ? ` · ${lead.replyCount} repl${lead.replyCount === 1 ? 'y' : 'ies'}` : ''}
                         </span>
@@ -1226,7 +1191,7 @@ export default function OutreachPanel() {
                           })
                         }
                         disabled={isBusy}
-                        className="shrink-0 rounded-lg p-1.5 text-slate-500 hover:text-rose-400 hover:bg-rose-500/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-rose-400/40 cursor-pointer disabled:opacity-50"
+                        className="shrink-0 rounded-md p-1.5 text-[var(--ui-faint)] transition-colors hover:text-[var(--ui-bad)] hover:bg-[color-mix(in_oklch,var(--ui-bad)_16%,transparent)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ui-bad)]/40 cursor-pointer disabled:opacity-50"
                         aria-label={`Delete ${lead.email}`}
                       >
                         <Trash2 className="w-3.5 h-3.5" />
@@ -1243,8 +1208,8 @@ export default function OutreachPanel() {
           <div className={`${CARD} min-h-[28rem] h-full flex flex-col`}>
             <div className={CARD_HEADER}>
               <div className="min-w-0">
-                <h3 className="text-sm font-extrabold text-white tracking-tight">Conversation</h3>
-                <p className="text-[11px] text-slate-400 mt-0.5 truncate">
+                <h3 className="ui-panel-title">Conversation</h3>
+                <p className="ui-hint mt-0.5 truncate">
                   {thread?.lead
                     ? (thread.lead.company || thread.lead.name || thread.lead.email)
                     : 'Select a lead to open the thread'}
@@ -1271,27 +1236,26 @@ export default function OutreachPanel() {
                       return (
                         <div
                           key={message.id}
-                          className={`rounded-2xl border px-3.5 py-3 text-xs leading-relaxed ${
-                            inbound
-                              ? 'border-[#FFA84A]/25 bg-[#FFA84A]/[0.06] mr-6'
-                              : 'border-white/10 bg-white/[0.03] ml-6'
+                          className={`rounded-xl px-3.5 py-3 text-[13px] leading-relaxed ${
+                            inbound ? 'mr-6' : 'ml-6'
                           }`}
+                          style={{ background: inbound ? 'var(--ui-raised)' : 'var(--ui-step)' }}
                         >
                           <div className="mb-1.5 flex items-center justify-between gap-2">
-                            <span className="text-[10px] font-bold text-slate-500">
+                            <span className="ui-hint font-semibold">
                               {inbound ? 'Prospect' : 'You'}
                             </span>
-                            {when && <span className="text-[10px] text-slate-600">{when}</span>}
+                            {when && <span className="ui-hint">{when}</span>}
                           </div>
-                          {message.subject && <p className="font-semibold text-white mb-1">{message.subject}</p>}
-                          <p className="whitespace-pre-wrap text-slate-300">{message.body}</p>
+                          {message.subject && <p className="font-semibold mb-1">{message.subject}</p>}
+                          <p className="whitespace-pre-wrap">{message.body}</p>
                         </div>
                       );
                     })
                   )}
                 </div>
 
-                <div className="space-y-3 border-t border-white/[0.06] pt-4 mt-auto">
+                <div className="space-y-3 pt-4 mt-auto">
                   <div className="space-y-1.5">
                     <label htmlFor="outreach-reply-subject" className={LABEL}>Subject</label>
                     <input
@@ -1312,14 +1276,14 @@ export default function OutreachPanel() {
                       rows={5}
                       placeholder="Write a reply…"
                       disabled={busy === 'reply' || busy === 'reply-send'}
-                      className={`${FIELD} leading-relaxed resize-y`}
+                      className="ui-textarea"
                     />
                   </div>
                   <div className="flex flex-wrap gap-2">
                     <button type="button" onClick={draftReply} disabled={!inboxId || isBusy} className={GHOST_BTN}>
                       {busy === 'reply' ? (
                         <>
-                          <Loader2 className="w-3.5 h-3.5 animate-spin" /> Drafting…
+                          <Loader2 className="ui-spin w-4 h-4" /> Drafting…
                         </>
                       ) : (
                         'Draft reply'
@@ -1333,7 +1297,7 @@ export default function OutreachPanel() {
                     >
                       {busy === 'reply-send' ? (
                         <>
-                          <Loader2 className="w-3.5 h-3.5 animate-spin" /> Sending…
+                          <Loader2 className="ui-spin w-4 h-4" /> Sending…
                         </>
                       ) : (
                         <>

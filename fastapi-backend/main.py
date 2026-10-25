@@ -1,4 +1,7 @@
+import logging
 import os
+import threading
+from contextlib import asynccontextmanager
 
 import uvicorn
 from fastapi import FastAPI, HTTPException, Request
@@ -9,9 +12,20 @@ from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
 
 from config import CONFIG
+from growthcrew import finder
 from growthcrew.errors import GrowthcrewError
 from routers.studio_router import router as studio_router
 from routers.growthcrew_router import router as growthcrew_router
+from routers.finder_router import router as finder_router
+
+logger = logging.getLogger("growthcrew.main")
+
+
+@asynccontextmanager
+async def lifespan(_app: FastAPI):
+    startup_tasks()
+    yield
+
 
 app = FastAPI(
     title="GrowthCrew API",
@@ -21,6 +35,7 @@ app = FastAPI(
         "email, replies)."
     ),
     version="1.0.0",
+    lifespan=lifespan,
 )
 
 # Enable CORS for React frontend integration
@@ -33,9 +48,11 @@ app.add_middleware(
 )
 
 # Both product surfaces are served by this single app: the social studio under
-# /api and the outreach / lead-generation API under /api/growthcrew.
+# /api, the outreach / lead-generation API under /api/growthcrew, and the lead
+# finder under /api/finder.
 app.include_router(studio_router)
 app.include_router(growthcrew_router)
+app.include_router(finder_router)
 
 # Mount static formatted_media folder for high-res padded Instagram photos
 MEDIA_DIR = os.path.join(os.path.dirname(__file__), "formatted_media")
@@ -88,9 +105,36 @@ async def root():
         "service": "GrowthCrew API",
         "status": "online",
         "framework": "FastAPI (Python)",
-        "surfaces": {"social_studio": "/api", "outreach": "/api/growthcrew"},
+        "surfaces": {"social_studio": "/api", "outreach": "/api/growthcrew", "lead_finder": "/api/finder"},
         "documentation": "/docs",
     }
+
+
+def _warm_lead_database() -> None:
+    """Open the MotherDuck connection off the request path.
+
+    The first query pays a ~16s connection warm-up; doing it in a daemon thread
+    at startup keeps the first preview responsive.
+    """
+
+    def warm() -> None:
+        try:
+            from growthcrew import leadsdb
+
+            if not leadsdb.is_configured():
+                return
+            leadsdb._connection()
+            logger.info("Lead database connection warmed")
+        except Exception as error:  # noqa: BLE001 - warm-up is best effort
+            logger.warning("Could not warm the lead database connection: %s", error)
+
+    threading.Thread(target=warm, name="motherduck-warmup", daemon=True).start()
+
+
+def startup_tasks() -> None:
+    _warm_lead_database()
+    if (CONFIG.FINDER_SCHEDULER or "").strip().lower() in {"1", "true", "yes", "on"}:
+        finder.start_scheduler()
 
 
 if __name__ == "__main__":

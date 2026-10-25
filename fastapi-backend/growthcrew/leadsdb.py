@@ -14,6 +14,7 @@ Config (fastapi-backend/.env):
 from __future__ import annotations
 
 import re
+import asyncio
 import threading
 from typing import Any
 
@@ -150,6 +151,16 @@ def _tokens(text: Any) -> list[str]:
     return [token for token in cleaned.split() if len(token) >= 2 and token not in STOPWORDS]
 
 
+def _location_tokens(location: str) -> list[str]:
+    # This dataset is entirely US-based. Country names identify its coverage,
+    # not text that must appear in a city/state/address. Keep narrower places.
+    location = re.sub(
+        r"\b(?:united states(?: of america)?|u\.?s\.?a\.?|u\.?s\.?)\b\.?",
+        " ", location, flags=re.I,
+    )
+    return _tokens(location)
+
+
 def _or_predicate(column: str, tokens: list[str]) -> str:
     """True when ANY token matches — tolerant to partial queries."""
     if not tokens:
@@ -238,32 +249,21 @@ def _row_to_lead(row: dict[str, Any], index: int) -> dict | None:
 
 
 def search_dataset(query: str, location: str, max_results: int) -> list[dict]:
-    """Search the MotherDuck lead tables; returns GrowthCrew-shaped leads."""
+    """Search via read-only MCP, preserving the finder's ranking and country rules.
+
+    Finder previews, batches and digests invoke this synchronous entry point
+    from workers. Each call owns an isolated async MCP session.
+    """
     if not is_configured():
         return []
     wanted = max(int(max_results or 20), 1)
     limit = min(max(wanted * 3, 30), 300)
-    query_tokens, location_tokens = _tokens(query), _tokens(location)
+    query_tokens, location_tokens = _tokens(query), _location_tokens(location)
 
-    rows: list[tuple] = []
-    con = _connection()
-    with _lock:
-        for source in SOURCES:
-            rows.extend(con.execute(_source_sql(source, query_tokens, location_tokens, limit)).fetchall())
+    from growthcrew.lead_chat import execute_source_queries
 
-    leads: list[dict] = []
-    seen_emails: set[str] = set()
-    for row in rows:
-        lead = _row_to_lead(dict(zip(RESULT_COLUMNS, row)), len(leads))
-        if not lead:
-            continue
-        email = lead["email"]
-        if email in seen_emails:
-            continue
-        seen_emails.add(email)
-        leads.append(lead)
-        if len(leads) >= wanted:
-            break
+    queries = [_source_sql(source, query_tokens, location_tokens, limit) for source in SOURCES]
+    leads, _ = asyncio.run(execute_source_queries(queries, wanted))
     return leads
 
 

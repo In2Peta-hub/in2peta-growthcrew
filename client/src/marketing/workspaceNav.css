@@ -1,0 +1,66 @@
+/* Shared module switcher. It is the map of the product: two modules live,
+   the rest clearly labelled as coming soon so a click never becomes a dead
+   end. Imported by WorkspaceNav so every shell gets it. */
+
+.ws-switcher {
+  position: sticky;
+  inset-block-start: 3.6rem;
+  z-index: 40;
+  background: var(--brand-bg);
+}
+
+.ws-switcher.is-static {
+  position: static;
+  background: transparent;
+}
+
+.ws-switcher-in {
+  max-inline-size: var(--ws-shell-width, 78rem);
+  margin-inline: auto;
+  padding: 0.55rem var(--ws-shell-pad, clamp(1rem, 3vw, 2rem));
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.ws-switcher-in::-webkit-scrollbar { display: none; }
+
+.ws-switcher-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  flex: none;
+  min-block-size: 2.1rem;
+  padding: 0 0.7rem;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--brand-muted);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  white-space: nowrap;
+  transition:
+    background-color 150ms ease,
+    color 150ms ease,
+    transform 140ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.ws-switcher-item:active { transform: scale(0.97); }
+.ws-switcher-item.is-active { background: var(--brand-raised); color: var(--brand-ink); }
+.ws-switcher-item.is-soon { color: color-mix(in oklch, var(--brand-muted) 75%, transparent); }
+
+.ws-switcher-soon {
+  padding: 0.08rem 0.35rem;
+  border-radius: 999px;
+  background: color-mix(in oklch, var(--brand-lavender) 14%, transparent);
+  color: var(--brand-lavender);
+  font-size: 0.625rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .ws-switcher-item:hover { background: var(--brand-raised); color: var(--brand-ink); }
+}
