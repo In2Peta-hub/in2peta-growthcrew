@@ -335,17 +335,42 @@ export default function App({ defaultTab = 'studio', apiUrl } = {}) {
     return () => clearInterval(interval);
   }, []);
 
+  // Handle Deleting / Disconnecting Channel
+  const handleDeleteChannel = async (channelId, e) => {
+    if (e) e.stopPropagation();
+    try {
+      await fetch(`${API_BASE}/api/channels/${channelId}`, { method: 'DELETE' });
+    } catch {
+      // ignore
+    }
+    setChannels((prev) => {
+      const rem = prev.filter((c) => c.id !== channelId);
+      if (activeChannel?.id === channelId) {
+        setActiveChannel(rem[0] || null);
+      }
+      return rem;
+    });
+    showToast('Channel removed.', 'info');
+  };
+
   // Handle Connecting Custom Channel & Credentials
   const handleConnectInstagram = async (e) => {
     e.preventDefault();
-    if (!customHandleInput.trim() && !customFbPageId.trim() && !customDiscordWebhook.trim()) {
-      showToast('Please provide a handle, Page ID, or Webhook URL to connect.', 'error');
-      return;
-    }
-    const formatted = customHandleInput.trim().replace(/^@/, '');
     const cleanPlatform = customPlatform.toLowerCase();
     const platName = ALL_PLATFORMS.find((p) => p.id === cleanPlatform)?.name || cleanPlatform;
-    
+
+    if (cleanPlatform === 'instagram' || cleanPlatform === 'facebook') {
+      if (!customFbPageId.trim() || !customFbToken.trim()) {
+        showToast('Meta requires authorization. Please click the "1-Click Connect with Facebook & Instagram" button above, or enter both Page ID and Page Access Token.', 'error');
+        return;
+      }
+    } else if (!customHandleInput.trim() && !customDiscordWebhook.trim()) {
+      showToast('Please provide a handle or Webhook URL to connect.', 'error');
+      return;
+    }
+
+    const formatted = customHandleInput.trim().replace(/^@/, '');
+
     try {
       const res = await fetch(`${API_BASE}/api/channels/custom-connect`, {
         method: 'POST',
@@ -361,22 +386,14 @@ export default function App({ defaultTab = 'studio', apiUrl } = {}) {
       });
 
       const data = await res.json();
+      if (!res.ok) {
+        showToast(data.detail || data.error || 'Connection failed. Please check credentials.', 'error');
+        return;
+      }
+
       if (data.channels && Array.isArray(data.channels)) {
         setChannels(data.channels);
         setActiveChannel(data.channel || data.channels[data.channels.length - 1]);
-      } else {
-        const fallbackChan = {
-          id: `custom_${Date.now()}`,
-          name: formatted ? `${formatted} (${platName})` : `My ${platName}`,
-          handle: formatted ? `@${formatted}` : `@${cleanPlatform}`,
-          platform: cleanPlatform,
-          platforms: [cleanPlatform],
-          avatar: attachedMediaUrl || SAMPLE_IN2PETA_MEDIA[0].url,
-          connected: true,
-          provider: 'Custom Connected',
-        };
-        setChannels((prev) => [...prev, fallbackChan]);
-        setActiveChannel(fallbackChan);
       }
 
       setShowConnectModal(false);
@@ -386,9 +403,8 @@ export default function App({ defaultTab = 'studio', apiUrl } = {}) {
       setCustomDiscordWebhook('');
       fetchData();
       showToast(`Connected ${platName} channel successfully!`, 'success');
-    } catch {
-      showToast(`Connected ${cleanPlatform} channel.`, 'success');
-      setShowConnectModal(false);
+    } catch (err) {
+      showToast(`Connection failed: ${err.message}`, 'error');
     }
   };
 
@@ -1991,15 +2007,24 @@ export default function App({ defaultTab = 'studio', apiUrl } = {}) {
                             <CheckCircle2 className="w-3 h-3 text-emerald-400" />
                             Published
                           </span>
-                          <a
-                            href="https://facebook.com/profile.php?id=61594485176950&sk=photos"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/[0.04] hover:bg-white/[0.08] text-xs font-bold text-[#FFA84A] border border-white/10 transition-all cursor-pointer"
-                          >
-                            <span>View Live Photos</span>
-                            <ExternalLink className="w-3 h-3" />
-                          </a>
+                          {(() => {
+                            const igUrl = post.broadcastResult?.platforms?.instagram?.url;
+                            const fbUrl = post.broadcastResult?.platforms?.facebook?.url;
+                            const liveUrl = igUrl || fbUrl || post.liveUrl || (post.channelHandle ? `https://www.instagram.com/${post.channelHandle.replace('@', '')}/` : null);
+                            const isIg = Boolean(igUrl) || post.platform === 'instagram';
+                            return liveUrl ? (
+                              <a
+                                href={liveUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/[0.04] hover:bg-white/[0.08] text-xs font-bold text-[#FFA84A] border border-white/10 transition-all cursor-pointer"
+                              >
+                                {isIg ? <InstagramIcon className="w-3 h-3 text-[#FF5376]" /> : <FacebookIcon className="w-3 h-3 text-[#38BDF8]" />}
+                                <span>{isIg ? 'View on Instagram' : 'View on Facebook'}</span>
+                                <ExternalLink className="w-3 h-3" />
+                              </a>
+                            ) : null;
+                          })()}
                         </div>
                       </div>
                     );
@@ -2065,11 +2090,28 @@ export default function App({ defaultTab = 'studio', apiUrl } = {}) {
                           )}
                           <span>{chan.handle}</span>
                         </span>
+                        {(chan.fbPageId && (chan.fbAccessToken || chan.provider === 'Meta Graph API' || chan.provider === 'Meta 1-Click OAuth')) ? (
+                          <span className="text-[9px] text-emerald-400 font-semibold block">✓ Meta Verified</span>
+                        ) : (
+                          <span className="text-[9px] text-amber-400 font-semibold block">⚠️ No Meta Token (Cannot Publish)</span>
+                        )}
                       </div>
                     </div>
-                    {activeChannel?.id === chan.id && (
-                      <CheckCircle2 className="w-4 h-4 text-[#FFA84A]" />
-                    )}
+                    <div className="flex items-center gap-2">
+                      {activeChannel?.id === chan.id && (
+                        <CheckCircle2 className="w-4 h-4 text-[#FFA84A]" />
+                      )}
+                      {chan.id !== 'cmu2huh5o0001p0aq03ly15ud' && (
+                        <button
+                          type="button"
+                          onClick={(e) => handleDeleteChannel(chan.id, e)}
+                          title="Remove Channel"
+                          className="p-1.5 rounded-lg hover:bg-red-500/20 text-slate-500 hover:text-red-400 transition-colors cursor-pointer"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      )}
+                    </div>
                   </div>
                 ))}
               </div>
@@ -2133,7 +2175,7 @@ export default function App({ defaultTab = 'studio', apiUrl } = {}) {
 
               {(customPlatform === 'facebook' || customPlatform === 'instagram') && (
                 <div className="space-y-2 p-3 rounded-2xl bg-white/[0.02] border border-white/10">
-                  <p className="text-[10px] text-[#FFA84A] font-semibold">Meta Graph API Credentials (Optional for Custom Page):</p>
+                  <p className="text-[10px] text-[#FFA84A] font-semibold">Meta Graph API Credentials (Required for Custom Account):</p>
                   <div>
                     <input
                       type="text"
@@ -2152,8 +2194,8 @@ export default function App({ defaultTab = 'studio', apiUrl } = {}) {
                       className="w-full bg-[#07080b] border border-white/10 rounded-xl px-3 py-2 text-xs text-white placeholder:text-slate-600 focus:outline-none focus:border-[#FF6B4A]/60"
                     />
                   </div>
-                  <p className="text-[9px] text-slate-500">
-                    Leave blank to use pre-configured system token, or paste your own Page ID & Token.
+                  <p className="text-[9px] text-slate-400 leading-relaxed">
+                    Paste your Facebook Page ID and Meta Page Access Token (generated from Business Manager / Meta Developer). Or click the 1-Click button above.
                   </p>
                 </div>
               )}

@@ -381,8 +381,11 @@ async def create_queue_post(post: CreateQueuePostRequest):
             "broadcastResult": broadcast_result
         })
 
-        if not broadcast_result.get("success", False) and broadcast_result.get("failedCount", 0) > 0 and broadcast_result.get("successfulCount", 0) == 0:
-            saved = QueueService.update_post(saved["id"], {"status": "FAILED"})
+        if not broadcast_result.get("success", False):
+            saved = QueueService.update_post(saved["id"], {
+                "status": "FAILED",
+                "broadcastResult": broadcast_result
+            })
             raise HTTPException(
                 status_code=400,
                 detail=broadcast_result.get("summary") or "Failed to publish to selected channels"
@@ -480,6 +483,16 @@ async def publish_now(post_id: str):
     if "facebook" in broadcast_result.get("platforms", {}):
         final_post_id = broadcast_result["platforms"]["facebook"].get("id")
 
+    if not broadcast_result.get("success", False):
+        updated = QueueService.update_post(post_id, {
+            "status": "FAILED",
+            "broadcastResult": broadcast_result
+        })
+        raise HTTPException(
+            status_code=400,
+            detail=broadcast_result.get("summary") or "Failed to publish to selected channels"
+        )
+
     updated = QueueService.update_post(post_id, {
         "status": "PUBLISHED",
         "postizPostId": final_post_id,
@@ -489,7 +502,7 @@ async def publish_now(post_id: str):
     })
 
     return {
-        "success": broadcast_result.get("success", True),
+        "success": True,
         "message": broadcast_result.get("summary", "Post published across all channels!"),
         "post": updated,
         "postizPostId": final_post_id,
@@ -505,6 +518,13 @@ class CustomChannelConnectRequest(BaseModel):
     fbAccessToken: Optional[str] = None
     discordWebhookUrl: Optional[str] = None
 
+@router.delete("/channels/{channel_id}")
+async def delete_channel_endpoint(channel_id: str):
+    success = QueueService.delete_channel(channel_id)
+    if not success:
+        raise HTTPException(status_code=404, detail="Channel not found")
+    return {"success": True, "channels": QueueService.get_channels()}
+
 @router.post("/channels/custom-connect")
 async def custom_connect_channel(req: CustomChannelConnectRequest):
     clean_page_id = req.fbPageId.strip() if req.fbPageId else None
@@ -512,18 +532,39 @@ async def custom_connect_channel(req: CustomChannelConnectRequest):
     clean_discord = req.discordWebhookUrl.strip() if req.discordWebhookUrl else None
     ig_id = None
 
-    if req.platform in ("facebook", "instagram") and clean_page_id and clean_token:
-        # Automatically look up linked Instagram Business Account ID from Facebook Page
+    if req.platform in ("facebook", "instagram"):
+        if not clean_page_id or not clean_token:
+            raise HTTPException(
+                status_code=400,
+                detail="Meta Page ID and Page Access Token are required for manual setup. For 1-Click setup without tokens, click '1-Click Connect with Facebook & Instagram' above."
+            )
         try:
             lookup = requests.get(
-                f"https://graph.facebook.com/v21.0/{clean_page_id}?fields=instagram_business_account,name&access_token={clean_token}",
+                f"https://graph.facebook.com/v21.0/{clean_page_id}?fields=instagram_business_account{{id,username,name,profile_picture_url}},name&access_token={clean_token}",
                 timeout=10
             ).json()
-            if "instagram_business_account" in lookup and "id" in lookup["instagram_business_account"]:
-                ig_id = lookup["instagram_business_account"]["id"]
-                print(f"[Custom Connect] Auto-detected Instagram Business ID: {ig_id}")
+            if "error" in lookup:
+                err_msg = lookup["error"].get("message", "Invalid Meta Page ID or Token")
+                raise HTTPException(status_code=400, detail=f"Meta Error: {err_msg}")
+
+            ig_data = lookup.get("instagram_business_account") or {}
+            if req.platform == "instagram" and not ig_data.get("id"):
+                page_name = lookup.get("name", clean_page_id)
+                raise HTTPException(
+                    status_code=400,
+                    detail=f"The Facebook Page '{page_name}' does not have a linked Instagram Business account. Please link your Instagram account to this Page in Facebook Page Settings first."
+                )
+            ig_id = ig_data.get("id")
+            ig_username = ig_data.get("username")
+            if ig_username:
+                req.handle = f"@{ig_username}"
+                req.name = f"{lookup.get('name', 'Page')} (@{ig_username})"
+            elif lookup.get("name"):
+                req.name = lookup["name"]
+        except HTTPException:
+            raise
         except Exception as e:
-            print(f"[Custom Connect] Instagram lookup notice: {e}")
+            raise HTTPException(status_code=400, detail=f"Failed to verify Meta credentials: {str(e)}")
 
     channel_obj = {
         "id": f"chan_{int(time.time() * 1000)}",
@@ -541,7 +582,6 @@ async def custom_connect_channel(req: CustomChannelConnectRequest):
     }
     updated = QueueService.add_channel(channel_obj)
 
-    # Return safe sanitized channel info to the client
     safe_channel = {**channel_obj, "fbAccessToken": "***" if clean_token else None}
     safe_channels = [
         {**c, "fbAccessToken": "***" if c.get("fbAccessToken") else None}

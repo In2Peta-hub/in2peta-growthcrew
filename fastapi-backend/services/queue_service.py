@@ -203,6 +203,17 @@ class QueueService:
         return channels
 
     @classmethod
+    def delete_channel(cls, channel_id: str) -> bool:
+        data = cls.read_data()
+        channels = data.get("channels", [])
+        new_channels = [c for c in channels if c.get("id") != channel_id]
+        if len(new_channels) != len(channels):
+            data["channels"] = new_channels
+            cls.write_data(data)
+            return True
+        return False
+
+    @classmethod
     def get_channel_by_id(cls, channel_id: Optional[str]) -> Optional[Dict[str, Any]]:
         if not channel_id:
             return None
