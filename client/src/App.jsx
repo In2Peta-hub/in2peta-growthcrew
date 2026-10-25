@@ -42,6 +42,8 @@ import { getModule } from './features';
 import { clearSession, getSession, verifySignIn, setSession } from './finder/finderApi';
 import { API_BASE } from './api';
 import Segmented from './ui/Segmented';
+import { readRoute, viewUrl } from './routing';
+import { navigateAcrossHosts } from './sessionBridge';
 
 // Custom SVG Icons for Multi-Platform Social Channels
 const InstagramIcon = ({ className = 'w-4 h-4', ...props }) => (
@@ -128,7 +130,7 @@ const SAMPLE_IN2PETA_MEDIA = [
 ];
 
 // Social Studio. Reached only from the account menu on the review screen.
-function SocialStudio({ currentUser, onBack, onLogout, onNavigate, defaultTab = 'studio' }) {
+function SocialStudio({ currentUser, onBack, onBackToSite, onLogout, onNavigate, defaultTab = 'studio' }) {
   const [activeTab, setActiveTab] = useState(defaultTab); // 'studio' | 'queue' | 'history'
   const [showBeginnerGuide, setShowBeginnerGuide] = useState(true);
   const [accountMenuOpen, setAccountMenuOpen] = useState(false);
@@ -658,10 +660,10 @@ function SocialStudio({ currentUser, onBack, onLogout, onNavigate, defaultTab = 
       <header>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 min-h-18 flex flex-wrap items-center justify-between gap-3 py-3">
           <div className="flex items-center gap-3 min-w-0">
-            <button type="button" onClick={onBack} className="ui-btn ui-btn-ghost ui-btn-icon shrink-0" aria-label="Back to your leads">
+            <h1 className="ui-panel-title"><button type="button" onClick={onBackToSite} className="ui-btn ui-btn-ghost shrink-0" aria-label="GrowthCrew home page">
               <img className="brand-logo" src="/brand/in2peta-logo.png" alt="" width="40" height="40" />
-            </button>
-            <h1 className="ui-panel-title truncate text-base sm:text-lg">GrowthCrew <span className="hidden sm:inline text-[var(--ui-muted)] font-normal">/ Social Studio</span></h1>
+              <span className="ui-panel-title truncate text-base sm:text-lg">GrowthCrew <span className="hidden sm:inline text-[var(--ui-muted)] font-normal">/ Social Studio</span></span>
+            </button></h1>
             <button type="button" onClick={onBack} className="ui-btn ui-btn-ghost ui-btn-sm hidden sm:inline-flex">
               <ArrowRight className="rotate-180" aria-hidden="true" /> Back to your leads
             </button>
@@ -2083,11 +2085,58 @@ export default function App() {
   const [autopilotOff, setAutopilotOff] = useState(
     () => entry.autopilotOff || localStorage.getItem(AUTOPILOT_OFF_KEY) === '1'
   );
-  const [view, setView] = useState(() => {
+  const [view, updateView] = useState(() => {
     if (entry.signin && entry.email) return 'verifying';
-    if (getSession()) return 'workspace';
-    return entry.autopilotOff ? 'login' : 'landing';
+    return entry.autopilotOff ? 'review' : readRoute();
   });
+
+  const setView = (next, { replace = false } = {}) => {
+    const target = new URL(viewUrl(next));
+    if (target.origin !== window.location.origin) {
+      void navigateAcrossHosts(target, replace).catch(() => {
+        clearSession();
+        window.location.assign(viewUrl('login'));
+      });
+      return;
+    }
+    window.history[replace ? 'replaceState' : 'pushState'](null, '', target.href);
+    updateView(next);
+    window.scrollTo(0, 0);
+  };
+
+  useEffect(() => {
+    const onPopState = () => {
+      setSessionState(getSession());
+      updateView(readRoute());
+    };
+    const onStorage = () => setSessionState(getSession());
+    window.addEventListener('popstate', onPopState);
+    window.addEventListener('storage', onStorage);
+    window.addEventListener('pageshow', onStorage);
+    return () => {
+      window.removeEventListener('popstate', onPopState);
+      window.removeEventListener('storage', onStorage);
+      window.removeEventListener('pageshow', onStorage);
+    };
+  }, []);
+
+  // Canonicalize old public links and Meta's public-host callback. Keep its
+  // parameters until Social Studio has consumed them.
+  useEffect(() => {
+    if (view === 'verifying') return;
+    const target = new URL(viewUrl(view));
+    target.search = window.location.search;
+    target.hash = window.location.hash;
+    if (target.href === window.location.href) return;
+    if (target.origin !== window.location.origin) {
+      void navigateAcrossHosts(target, true).catch(() => {
+        clearSession();
+        window.location.replace(viewUrl('login'));
+      });
+    } else {
+      window.history.replaceState(null, '', target.href);
+    }
+  }, [view]);
   const verifyStarted = useRef(false);
 
   // Strip one-time params from the address bar and remember the "turn off" request.
@@ -2121,7 +2170,8 @@ export default function App() {
     setSessionState(getSession());
     setSignedInAccount(account || null);
     setLoginNotice('');
-    setView('workspace');
+    const requested = readRoute();
+    setView(requested === 'landing' || requested === 'login' ? 'workspace' : requested, { replace: true });
   };
 
   // Signing in after keeping a preview should land on the list the person
@@ -2172,7 +2222,7 @@ export default function App() {
     view === 'review' || view === 'social' || view === 'workspace' || view.startsWith('soon:');
   const activeView = !session && needsSession ? 'login' : view;
 
-  if (activeView === 'verifying') return <SigningIn />;
+  if (activeView === 'verifying' || new URL(viewUrl(view)).origin !== window.location.origin) return <SigningIn />;
 
   if (activeView === 'login') {
     return (
@@ -2217,7 +2267,7 @@ export default function App() {
         initialAccount={signedInAccount}
         turnAutopilotOff={autopilotOff}
         onAutopilotHandled={handleAutopilotHandled}
-        onHome={() => setView('workspace')}
+        onHome={() => setView('landing')}
         onOpenSocial={() => setView('social')}
         onNavigate={handleNavigate}
         onSignOut={handleSignOut}
@@ -2231,6 +2281,7 @@ export default function App() {
       <SocialStudio
         currentUser={currentUser}
         onBack={() => setView('review')}
+        onBackToSite={() => setView('landing')}
         onLogout={handleSignOut}
         onNavigate={handleNavigate}
       />

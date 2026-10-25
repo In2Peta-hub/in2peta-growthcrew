@@ -25,6 +25,9 @@ jobs:
       - name: Lint
         run: bun run lint
 
+      - name: Test routes
+        run: bun run test
+
       - name: Build
         run: bun run build
 

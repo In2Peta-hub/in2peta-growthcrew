@@ -32,6 +32,7 @@ from typing import Any, Callable
 from urllib.parse import quote
 
 from config import CONFIG
+from growthcrew.frontend_urls import dashboard_url
 from growthcrew import finder_store, leadsdb, service, webpage
 from growthcrew.agentmail import agentmail_request
 from growthcrew.ai import chat_via_gemini, chat_via_openai, list_gateway_models
@@ -1501,7 +1502,7 @@ def request_sign_in(email: str, client_host: str | None = None) -> dict:
         code = secrets.token_urlsafe(24)
         expires = (datetime.now(timezone.utc) + timedelta(minutes=30)).isoformat()
         finder_store.save_code(normalized, _sha256_hex(code), expires)
-        link = f"{CONFIG.FRONTEND_URL.rstrip('/')}/?signin={quote(code)}&email={quote(normalized)}"
+        link = f"{dashboard_url('/leads')}?signin={quote(code)}&email={quote(normalized)}"
         _send_sign_in_email(normalized, link, client_host)
     return {"sent": True}
 
@@ -1980,7 +1981,7 @@ def _send_digest(account: dict, leads: list[dict]) -> bool:
             account.get("email"),
         )
         return False
-    subject, text, html = render_digest(public_account(account), leads, CONFIG.FRONTEND_URL)
+    subject, text, html = render_digest(public_account(account), leads, dashboard_url('/leads'))
     agentmail_request(
         f"/inboxes/{quote(inbox, safe='')}/messages/send",
         "POST",

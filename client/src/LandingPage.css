@@ -180,7 +180,7 @@
   }
 
   .gcl-btn-light:hover {
-    background: white;
+    background: color-mix(in oklch, var(--gcl-ink), white 15%);
   }
 
   .gcl-btn:hover svg {

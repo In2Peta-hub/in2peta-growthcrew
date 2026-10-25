@@ -38,12 +38,33 @@ bun install
 bun run dev
 ```
 
-- App: http://localhost:5173
+- Public site: http://localhost:5173
+- Dashboard: http://app.localhost:5173
+- Lead Gen: http://app.localhost:5173/leads
+- Social Studio: http://app.localhost:5173/social
 - API docs: http://localhost:3005/docs
 
 The Vite dev server proxies `/api/*` to the backend, so no `VITE_API_URL` is
 needed locally. Set `VITE_API_URL=http://localhost:3005` in `client/.env` only
 if you bypass the proxy.
+
+The GrowthCrew logo in the dashboard returns to the public site. The Workspace
+navigation tab returns to the dashboard home. Dashboard paths support direct
+links, refresh, and browser Back and Forward. Signing in on a protected path
+opens that section after authentication.
+
+For a custom domain, serve the same frontend deployment on both `example.com`
+and `app.example.com`. Set `VITE_SITE_URL=https://example.com` and
+`VITE_APP_URL=https://app.example.com` at build time, and set the backend's
+`FRONTEND_URL=https://example.com`. Add both domains and their DNS records in
+your hosting provider. SPA fallback rewrites are already in `client/vercel.json`.
+Vercel preview deployments use `/app`, `/app/leads`, and `/app/social` on the
+preview host when these variables are absent.
+
+Cross-host navigation requires the backend. It transfers sign-in using an
+origin-bound code that expires after 60 seconds and works once. The code travels
+in a URL fragment and is removed before the app renders. Session tokens stay in
+API responses and browser storage. Local sample mode uses sample sessions.
 
 After installing the backend dependencies above, run both services from one
 terminal with the cross-platform launcher:

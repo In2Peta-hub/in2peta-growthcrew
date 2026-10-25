@@ -18,7 +18,7 @@ export default function ComingSoon({
   if (!module) {
     return (
       <div className="ws-app">
-        <WorkspaceHeader email={session?.email} onHome={() => onNavigate('workspace')} onBackToSite={onBackToSite} onSignOut={onSignOut} />
+        <WorkspaceHeader email={session?.email} onBackToSite={onBackToSite} onSignOut={onSignOut} />
         <WorkspaceNav active="workspace" onNavigate={onNavigate} />
         <main className="ws-main ws-soon-main">
           <div className="ws-soon-panel">
@@ -37,7 +37,6 @@ export default function ComingSoon({
     <div className="ws-app">
       <WorkspaceHeader
         email={session?.email}
-        onHome={() => onNavigate('workspace')}
         onBackToSite={onBackToSite}
         onSignOut={onSignOut}
       />
@@ -72,7 +71,6 @@ export default function ComingSoon({
 
       <footer className="ws-footer">
         <span>GrowthCrew by In2Peta</span>
-        <button type="button" className="ui-link" onClick={onBackToSite}>Back to the site</button>
       </footer>
     </div>
   );

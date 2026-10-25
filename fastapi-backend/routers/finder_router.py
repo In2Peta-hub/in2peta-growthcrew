@@ -14,7 +14,7 @@ from fastapi.responses import JSONResponse, Response
 from pydantic import BaseModel, Field
 
 from config import CONFIG
-from growthcrew import finder, finder_store
+from growthcrew import finder, finder_store, session_handoffs
 from growthcrew.errors import GrowthcrewError
 
 router = APIRouter(prefix="/api/finder", tags=["GrowthCrew Lead Finder"])
@@ -150,6 +150,28 @@ def password_session(body: PasswordBody, request: Request):
 @router.post("/sessions/verify")
 def verify_session(body: VerifyBody):
     return finder.verify_sign_in(body.email, body.code)
+
+
+class HandoffBody(BaseModel):
+    origin: str = Field(min_length=8, max_length=300)
+
+
+class ConsumeHandoffBody(BaseModel):
+    code: str = Field(min_length=20, max_length=200)
+
+
+@router.post("/session-handoffs")
+def create_handoff(body: HandoffBody, request: Request):
+    account = _require_account(request)
+    if not finder.allow_request("session-handoffs", _client_ip(request), 60):
+        raise GrowthcrewError("Too many navigation requests. Try again shortly.", 429, "RATE_LIMITED")
+    code = session_handoffs.create(account, request.headers.get("origin", ""), body.origin)
+    return _json(201, {"code": code})
+
+
+@router.post("/session-handoffs/consume")
+def consume_handoff(body: ConsumeHandoffBody, request: Request):
+    return _json(200, session_handoffs.consume(body.code, request.headers.get("origin", "")))
 
 
 @router.get("/me")

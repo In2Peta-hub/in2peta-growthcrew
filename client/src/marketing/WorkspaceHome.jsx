@@ -123,7 +123,6 @@ export default function WorkspaceHome({
     <div className="ws-app">
       <WorkspaceHeader
         email={session?.email}
-        onHome={() => onNavigate('workspace')}
         onBackToSite={onBackToSite}
         onSignOut={onSignOut}
       />
@@ -239,7 +238,6 @@ export default function WorkspaceHome({
 
       <footer className="ws-footer">
         <span>GrowthCrew by In2Peta</span>
-        <button type="button" className="ui-link" onClick={onBackToSite}>Back to the site</button>
       </footer>
     </div>
   );

@@ -7,6 +7,7 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "oxlint src",
+    "test": "bun test tests",
     "preview": "vite preview",
     "serve:website": "node public/website/serve.js -p 3000"
   },
