@@ -96,3 +96,33 @@ class LeadDatabaseTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+def test_search_country_usa_matches_us_records_without_country_text(monkeypatch):
+    import duckdb
+    from growthcrew import lead_chat, leadsdb
+
+    con = duckdb.connect()
+    row = dataset_row(title='Founder', company='Acme Software', category='Software')
+    columns = ', '.join(f"'{str(value).replace(chr(39), chr(39)*2)}' AS {key}" for key, value in row.items())
+    source = {
+        'dataset': 'contacts', 'email_pred': "email_a LIKE '%@%'",
+        'inner': f"SELECT {columns}, 'Acme Software Founder' AS search_text, 'Chicago IL' AS location_text",
+    }
+    monkeypatch.setattr(leadsdb, 'is_configured', lambda: True)
+    async def execute_queries(queries, max_results):
+        leads = []
+        for sql in queries:
+            for values in con.execute(sql).fetchall():
+                lead = leadsdb._row_to_lead(dict(zip(RESULT_COLUMNS, values)), len(leads))
+                if lead:
+                    leads.append(lead)
+        return leads[:max_results], queries
+    monkeypatch.setattr(lead_chat, 'execute_source_queries', execute_queries)
+    monkeypatch.setattr(leadsdb, 'SOURCES', [source])
+    try:
+        for location in ('USA', 'United States', 'U.S.A.', 'Chicago, USA'):
+            assert len(leadsdb.search_dataset('software founder', location, 5)) == 1, location
+        assert leadsdb.search_dataset('software founder', 'Austin, USA', 5) == []
+    finally:
+        con.close()

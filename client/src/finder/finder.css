@@ -1,0 +1,591 @@
+/* GrowthCrew lead finder — review screen, refine dialog, autopilot card,
+   sign-in page. Layered as components so Tailwind utilities keep working
+   on top. Motion follows the brief: transform/opacity only, ease-out,
+   press feedback, hover gated to fine pointers, nothing on keyboard
+   actions. */
+
+@layer components {
+  /* ── Shared bits ────────────────────────────────────────────── */
+  .fn-wordmark {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    border: 0;
+    padding: 0;
+    background: none;
+    color: var(--ui-ink);
+    cursor: pointer;
+    user-select: none;
+    transition: transform var(--ui-t-press) var(--ui-ease-out);
+  }
+
+  .fn-wordmark:active {
+    transform: scale(0.97);
+  }
+
+  .fn-wordmark-text {
+    font-family: var(--font-display);
+    font-size: 1.125rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    line-height: 1;
+  }
+
+  .fn-notice {
+    margin: 0;
+    font-size: 0.875rem;
+    color: var(--ui-lavender);
+  }
+
+  .fn-error {
+    margin: 0;
+    font-size: 0.813rem;
+    color: var(--ui-bad);
+  }
+
+  .fn-strong {
+    color: var(--ui-ink);
+  }
+
+  .fn-center {
+    min-block-size: 100svh;
+    display: grid;
+    place-content: center;
+    justify-items: center;
+    gap: 0.75rem;
+    color: var(--ui-muted);
+  }
+
+  /* Checkbox styled as a switch (real input, keyboard reachable). */
+  .fn-switch {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.65rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--ui-ink);
+    cursor: pointer;
+    user-select: none;
+  }
+
+  .fn-switch input {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    opacity: 0;
+  }
+
+  .fn-switch-track {
+    position: relative;
+    flex: none;
+    inline-size: 2.5rem;
+    block-size: 1.5rem;
+    border-radius: 999px;
+    background: var(--ui-step);
+    transition: background-color var(--ui-t-hover) ease;
+  }
+
+  .fn-switch-track::after {
+    content: '';
+    position: absolute;
+    inset-block: 0.1875rem;
+    inset-inline-start: 0.1875rem;
+    inline-size: 1.125rem;
+    block-size: 1.125rem;
+    border-radius: 999px;
+    background: var(--ui-muted);
+    transition:
+      transform var(--ui-t-hover) var(--ui-ease-out),
+      background-color var(--ui-t-hover) ease;
+  }
+
+  .fn-switch input:checked + .fn-switch-track {
+    background: var(--ui-accent);
+  }
+
+  .fn-switch input:checked + .fn-switch-track::after {
+    transform: translateX(1rem);
+    background: white;
+  }
+
+  .fn-switch input:disabled + .fn-switch-track {
+    opacity: 0.5;
+    cursor: wait;
+  }
+
+  .fn-switch:has(input:focus-visible) .fn-switch-track {
+    outline: 2px solid var(--ui-lavender);
+    outline-offset: 2px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .fn-switch-track,
+    .fn-switch-track::after {
+      transition: none;
+    }
+  }
+
+  /* Menu icons sit at control size inside items. */
+  .ui-menu-item svg {
+    inline-size: 1rem;
+    block-size: 1rem;
+    flex: none;
+  }
+
+  /* ── Review screen ──────────────────────────────────────────── */
+  .fn-app {
+    min-block-size: 100svh;
+  }
+
+  .fn-header {
+    background: var(--ui-surface);
+  }
+
+  .fn-header-in {
+    max-inline-size: 68rem;
+    margin-inline: auto;
+    padding: 0.75rem 1.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  .fn-account {
+    position: relative;
+  }
+
+  .fn-account-menu {
+    position: absolute;
+    inset-inline-end: 0;
+    inset-block-start: 100%;
+    margin-block-start: 0.4rem;
+    inline-size: 15rem;
+    z-index: 30;
+  }
+
+  .fn-account-email {
+    padding: 0.5rem 0.7rem 0.6rem;
+  }
+
+  .fn-account-email p {
+    margin: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .fn-main {
+    max-inline-size: 46rem;
+    margin-inline: auto;
+    padding: 1.75rem 1.25rem 4rem;
+    display: grid;
+    gap: 1.25rem;
+    align-content: start;
+  }
+
+  .fn-head {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .fn-head-row {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .fn-title {
+    overflow-wrap: break-word;
+  }
+
+  .fn-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 0.75rem;
+  }
+
+  .fn-row {
+    display: grid;
+    gap: 0.85rem;
+    padding: 1.25rem;
+    border-radius: var(--ui-r-panel);
+    background: var(--ui-surface);
+  }
+
+  .fn-row-leave {
+    opacity: 0;
+    transform: translateY(-6px);
+    transition:
+      opacity 180ms var(--ui-ease-out),
+      transform 180ms var(--ui-ease-out);
+  }
+
+  .fn-row-leave-instant {
+    transition: none;
+    transform: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .fn-row-leave {
+      transition: none;
+      transform: none;
+    }
+  }
+
+  .fn-lead-head {
+    display: grid;
+    gap: 0.25rem;
+  }
+
+  .fn-lead-name {
+    font-weight: 600;
+    font-size: 1rem;
+    color: var(--ui-ink);
+  }
+
+  .fn-lead-email {
+    margin: 0;
+    font-size: 0.813rem;
+    color: var(--ui-faint);
+    overflow-wrap: anywhere;
+  }
+
+  .fn-lead-meta {
+    margin: 0;
+    font-size: 0.813rem;
+    color: var(--ui-muted);
+  }
+
+  .fn-why {
+    margin: 0;
+    font-size: 0.938rem;
+    line-height: 1.5;
+    color: var(--ui-muted);
+  }
+
+  .fn-row-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+
+  /* Keep / Skip are compact and quiet: on a list of ten, ten violet
+     buttons would each claim to be the one action on the screen. */
+  .fn-row-actions > .ui-btn {
+    flex: 0 0 auto;
+    min-inline-size: 6.5rem;
+  }
+
+  .fn-writing {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    margin: 0;
+    min-block-size: 2.5rem;
+    font-size: 0.875rem;
+    color: var(--ui-muted);
+  }
+
+  .fn-writing svg {
+    inline-size: 1rem;
+    block-size: 1rem;
+    color: var(--ui-lavender);
+  }
+
+  /* The message editor inside a kept row. */
+  .fn-editor {
+    display: grid;
+    gap: 0.9rem;
+  }
+
+  .fn-editor-fields {
+    display: grid;
+    gap: 0.9rem;
+  }
+
+  .fn-editor-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+
+  .fn-editor-actions > .ui-btn {
+    flex: 1 1 auto;
+  }
+
+  .fn-saved {
+    font-size: 0.813rem;
+    font-weight: 600;
+    color: var(--ui-good);
+  }
+
+  /* Skeleton rows while the list loads. */
+  .fn-skel {
+    display: grid;
+    gap: 0.6rem;
+    padding: 1.25rem;
+    border-radius: var(--ui-r-panel);
+    background: var(--ui-surface);
+  }
+
+  .fn-skel::before,
+  .fn-skel::after {
+    content: '';
+    border-radius: 4px;
+    background: var(--ui-step);
+  }
+
+  .fn-skel::before {
+    inline-size: 62%;
+    block-size: 0.9rem;
+  }
+
+  .fn-skel::after {
+    inline-size: 92%;
+    block-size: 0.65rem;
+  }
+
+  /* Quiet states: everyone reviewed, progress, suggestions, errors. */
+  .fn-state {
+    display: grid;
+    gap: 0.9rem;
+    justify-items: start;
+  }
+
+  .fn-everyone {
+    display: grid;
+    gap: 0.9rem;
+    justify-items: center;
+    text-align: center;
+    padding-block: 1.5rem;
+  }
+
+  .fn-quiet {
+    text-align: center;
+    padding-block: 1rem;
+  }
+
+  .fn-progress {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    margin: 0;
+    font-size: 0.875rem;
+    color: var(--ui-muted);
+  }
+
+  .fn-progress svg {
+    inline-size: 1rem;
+    block-size: 1rem;
+    color: var(--ui-lavender);
+  }
+
+  .fn-suggestions {
+    display: grid;
+    gap: 0.3rem;
+    justify-items: center;
+  }
+
+  .fn-suggestion {
+    border: 0;
+    padding: 0.15rem 0;
+    background: none;
+    font: inherit;
+    font-size: 0.938rem;
+    font-weight: 600;
+    color: var(--ui-lavender);
+    cursor: pointer;
+    transition: color var(--ui-t-hover) ease;
+  }
+
+  .fn-suggestion:active {
+    transform: scale(0.97);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .fn-suggestion:hover {
+      color: var(--ui-ink);
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+  }
+
+  /* Autopilot card at the end of the list. */
+  .fn-autopilot {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .fn-autopilot-main {
+    display: grid;
+    gap: 0.5rem;
+    justify-items: start;
+  }
+
+  .fn-autopilot-next {
+    margin: 0;
+  }
+
+  .fn-connect {
+    position: relative;
+    justify-self: start;
+  }
+
+  .fn-connect-menu {
+    position: absolute;
+    inset-block-start: 100%;
+    inset-inline-end: auto;
+    inset-inline-start: 0;
+    margin-block-start: 0.4rem;
+    inline-size: 17rem;
+    z-index: 30;
+  }
+
+  .fn-connect-hint {
+    margin: 0;
+    padding: 0.5rem 0.7rem 0.4rem;
+    font-size: 0.813rem;
+    color: var(--ui-faint);
+    line-height: 1.45;
+  }
+
+  /* Toast with Undo. */
+  .fn-toast {
+    position: fixed;
+    inset-block-end: 1.25rem;
+    inset-inline-end: 1.25rem;
+    z-index: 60;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.75rem 1rem;
+    max-inline-size: min(24rem, calc(100vw - 2rem));
+  }
+
+  .fn-toast > span {
+    font-size: 0.875rem;
+  }
+
+  /* ── Refine dialog ──────────────────────────────────────────── */
+  .fn-refine {
+    display: grid;
+  }
+
+  .fn-refine-form {
+    display: grid;
+    gap: 1.1rem;
+    margin-block-start: 1.25rem;
+  }
+
+  .fn-refine-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    padding-block-start: 0.25rem;
+  }
+
+  /* ── Sign-in page ───────────────────────────────────────────── */
+  .fn-login {
+    min-block-size: 100svh;
+    display: grid;
+    grid-template-rows: auto 1fr;
+  }
+
+  .fn-login-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1rem 1.25rem;
+  }
+
+  .fn-login-main {
+    display: grid;
+    place-items: center;
+    align-content: center;
+    padding: 1rem 1.25rem 4rem;
+  }
+
+  .fn-login-card {
+    inline-size: min(100%, 24rem);
+    display: grid;
+    gap: 1.25rem;
+    padding: 1.75rem;
+    border-radius: var(--ui-r-panel);
+    background: var(--ui-surface);
+  }
+
+  .fn-login-title {
+    margin: 0;
+  }
+
+  .fn-login-sub {
+    margin: 0;
+  }
+
+  .fn-login-form {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .fn-login-sample {
+    margin: 0;
+  }
+
+  .fn-login-icon {
+    display: grid;
+    place-items: center;
+    inline-size: 2.75rem;
+    block-size: 2.75rem;
+    border-radius: 999px;
+    background: var(--ui-accent-soft);
+    color: var(--ui-lavender);
+  }
+
+  .fn-login-icon svg {
+    inline-size: 1.25rem;
+    block-size: 1.25rem;
+  }
+
+  @media (max-width: 480px) {
+    .fn-row,
+    .fn-skel {
+      padding: 1rem;
+    }
+
+    .fn-editor-actions > .ui-btn {
+      flex: 1 1 calc(50% - 0.25rem);
+    }
+  }
+
+  /* "What do you offer?" — one inline question, not a settings page. */
+  .fn-offer {
+    display: grid;
+    gap: 0.5rem;
+    margin-block-end: 1.5rem;
+  }
+
+  .fn-offer-row {
+    display: flex;
+    gap: 0.5rem;
+    margin-block-start: 0.5rem;
+  }
+
+  .fn-offer-row .ui-input {
+    flex: 1;
+  }
+
+  @media (max-width: 560px) {
+    .fn-offer-row {
+      flex-direction: column;
+    }
+  }
+}

@@ -48,9 +48,22 @@ class Config:
     MOTHERDUCK_TOKEN: str = os.getenv("MOTHERDUCK_TOKEN", "")
     MOTHERDUCK_DATABASE: str = os.getenv("MOTHERDUCK_DATABASE", "business_leads")
 
+    # GrowthCrew lead finder (docs/lead-finder-spec.md). AgentMail inbox that
+    # sends sign-in links and Monday digests; the shared secret for the Render
+    # cron that calls /digests/run; the review page base URL; and the flag that
+    # starts the weekly-digest scheduler thread.
+    FINDER_FROM_INBOX: str = os.getenv("FINDER_FROM_INBOX", "")
+    FINDER_DIGEST_SECRET: str = os.getenv("FINDER_DIGEST_SECRET", "")
+    FRONTEND_URL: str = os.getenv("FRONTEND_URL", "http://localhost:5173")
+    FINDER_SCHEDULER: str = os.getenv("FINDER_SCHEDULER", "")
+    # Optional testing account; PBKDF2 hash only, never a plaintext password.
+    FINDER_TEST_EMAIL: str = os.getenv("FINDER_TEST_EMAIL", "")
+    FINDER_TEST_PASSWORD_HASH: str = os.getenv("FINDER_TEST_PASSWORD_HASH", "")
+
     # GrowthCrew AI drafting (LiteLLM gateway / OpenAI-compatible endpoints)
     LITELLM_BASE_URL: str = os.getenv("LITELLM_BASE_URL", "")
     LITELLM_MASTER_KEY: str = os.getenv("LITELLM_MASTER_KEY", "")
+    LITELLM_MODEL: str = os.getenv("LITELLM_MODEL", "kimi-k3")
     OPENAI_API_KEY: str = os.getenv("OPENAI_API_KEY", "")
     OPENAI_API_BASE: str = os.getenv("OPENAI_API_BASE", "")
     API_KEY_ENCRYPTION_KEY: str = os.getenv("API_KEY_ENCRYPTION_KEY", "")

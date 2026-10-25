@@ -1,0 +1,589 @@
+/*  GrowthCrew interface language — the workspace side of the landing page.
+
+    Same brand, same rules, tuned for screens people use all day:
+    - Surfaces separate by tone steps, not borders, glows or shadows.
+      Only things that float (menus, dialogs, toasts) cast a shadow.
+    - Violet is for the one primary action and for "selected". Lavender
+      is for links and quiet emphasis. Everything else is ink and muted.
+    - Satoshi for all interface text, sentence case, 13px minimum.
+      Cabinet Grotesk only for page and panel titles.
+    - Buttons are pill-shaped and flat, matching the landing page. Controls (inputs, switches) are
+      6px. Panels are 12px. Pills only for status badges and avatars.
+    - Motion follows frequency: press feedback everywhere (scale .97),
+      fast menus from their trigger, short dialogs, no animation on things
+      used constantly (tab switches, typing, keyboard actions).           */
+
+/* Layered as components so Tailwind utilities can still adjust layout
+   (width, margin, grid placement) on top of these classes. */
+@layer components {
+  :root {
+    --ui-bg: var(--brand-bg, #fbf7f0);
+    --ui-surface: var(--brand-surface, #ffffff);
+    --ui-raised: var(--brand-raised, #f4ede1);
+    --ui-step: #ede4d4;
+    --ui-step-strong: #e2d6c2;
+    --ui-ink: var(--brand-ink, #1c1a24);
+    --ui-muted: var(--brand-muted, #57515f);
+    --ui-faint: #81788a;
+    --ui-accent: var(--brand-purple, #6b2fe0);
+    --ui-accent-hover: var(--brand-purple-hover, #5a22c9);
+    --ui-accent-soft: #efe8ff;
+    --ui-lavender: var(--brand-lavender, #6b3fd6);
+    --ui-line: color-mix(in oklch, var(--ui-ink) 12%, transparent);
+    --ui-line-strong: color-mix(in oklch, var(--ui-ink) 22%, transparent);
+    --ui-good: oklch(0.52 0.12 158);
+    --ui-warn: oklch(0.6 0.13 70);
+    --ui-bad: oklch(0.55 0.18 28);
+
+    --ui-r-btn: 999px;
+    --ui-r-ctl: 6px;
+    --ui-r-panel: 12px;
+
+    --ui-ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+    --ui-ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+    --ui-t-press: 140ms;
+    --ui-t-hover: 150ms;
+    --ui-t-pop: 180ms;
+    --ui-t-dialog: 220ms;
+
+    --ui-shadow-float: 0 18px 44px -16px rgb(74 52 24 / 0.28), 0 0 0 1px rgb(28 26 36 / 0.06);
+  }
+
+  /* ── Buttons ─────────────────────────────────────────────────── */
+  .ui-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    min-block-size: 2.5rem;
+    padding: 0 1rem;
+    border: 0;
+    border-radius: var(--ui-r-btn);
+    background: var(--ui-raised);
+    color: var(--ui-ink);
+    font: inherit;
+    font-size: 0.875rem;
+    font-weight: 600;
+    line-height: 1.2;
+    white-space: nowrap;
+    cursor: pointer;
+    user-select: none;
+    transition:
+      background-color var(--ui-t-hover) ease,
+      color var(--ui-t-hover) ease,
+      transform var(--ui-t-press) var(--ui-ease-out);
+  }
+
+  .ui-btn svg {
+    inline-size: 1rem;
+    block-size: 1rem;
+    flex: none;
+  }
+
+  .ui-btn:active:not(:disabled) {
+    transform: scale(0.97);
+  }
+
+  .ui-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .ui-btn-primary {
+    background: var(--ui-accent);
+    color: white;
+  }
+
+  .ui-btn-light {
+    background: var(--ui-ink);
+    color: var(--ui-bg);
+  }
+
+  .ui-btn-ghost {
+    background: transparent;
+    color: var(--ui-muted);
+  }
+
+  .ui-btn-danger {
+    background: color-mix(in oklch, var(--ui-bad) 16%, var(--ui-surface));
+    color: var(--ui-bad);
+  }
+
+  .ui-btn-sm {
+    min-block-size: 2rem;
+    padding: 0 0.75rem;
+    font-size: 0.8125rem;
+  }
+
+  .ui-btn-lg {
+    min-block-size: 3rem;
+    padding: 0 1.4rem;
+    font-size: 0.9375rem;
+  }
+
+  .ui-btn-icon {
+    inline-size: 2.5rem;
+    padding: 0;
+  }
+
+  .ui-btn-icon.ui-btn-sm {
+    inline-size: 2rem;
+  }
+
+  .ui-btn-block {
+    inline-size: 100%;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .ui-btn:hover:not(:disabled) { background: var(--ui-step); }
+    .ui-btn-primary:hover:not(:disabled) { background: var(--ui-accent-hover); }
+    .ui-btn-light:hover:not(:disabled) { background: #000; }
+    .ui-btn-ghost:hover:not(:disabled) { background: var(--ui-raised); color: var(--ui-ink); }
+    .ui-btn-danger:hover:not(:disabled) { background: color-mix(in oklch, var(--ui-bad) 24%, var(--ui-surface)); }
+  }
+
+  /* Text link styled action. */
+  .ui-link {
+    border: 0;
+    padding: 0;
+    background: none;
+    color: var(--ui-lavender);
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: underline;
+    text-decoration-color: transparent;
+    text-underline-offset: 3px;
+    transition: text-decoration-color var(--ui-t-hover) ease, color var(--ui-t-hover) ease;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .ui-link:hover { text-decoration-color: currentColor; color: var(--ui-ink); }
+  }
+
+  /* ── Panels ──────────────────────────────────────────────────── */
+  .ui-panel {
+    border-radius: var(--ui-r-panel);
+    background: var(--ui-surface);
+    padding: 1.5rem;
+  }
+
+  .ui-panel-inset {
+    border-radius: 8px;
+    background: var(--ui-bg);
+    padding: 1rem;
+  }
+
+  .ui-panel-raised {
+    border-radius: 8px;
+    background: var(--ui-raised);
+    padding: 1rem;
+  }
+
+  .ui-title {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    font-weight: 700;
+    letter-spacing: -0.025em;
+    line-height: 1.1;
+    color: var(--ui-ink);
+  }
+
+  .ui-panel-title {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: 1.125rem;
+    font-weight: 700;
+    letter-spacing: -0.015em;
+    line-height: 1.2;
+    color: var(--ui-ink);
+  }
+
+  .ui-sub {
+    margin: 0;
+    font-size: 0.875rem;
+    color: var(--ui-muted);
+    line-height: 1.45;
+  }
+
+  /* Field label: sentence case, readable, never tiny tracked caps. */
+  .ui-label {
+    display: block;
+    margin-block-end: 0.4rem;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--ui-muted);
+  }
+
+  .ui-hint {
+    font-size: 0.8125rem;
+    color: var(--ui-faint);
+  }
+
+  /* ── Fields ──────────────────────────────────────────────────── */
+  .ui-input,
+  .ui-select,
+  .ui-textarea {
+    inline-size: 100%;
+    min-block-size: 2.5rem;
+    padding: 0 0.85rem;
+    border: 1px solid var(--ui-line-strong);
+    border-radius: var(--ui-r-ctl);
+    background: var(--ui-bg);
+    color: var(--ui-ink);
+    font: inherit;
+    font-size: 0.875rem;
+    transition: border-color var(--ui-t-hover) ease;
+  }
+
+  .ui-textarea {
+    padding-block: 0.65rem;
+    line-height: 1.5;
+    resize: vertical;
+  }
+
+  .ui-input::placeholder,
+  .ui-textarea::placeholder {
+    color: var(--ui-faint);
+  }
+
+  .ui-input:focus-visible,
+  .ui-select:focus-visible,
+  .ui-textarea:focus-visible {
+    outline: 2px solid var(--ui-accent);
+    outline-offset: -1px;
+    border-color: transparent;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    :is(.ui-input, .ui-select, .ui-textarea):hover:not(:focus-visible) { border-color: color-mix(in oklch, var(--ui-ink) 34%, transparent); }
+  }
+
+  /* ── Segmented switch (real radios, sliding thumb) ───────────── */
+  .ui-seg {
+    position: relative;
+    display: inline-grid;
+    grid-auto-flow: column;
+    grid-auto-columns: 1fr;
+    padding: 3px;
+    border-radius: 8px;
+    background: var(--ui-bg);
+    isolation: isolate;
+  }
+
+  .ui-seg-block {
+    display: grid;
+  }
+
+  .ui-seg-thumb {
+    position: absolute;
+    inset-block: 3px;
+    inset-inline-start: 3px;
+    inline-size: calc((100% - 6px) / var(--seg-n));
+    border-radius: var(--ui-r-ctl);
+    background: var(--ui-step-strong);
+    transform: translateX(calc(var(--seg-i) * 100%));
+    transition: transform 240ms var(--ui-ease-in-out);
+    z-index: -1;
+  }
+
+  .ui-seg-opt {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    min-block-size: 2rem;
+    padding: 0 0.85rem;
+    border-radius: var(--ui-r-ctl);
+    color: var(--ui-muted);
+    font-size: 0.8125rem;
+    font-weight: 600;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: color var(--ui-t-hover) ease;
+  }
+
+  .ui-seg-opt svg {
+    inline-size: 0.95rem;
+    block-size: 0.95rem;
+  }
+
+  .ui-seg-opt[data-on] {
+    color: var(--ui-ink);
+  }
+
+  .ui-seg-opt input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .ui-seg-opt:has(input:focus-visible) {
+    outline: 2px solid var(--ui-lavender);
+    outline-offset: -2px;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .ui-seg-opt:not([data-on]):hover { color: var(--ui-ink); }
+  }
+
+  /* ── Tabs (page-level navigation; switching is instant) ──────── */
+  .ui-tabs {
+    display: flex;
+    gap: 0.25rem;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .ui-tab {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-block-size: 2.5rem;
+    padding: 0 0.9rem;
+    border: 0;
+    border-radius: var(--ui-r-ctl);
+    background: transparent;
+    color: var(--ui-muted);
+    font: inherit;
+    font-size: 0.875rem;
+    font-weight: 600;
+    white-space: nowrap;
+    cursor: pointer;
+    transition:
+      background-color var(--ui-t-hover) ease,
+      color var(--ui-t-hover) ease,
+      transform var(--ui-t-press) var(--ui-ease-out);
+  }
+
+  .ui-tab svg {
+    inline-size: 1rem;
+    block-size: 1rem;
+  }
+
+  .ui-tab:active {
+    transform: scale(0.97);
+  }
+
+  .ui-tab[aria-selected='true'],
+  .ui-tab[aria-current='page'],
+  .ui-tab[data-on] {
+    background: var(--ui-raised);
+    color: var(--ui-ink);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .ui-tab:hover { color: var(--ui-ink); }
+  }
+
+  /* ── Chips: selectable options (channels, ideas, filters) ────── */
+  .ui-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    min-block-size: 2.25rem;
+    padding: 0 0.8rem;
+    border: 0;
+    border-radius: var(--ui-r-ctl);
+    background: var(--ui-raised);
+    color: var(--ui-muted);
+    font: inherit;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    text-align: start;
+    cursor: pointer;
+    transition:
+      background-color var(--ui-t-hover) ease,
+      color var(--ui-t-hover) ease,
+      transform var(--ui-t-press) var(--ui-ease-out);
+  }
+
+  .ui-chip svg {
+    inline-size: 0.95rem;
+    block-size: 0.95rem;
+    flex: none;
+  }
+
+  .ui-chip:active {
+    transform: scale(0.97);
+  }
+
+  .ui-chip[aria-pressed='true'],
+  .ui-chip[aria-checked='true'],
+  .ui-chip[data-on] {
+    background: var(--ui-accent-soft);
+    color: var(--ui-ink);
+    box-shadow: inset 0 0 0 1px color-mix(in oklch, var(--ui-accent) 60%, transparent); /* selection ring, not a shadow at rest */
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .ui-chip:hover { color: var(--ui-ink); background: var(--ui-step); }
+    .ui-chip[aria-pressed='true']:hover,
+    .ui-chip[data-on]:hover { background: color-mix(in oklch, var(--ui-accent) 24%, var(--ui-surface)); }
+  }
+
+  /* ── Status badges ───────────────────────────────────────────── */
+  .ui-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.15rem 0.55rem;
+    border-radius: 999px;
+    background: var(--ui-step);
+    color: var(--ui-ink);
+    font-size: 0.8125rem;
+    font-weight: 600;
+    line-height: 1.35;
+    white-space: nowrap;
+  }
+
+  .ui-badge-accent { background: var(--ui-accent); color: white; }
+  .ui-badge-good { background: color-mix(in oklch, var(--ui-good) 18%, var(--ui-surface)); color: var(--ui-good); }
+  .ui-badge-warn { background: color-mix(in oklch, var(--ui-warn) 16%, var(--ui-surface)); color: var(--ui-warn); }
+  .ui-badge-bad { background: color-mix(in oklch, var(--ui-bad) 16%, var(--ui-surface)); color: var(--ui-bad); }
+
+  .ui-dot {
+    inline-size: 0.5rem;
+    block-size: 0.5rem;
+    border-radius: 50%;
+    background: currentColor;
+    flex: none;
+  }
+
+  /* ── Floating layers: menus, dialogs, toasts ─────────────────── */
+  /* Menus scale in from their trigger; set --ui-origin per menu. */
+  .ui-menu {
+    border-radius: 10px;
+    background: var(--ui-raised);
+    padding: 0.35rem;
+    box-shadow: var(--ui-shadow-float);
+    transform-origin: var(--ui-origin, top right);
+    transition:
+      opacity var(--ui-t-pop) var(--ui-ease-out),
+      transform var(--ui-t-pop) var(--ui-ease-out);
+
+    @starting-style {
+      opacity: 0;
+      transform: scale(0.96) translateY(-4px);
+    }
+  }
+
+  .ui-menu-item {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    inline-size: 100%;
+    min-block-size: 2.25rem;
+    padding: 0 0.7rem;
+    border: 0;
+    border-radius: var(--ui-r-ctl);
+    background: transparent;
+    color: var(--ui-ink);
+    font: inherit;
+    font-size: 0.875rem;
+    text-align: start;
+    cursor: pointer;
+  }
+
+  .ui-menu-item:focus-visible {
+    background: var(--ui-step);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .ui-menu-item:hover { background: var(--ui-step); }
+  }
+
+  /* Dialogs stay centred (not anchored to a trigger), so they scale
+     from the middle. Backdrop is a flat scrim, no blur. */
+  .ui-scrim {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    display: grid;
+    place-items: center;
+    padding: 1rem;
+    background: rgb(28 26 36 / 0.42);
+    transition: opacity var(--ui-t-dialog) ease;
+
+    @starting-style {
+      opacity: 0;
+    }
+  }
+
+  .ui-dialog {
+    inline-size: min(100%, 32rem);
+    max-block-size: calc(100svh - 2rem);
+    overflow: auto;
+    border-radius: var(--ui-r-panel);
+    background: var(--ui-surface);
+    padding: 1.5rem;
+    box-shadow: var(--ui-shadow-float);
+    transition:
+      opacity var(--ui-t-dialog) var(--ui-ease-out),
+      transform var(--ui-t-dialog) var(--ui-ease-out);
+
+    @starting-style {
+      opacity: 0;
+      transform: scale(0.97) translateY(8px);
+    }
+  }
+
+  .ui-toast {
+    border-radius: 10px;
+    background: var(--ui-raised);
+    color: var(--ui-ink);
+    box-shadow: var(--ui-shadow-float);
+    transition:
+      opacity 260ms var(--ui-ease-out),
+      transform 320ms var(--ui-ease-out);
+
+    @starting-style {
+      opacity: 0;
+      transform: translateY(16px);
+    }
+  }
+
+  /* ── Entrances: things that arrive because of the user's action ── */
+  /* New results (drafts, leads, queue rows) settle in once; capped
+     stagger so a long list never takes more than ~0.4s to settle. */
+  @keyframes ui-arrive {
+    from { opacity: 0; transform: translateY(8px); }
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .ui-arrive {
+      animation: ui-arrive 320ms var(--ui-ease-out) backwards;
+      animation-delay: calc(min(var(--i, 0), 8) * 40ms);
+    }
+  }
+
+  /* Switching between views: a quick fade only (used often, so no travel). */
+  @keyframes ui-fade-in {
+    from { opacity: 0; }
+  }
+
+  .ui-view {
+    animation: ui-fade-in 160ms ease-out;
+  }
+
+  /* Loading spinner: fast spin reads as fast loading. */
+  @keyframes ui-spin {
+    to { transform: rotate(360deg); }
+  }
+
+  .ui-spin {
+    animation: ui-spin 0.7s linear infinite;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .ui-seg-thumb,
+    .ui-menu,
+    .ui-dialog,
+    .ui-toast {
+      transition-property: opacity;
+    }
+  }
+}
