@@ -1,0 +1,14 @@
+.env
+.env.*
+.venv/
+venv/
+data/
+*.pem
+*.key
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+tests/
+formatted_media/
