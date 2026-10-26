@@ -1772,12 +1772,16 @@ function SocialStudio({ currentUser, onBack, onBackToSite, onLogout, onNavigate,
                           <span className="text-[13px] text-[var(--ui-muted)] flex items-center gap-1.5">
                             {chan.platform === 'facebook' ? (
                               <FacebookIcon className="w-3 h-3 text-[#38BDF8]" />
+                            ) : chan.platform === 'x' ? (
+                              <span className="font-bold text-white text-[11px]">𝕏</span>
                             ) : (
                               <InstagramIcon className="w-3 h-3 text-[var(--ui-lavender)]" />
                             )}
                             <span>{chan.handle}</span>
                           </span>
-                          {(chan.fbPageId && (chan.fbAccessToken || chan.provider === 'Meta Graph API' || chan.provider === 'Meta 1-Click OAuth')) ? (
+                          {chan.platform === 'x' ? (
+                            <span className="text-[9px] text-sky-400 font-semibold block">✓ X API v2 Connected</span>
+                          ) : (chan.fbPageId && (chan.fbAccessToken || chan.provider === 'Meta Graph API' || chan.provider === 'Meta 1-Click OAuth')) ? (
                             <span className="text-[9px] text-emerald-400 font-semibold block">✓ Meta Verified</span>
                           ) : (
                             <span className="text-[9px] text-amber-400 font-semibold block">⚠️ No Meta Token (Cannot Publish)</span>
