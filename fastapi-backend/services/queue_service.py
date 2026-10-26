@@ -28,6 +28,24 @@ DEFAULT_DATA: Dict[str, Any] = {
             "fbAccessToken": None,
             "igBusinessAccountId": "17841415311653642",
             "discordWebhookUrl": None
+        },
+        {
+            "id": "cmu2huh5o0003p0aq03lyx01",
+            "name": "1914 Aarya Dharmadhikari (X)",
+            "handle": "@1914Aarya76802",
+            "platform": "x",
+            "platforms": ["x"],
+            "avatar": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=200&auto=format&fit=crop&q=80",
+            "connected": True,
+            "provider": "X Developer API v2",
+            "fbPageId": None,
+            "fbAccessToken": None,
+            "igBusinessAccountId": None,
+            "discordWebhookUrl": None,
+            "xApiKey": None,
+            "xApiSecret": None,
+            "xAccessToken": None,
+            "xAccessSecret": None
         }
     ],
     "queue": []
@@ -190,6 +208,10 @@ class QueueService:
             "fbAccessToken": channel.get("fbAccessToken"),
             "igBusinessAccountId": channel.get("igBusinessAccountId"),
             "discordWebhookUrl": channel.get("discordWebhookUrl"),
+            "xApiKey": channel.get("xApiKey"),
+            "xApiSecret": channel.get("xApiSecret"),
+            "xAccessToken": channel.get("xAccessToken"),
+            "xAccessSecret": channel.get("xAccessSecret"),
         }
 
         existing_index = next((i for i, c in enumerate(channels) if c.get("id") == ch_id or c.get("name", "").lower() == ch_name.lower()), -1)

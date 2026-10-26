@@ -177,6 +177,16 @@ function SocialStudio({ currentUser, onBack, onBackToSite, onLogout, onNavigate,
       connected: true,
       provider: 'Meta Graph API',
     },
+    {
+      id: 'cmu2huh5o0003p0aq03lyx01',
+      name: '1914 Aarya Dharmadhikari (X)',
+      handle: '@1914Aarya76802',
+      platform: 'x',
+      platforms: ['x'],
+      avatar: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=200&auto=format&fit=crop&q=80',
+      connected: true,
+      provider: 'X Developer API v2',
+    },
   ]);
   const [activeChannel, setActiveChannel] = useState(channels[0]);
   const [showConnectModal, setShowConnectModal] = useState(false);
@@ -231,6 +241,10 @@ function SocialStudio({ currentUser, onBack, onBackToSite, onLogout, onNavigate,
   const [customFbPageId, setCustomFbPageId] = useState('');
   const [customFbToken, setCustomFbToken] = useState('');
   const [customDiscordWebhook, setCustomDiscordWebhook] = useState('');
+  const [customXApiKey, setCustomXApiKey] = useState('');
+  const [customXApiSecret, setCustomXApiSecret] = useState('');
+  const [customXAccessToken, setCustomXAccessToken] = useState('');
+  const [customXAccessSecret, setCustomXAccessSecret] = useState('');
 
   // Queue & Modals
   const [queueFilter, setQueueFilter] = useState('ALL');
@@ -340,6 +354,10 @@ function SocialStudio({ currentUser, onBack, onBackToSite, onLogout, onNavigate,
           fbPageId: customFbPageId.trim() || undefined,
           fbAccessToken: customFbToken.trim() || undefined,
           discordWebhookUrl: customDiscordWebhook.trim() || undefined,
+          xApiKey: customXApiKey.trim() || undefined,
+          xApiSecret: customXApiSecret.trim() || undefined,
+          xAccessToken: customXAccessToken.trim() || undefined,
+          xAccessSecret: customXAccessSecret.trim() || undefined,
         }),
       });
 
@@ -359,6 +377,10 @@ function SocialStudio({ currentUser, onBack, onBackToSite, onLogout, onNavigate,
       setCustomFbPageId('');
       setCustomFbToken('');
       setCustomDiscordWebhook('');
+      setCustomXApiKey('');
+      setCustomXApiSecret('');
+      setCustomXAccessToken('');
+      setCustomXAccessSecret('');
       fetchData();
       showToast(`Connected ${platName} channel successfully!`, 'success');
     } catch (err) {
@@ -1665,20 +1687,38 @@ function SocialStudio({ currentUser, onBack, onBackToSite, onLogout, onNavigate,
                           {(() => {
                             const igUrl = post.broadcastResult?.platforms?.instagram?.url;
                             const fbUrl = post.broadcastResult?.platforms?.facebook?.url;
-                            const liveUrl = igUrl || fbUrl || post.liveUrl || (post.channelHandle ? `https://www.instagram.com/${post.channelHandle.replace('@', '')}/` : null);
-                            const isIg = Boolean(igUrl) || post.platform === 'instagram';
-                            return liveUrl ? (
-                              <a
-                                href={liveUrl}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="ui-btn ui-btn-ghost ui-btn-sm"
-                              >
-                                {isIg ? <InstagramIcon className="w-3 h-3 text-[#FF5376]" /> : <FacebookIcon className="w-3 h-3 text-[#38BDF8]" />}
-                                <span>{isIg ? 'View on Instagram' : 'View on Facebook'}</span>
-                                <ExternalLink className="w-3 h-3" />
-                              </a>
-                            ) : null;
+                            const xUrl = post.broadcastResult?.platforms?.x?.url;
+                            return (
+                              <div className="flex items-center gap-2">
+                                {igUrl && (
+                                  <a href={igUrl} target="_blank" rel="noopener noreferrer" className="ui-btn ui-btn-ghost ui-btn-sm">
+                                    <InstagramIcon className="w-3 h-3 text-[#FF5376]" />
+                                    <span>Instagram</span>
+                                    <ExternalLink className="w-3 h-3" />
+                                  </a>
+                                )}
+                                {fbUrl && (
+                                  <a href={fbUrl} target="_blank" rel="noopener noreferrer" className="ui-btn ui-btn-ghost ui-btn-sm">
+                                    <FacebookIcon className="w-3 h-3 text-[#38BDF8]" />
+                                    <span>Facebook</span>
+                                    <ExternalLink className="w-3 h-3" />
+                                  </a>
+                                )}
+                                {xUrl && (
+                                  <a href={xUrl} target="_blank" rel="noopener noreferrer" className="ui-btn ui-btn-ghost ui-btn-sm">
+                                    <span className="font-bold text-white text-[11px]">𝕏</span>
+                                    <span>X (Twitter)</span>
+                                    <ExternalLink className="w-3 h-3" />
+                                  </a>
+                                )}
+                                {!igUrl && !fbUrl && !xUrl && post.liveUrl && (
+                                  <a href={post.liveUrl} target="_blank" rel="noopener noreferrer" className="ui-btn ui-btn-ghost ui-btn-sm">
+                                    <span>View Post</span>
+                                    <ExternalLink className="w-3 h-3" />
+                                  </a>
+                                )}
+                              </div>
+                            );
                           })()}
                         </div>
                       </div>
@@ -1848,6 +1888,51 @@ function SocialStudio({ currentUser, onBack, onBackToSite, onLogout, onNavigate,
                   </div>
                   <p className="text-[13px] text-[var(--ui-faint)]">
                     Enter your Facebook Page ID and Meta Page access token, or use Connect Facebook &amp; Instagram above.
+                  </p>
+                </div>
+              )}
+
+                            {customPlatform === 'x' && (
+                <div className="ui-panel-raised space-y-2">
+                  <p className="ui-label">X (Twitter) Developer API credentials</p>
+                  <div>
+                    <input
+                      type="text"
+                      placeholder="API Key (Consumer Key)"
+                      value={customXApiKey}
+                      onChange={(e) => setCustomXApiKey(e.target.value)}
+                      className="ui-input"
+                    />
+                  </div>
+                  <div>
+                    <input
+                      type="password"
+                      placeholder="API Key Secret (Consumer Secret)"
+                      value={customXApiSecret}
+                      onChange={(e) => setCustomXApiSecret(e.target.value)}
+                      className="ui-input"
+                    />
+                  </div>
+                  <div>
+                    <input
+                      type="text"
+                      placeholder="Access Token"
+                      value={customXAccessToken}
+                      onChange={(e) => setCustomXAccessToken(e.target.value)}
+                      className="ui-input"
+                    />
+                  </div>
+                  <div>
+                    <input
+                      type="password"
+                      placeholder="Access Token Secret"
+                      value={customXAccessSecret}
+                      onChange={(e) => setCustomXAccessSecret(e.target.value)}
+                      className="ui-input"
+                    />
+                  </div>
+                  <p className="text-[12px] text-[var(--ui-faint)]">
+                    Tip: If left blank, In2Peta's default connected X account (@1914Aarya76802) will be used automatically.
                   </p>
                 </div>
               )}

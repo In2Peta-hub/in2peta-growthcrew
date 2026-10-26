@@ -113,6 +113,101 @@ class MultiPlatformPublisher:
             return media_url
 
     @classmethod
+    def generate_oauth1_header(
+        cls,
+        method: str,
+        url: str,
+        consumer_key: str,
+        consumer_secret: str,
+        token: str,
+        token_secret: str
+    ) -> str:
+        import time as _t
+        import secrets
+        import hmac
+        import hashlib
+        import base64
+        import urllib.parse
+
+        oauth_params = {
+            'oauth_consumer_key': consumer_key,
+            'oauth_nonce': secrets.token_hex(16),
+            'oauth_signature_method': 'HMAC-SHA1',
+            'oauth_timestamp': str(int(_t.time())),
+            'oauth_token': token,
+            'oauth_version': '1.0'
+        }
+        sorted_params = '&'.join(
+            f"{urllib.parse.quote(k, safe='')}={urllib.parse.quote(str(v), safe='')}"
+            for k, v in sorted(oauth_params.items())
+        )
+        base_string = f"{method.upper()}&{urllib.parse.quote(url, safe='')}&{urllib.parse.quote(sorted_params, safe='')}"
+        signing_key = f"{urllib.parse.quote(consumer_secret, safe='')}&{urllib.parse.quote(token_secret, safe='')}"
+        signature = base64.b64encode(
+            hmac.new(signing_key.encode('utf-8'), base_string.encode('utf-8'), hashlib.sha1).digest()
+        ).decode('utf-8')
+        oauth_params['oauth_signature'] = signature
+        return 'OAuth ' + ', '.join(
+            f'{k}="{urllib.parse.quote(str(v), safe="")}"'
+            for k, v in sorted(oauth_params.items())
+        )
+
+    @classmethod
+    def publish_to_x(
+        cls,
+        text: str,
+        api_key: Optional[str] = None,
+        api_secret: Optional[str] = None,
+        access_token: Optional[str] = None,
+        access_token_secret: Optional[str] = None,
+        handle: Optional[str] = None
+    ) -> Dict[str, Any]:
+        """
+        Publish post to X (Twitter) using Twitter API v2.
+        """
+        ck = (api_key or CONFIG.TWITTER_API_KEY).strip()
+        cs = (api_secret or CONFIG.TWITTER_API_SECRET).strip()
+        at = (access_token or CONFIG.TWITTER_ACCESS_TOKEN).strip()
+        ats = (access_token_secret or CONFIG.TWITTER_ACCESS_TOKEN_SECRET).strip()
+
+        if not (ck and cs and at and ats):
+            raise Exception("X (Twitter) credentials missing. Please configure Consumer Key, Secret, Access Token and Token Secret.")
+
+        url = "https://api.twitter.com/2/tweets"
+        auth_header = cls.generate_oauth1_header("POST", url, ck, cs, at, ats)
+        clean_text = text[:280] if len(text) > 280 else text
+
+        resp = requests.post(
+            url,
+            json={"text": clean_text},
+            headers={"Authorization": auth_header, "Content-Type": "application/json"},
+            timeout=20
+        )
+        data = resp.json() if resp.content else {}
+
+        if resp.status_code in (200, 201) and "data" in data:
+            tweet_id = data["data"]["id"]
+            clean_handle = (handle or "1914Aarya76802").lstrip("@")
+            tweet_url = f"https://x.com/{clean_handle}/status/{tweet_id}"
+            return {
+                "status": "success",
+                "platform": "X (Twitter)",
+                "id": tweet_id,
+                "url": tweet_url,
+                "message": f"Published live to X (Twitter): {tweet_url}"
+            }
+
+        if resp.status_code == 402:
+            raise Exception("X (Twitter) API returned 402: Credits depleted. X Developer accounts operate on a pay-per-use model (~$0.015/tweet). Please top up credits on console.x.com to publish tweets.")
+        elif resp.status_code == 401:
+            raise Exception("X (Twitter) authentication failed (401 Unauthorized). Please check your API Key & Access Token.")
+        elif resp.status_code == 403:
+            raise Exception(f"X (Twitter) 403 Forbidden: {data.get('detail', 'Duplicate tweet or missing write permissions in Developer App settings')}")
+        else:
+            err = data.get("detail") or data.get("title") or resp.text
+            raise Exception(f"X (Twitter) error (HTTP {resp.status_code}): {err}")
+
+    @classmethod
     def broadcast_to_all(
         cls,
         platforms: List[str],
@@ -121,7 +216,12 @@ class MultiPlatformPublisher:
         fb_page_id: Optional[str] = None,
         fb_access_token: Optional[str] = None,
         ig_business_account_id: Optional[str] = None,
-        discord_webhook_url: Optional[str] = None
+        discord_webhook_url: Optional[str] = None,
+        x_api_key: Optional[str] = None,
+        x_api_secret: Optional[str] = None,
+        x_access_token: Optional[str] = None,
+        x_access_secret: Optional[str] = None,
+        x_handle: Optional[str] = None
     ) -> Dict[str, Any]:
         """
         Broadcast a single post simultaneously to all selected platforms.
@@ -272,12 +372,22 @@ class MultiPlatformPublisher:
 
         # 5. X (TWITTER)
         if "x" in target_platforms or "twitter" in target_platforms:
-            results["x"] = {
-                "status": "success",
-                "platform": "X (Twitter)",
-                "id": f"tweet_{int(time.time() * 1000)}",
-                "message": "Broadcasted to X (Twitter) Timeline"
-            }
+            try:
+                x_res = cls.publish_to_x(
+                    text=text,
+                    api_key=x_api_key,
+                    api_secret=x_api_secret,
+                    access_token=x_access_token,
+                    access_token_secret=x_access_secret,
+                    handle=x_handle
+                )
+                results["x"] = x_res
+            except Exception as e:
+                results["x"] = {
+                    "status": "error",
+                    "platform": "X (Twitter)",
+                    "error": str(e)
+                }
 
         # 6. REDDIT
         if "reddit" in target_platforms:
@@ -302,18 +412,22 @@ class MultiPlatformPublisher:
         ig_failed = has_ig and results.get("instagram", {}).get("status") == "error"
         has_fb = "facebook" in target_platforms
         fb_failed = has_fb and results.get("facebook", {}).get("status") == "error"
+        has_x = "x" in target_platforms or "twitter" in target_platforms
+        x_failed = has_x and results.get("x", {}).get("status") == "error"
 
         successful = [k for k, v in results.items() if v.get("status") == "success"]
         failed = [k for k, v in results.items() if v.get("status") == "error"]
 
-        # If primary platforms (Instagram / Facebook) were selected and failed, DO NOT report overall success
-        overall_success = (len(successful) > 0) and not ig_failed and not fb_failed
+        # If primary platforms were selected and failed, DO NOT report overall success
+        overall_success = (len(successful) > 0) and not ig_failed and not fb_failed and not x_failed
 
         err_parts = []
         if ig_failed:
             err_parts.append(f"Instagram: {results['instagram'].get('error')}")
         if fb_failed:
             err_parts.append(f"Facebook: {results['facebook'].get('error')}")
+        if x_failed:
+            err_parts.append(f"X (Twitter): {results['x'].get('error')}")
 
         return {
             "success": overall_success,

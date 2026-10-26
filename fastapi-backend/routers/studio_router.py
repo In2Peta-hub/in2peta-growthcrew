@@ -363,6 +363,10 @@ async def create_queue_post(post: CreateQueuePostRequest):
         ch_fb_token = channel.get("fbAccessToken")
         ch_ig_id = channel.get("igBusinessAccountId")
         ch_discord_url = channel.get("discordWebhookUrl")
+        ch_x_api_key = channel.get("xApiKey") or CONFIG.TWITTER_API_KEY
+        ch_x_api_secret = channel.get("xApiSecret") or CONFIG.TWITTER_API_SECRET
+        ch_x_access_token = channel.get("xAccessToken") or CONFIG.TWITTER_ACCESS_TOKEN
+        ch_x_access_secret = channel.get("xAccessSecret") or CONFIG.TWITTER_ACCESS_TOKEN_SECRET
 
         broadcast_result = MultiPlatformPublisher.broadcast_to_all(
             platforms=target_platforms,
@@ -371,7 +375,12 @@ async def create_queue_post(post: CreateQueuePostRequest):
             fb_page_id=ch_fb_page_id,
             fb_access_token=ch_fb_token,
             ig_business_account_id=ch_ig_id,
-            discord_webhook_url=ch_discord_url
+            discord_webhook_url=ch_discord_url,
+            x_api_key=ch_x_api_key,
+            x_api_secret=ch_x_api_secret,
+            x_access_token=ch_x_access_token,
+            x_access_secret=ch_x_access_secret,
+            x_handle=channel.get("handle")
         )
         final_post_id = None
         if "facebook" in broadcast_result.get("platforms", {}):
@@ -468,6 +477,10 @@ async def publish_now(post_id: str):
     ch_fb_token = channel.get("fbAccessToken")
     ch_ig_id = channel.get("igBusinessAccountId")
     ch_discord_url = channel.get("discordWebhookUrl")
+    ch_x_api_key = channel.get("xApiKey") or CONFIG.TWITTER_API_KEY
+    ch_x_api_secret = channel.get("xApiSecret") or CONFIG.TWITTER_API_SECRET
+    ch_x_access_token = channel.get("xAccessToken") or CONFIG.TWITTER_ACCESS_TOKEN
+    ch_x_access_secret = channel.get("xAccessSecret") or CONFIG.TWITTER_ACCESS_TOKEN_SECRET
 
     # Multi-platform simultaneous broadcasting using channel's dedicated credentials
     broadcast_result = MultiPlatformPublisher.broadcast_to_all(
@@ -477,7 +490,12 @@ async def publish_now(post_id: str):
         fb_page_id=ch_fb_page_id,
         fb_access_token=ch_fb_token,
         ig_business_account_id=ch_ig_id,
-        discord_webhook_url=ch_discord_url
+        discord_webhook_url=ch_discord_url,
+        x_api_key=ch_x_api_key,
+        x_api_secret=ch_x_api_secret,
+        x_access_token=ch_x_access_token,
+        x_access_secret=ch_x_access_secret,
+        x_handle=channel.get("handle")
     )
 
     final_post_id = None
@@ -518,6 +536,10 @@ class CustomChannelConnectRequest(BaseModel):
     fbPageId: Optional[str] = None
     fbAccessToken: Optional[str] = None
     discordWebhookUrl: Optional[str] = None
+    xApiKey: Optional[str] = None
+    xApiSecret: Optional[str] = None
+    xAccessToken: Optional[str] = None
+    xAccessSecret: Optional[str] = None
 
 @router.delete("/channels/{channel_id}")
 async def delete_channel_endpoint(channel_id: str):
@@ -567,6 +589,39 @@ async def custom_connect_channel(req: CustomChannelConnectRequest):
         except Exception as e:
             raise HTTPException(status_code=400, detail=f"Failed to verify Meta credentials: {str(e)}")
 
+    clean_ck = req.xApiKey.strip() if req.xApiKey else None
+    clean_cs = req.xApiSecret.strip() if req.xApiSecret else None
+    clean_at = req.xAccessToken.strip() if req.xAccessToken else None
+    clean_ats = req.xAccessSecret.strip() if req.xAccessSecret else None
+
+    if req.platform in ("x", "twitter"):
+        ck = clean_ck or CONFIG.TWITTER_API_KEY
+        cs = clean_cs or CONFIG.TWITTER_API_SECRET
+        at = clean_at or CONFIG.TWITTER_ACCESS_TOKEN
+        ats = clean_ats or CONFIG.TWITTER_ACCESS_TOKEN_SECRET
+
+        if not (ck and cs and at and ats):
+            raise HTTPException(
+                status_code=400,
+                detail="X (Twitter) requires Consumer Key, Consumer Secret, Access Token, and Token Secret."
+            )
+        try:
+            url_me = "https://api.twitter.com/2/users/me"
+            auth_hdr = MultiPlatformPublisher.generate_oauth1_header("GET", url_me, ck, cs, at, ats)
+            u_res = requests.get(url_me, headers={"Authorization": auth_hdr}, timeout=10)
+            u_data = u_res.json() if u_res.content else {}
+            if u_res.status_code != 200 or "data" not in u_data:
+                err_detail = u_data.get("detail") or u_data.get("title") or u_res.text
+                raise HTTPException(status_code=400, detail=f"X Authentication failed: {err_detail}")
+            x_user = u_data["data"]
+            req.handle = f"@{x_user.get('username')}"
+            req.name = f"{x_user.get('name', 'User')} (X)"
+        except HTTPException:
+            raise
+        except Exception as e:
+            raise HTTPException(status_code=400, detail=f"Failed to verify X credentials: {str(e)}")
+
+
     channel_obj = {
         "id": f"chan_{int(time.time() * 1000)}",
         "name": req.name or f"Connected ({req.platform.title()})",
@@ -579,15 +634,23 @@ async def custom_connect_channel(req: CustomChannelConnectRequest):
         "fbPageId": clean_page_id,
         "fbAccessToken": clean_token,
         "igBusinessAccountId": ig_id,
-        "discordWebhookUrl": clean_discord
+        "discordWebhookUrl": clean_discord,
+        "xApiKey": clean_ck,
+        "xApiSecret": clean_cs,
+        "xAccessToken": clean_at,
+        "xAccessSecret": clean_ats
     }
     updated = QueueService.add_channel(channel_obj)
 
-    safe_channel = {**channel_obj, "fbAccessToken": "***" if clean_token else None}
-    safe_channels = [
-        {**c, "fbAccessToken": "***" if c.get("fbAccessToken") else None}
-        for c in updated
-    ]
+    def _sanitize(c):
+        return {
+            **c,
+            "fbAccessToken": "***" if c.get("fbAccessToken") else None,
+            "xApiSecret": "***" if c.get("xApiSecret") else None,
+            "xAccessSecret": "***" if c.get("xAccessSecret") else None,
+        }
+    safe_channel = _sanitize(channel_obj)
+    safe_channels = [_sanitize(c) for c in updated]
     return {"success": True, "channel": safe_channel, "channels": safe_channels}
 
 @router.get("/facebook/status")

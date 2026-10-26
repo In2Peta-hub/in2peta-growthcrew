@@ -26,6 +26,13 @@ class Config:
     
     FB_PAGE_ACCESS_TOKEN: str = os.getenv("FB_PAGE_ACCESS_TOKEN", "").strip()
 
+    # Direct X (Twitter) Developer API v2 integration
+    TWITTER_API_KEY: str = os.getenv("TWITTER_API_KEY", "AaTSQz9kqBbM4TO0hmXIkbzRR").strip()
+    TWITTER_API_SECRET: str = os.getenv("TWITTER_API_SECRET", "u6O4PPLQGKxdmHbdfVcHbb4oZ0slxy1kkJoU1Z9Qe6L7zbjaC3").strip()
+    TWITTER_ACCESS_TOKEN: str = os.getenv("TWITTER_ACCESS_TOKEN", "1809640476162813952-IhAgZVpt1iiZKxCYlDKQF3d46EsFm1").strip()
+    TWITTER_ACCESS_TOKEN_SECRET: str = os.getenv("TWITTER_ACCESS_TOKEN_SECRET", "YHW2ss2O9TyoDs85SAZ5PW38JK3jEUIaqsH8mI5a8r7Aj").strip()
+
+
     # GrowthCrew outreach (ported from the gpu_platform Fastify module)
     CORECLAW_API_KEY: str = os.getenv("CORECLAW_API_KEY", "")
     AGENTMAIL_API_KEY: str = os.getenv("AGENTMAIL_API_KEY", "")
