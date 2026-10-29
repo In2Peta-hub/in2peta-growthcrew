@@ -389,7 +389,16 @@ function SocialStudio({ currentUser, onBack, onBackToSite, onLogout, onNavigate,
 
       if (data.channels && Array.isArray(data.channels)) {
         setChannels(data.channels);
-        setActiveChannel(data.channel || data.channels[data.channels.length - 1]);
+        const targetChan = data.channel || data.channels[data.channels.length - 1];
+        setActiveChannel(targetChan);
+        if (targetChan?.platforms && targetChan.platforms.length > 0) {
+          setSelectedPlatforms(targetChan.platforms);
+        } else if (targetChan?.platform) {
+          setSelectedPlatforms([targetChan.platform]);
+        }
+        if (targetChan?.platform) {
+          setActivePreviewPlatform(targetChan.platform);
+        }
       }
 
       setShowConnectModal(false);
@@ -1782,6 +1791,14 @@ function SocialStudio({ currentUser, onBack, onBackToSite, onLogout, onNavigate,
                       type="button"
                       onClick={() => {
                         setActiveChannel(chan);
+                        if (chan?.platforms && chan.platforms.length > 0) {
+                          setSelectedPlatforms(chan.platforms);
+                        } else if (chan?.platform) {
+                          setSelectedPlatforms([chan.platform]);
+                        }
+                        if (chan?.platform) {
+                          setActivePreviewPlatform(chan.platform);
+                        }
                         setShowConnectModal(false);
                         showToast(`Active channel set to ${chan.name}!`, 'success');
                       }}
