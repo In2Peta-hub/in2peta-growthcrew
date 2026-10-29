@@ -45,7 +45,14 @@ DEFAULT_DATA: Dict[str, Any] = {
             "xApiKey": None,
             "xApiSecret": None,
             "xAccessToken": None,
-            "xAccessSecret": None
+            "xAccessSecret": None,
+            "redditClientId": None,
+            "redditClientSecret": None,
+            "redditUsername": None,
+            "redditPassword": None,
+            "redditRefreshToken": None,
+            "redditAccessToken": None,
+            "redditSubreddit": None
         }
     ],
     "queue": []
@@ -212,6 +219,13 @@ class QueueService:
             "xApiSecret": channel.get("xApiSecret"),
             "xAccessToken": channel.get("xAccessToken"),
             "xAccessSecret": channel.get("xAccessSecret"),
+            "redditClientId": channel.get("redditClientId"),
+            "redditClientSecret": channel.get("redditClientSecret"),
+            "redditUsername": channel.get("redditUsername"),
+            "redditPassword": channel.get("redditPassword"),
+            "redditRefreshToken": channel.get("redditRefreshToken"),
+            "redditAccessToken": channel.get("redditAccessToken"),
+            "redditSubreddit": channel.get("redditSubreddit"),
         }
 
         existing_index = next((i for i, c in enumerate(channels) if c.get("id") == ch_id or c.get("name", "").lower() == ch_name.lower()), -1)

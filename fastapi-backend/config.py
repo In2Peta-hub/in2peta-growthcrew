@@ -73,6 +73,16 @@ class Config:
     IN2PETA_MODEL: str = os.getenv("IN2PETA_MODEL", "deepseek-v4-flash")
     DISCORD_WEBHOOK_URL: str = os.getenv("DISCORD_WEBHOOK_URL", "")
 
+    # Direct Reddit API v1 integration (OAuth 2.0 / script app)
+    REDDIT_CLIENT_ID: str = os.getenv("REDDIT_CLIENT_ID", "").strip()
+    REDDIT_CLIENT_SECRET: str = os.getenv("REDDIT_CLIENT_SECRET", "").strip()
+    REDDIT_USERNAME: str = os.getenv("REDDIT_USERNAME", "").strip()
+    REDDIT_PASSWORD: str = os.getenv("REDDIT_PASSWORD", "").strip()
+    REDDIT_REFRESH_TOKEN: str = os.getenv("REDDIT_REFRESH_TOKEN", "").strip()
+    REDDIT_ACCESS_TOKEN: str = os.getenv("REDDIT_ACCESS_TOKEN", "").strip()
+    REDDIT_USER_AGENT: str = os.getenv("REDDIT_USER_AGENT", "GrowthCrew:v1.0 (social-studio)").strip()
+    REDDIT_SUBREDDIT: str = os.getenv("REDDIT_SUBREDDIT", "test").strip()
+
     # Meta / Facebook OAuth 2.0 (1-Click Client Connect)
     META_APP_ID: str = os.getenv("META_APP_ID", "2310904426390434")
     META_APP_SECRET: str = os.getenv("META_APP_SECRET", "")

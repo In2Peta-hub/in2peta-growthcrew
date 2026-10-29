@@ -367,6 +367,14 @@ async def create_queue_post(post: CreateQueuePostRequest):
         ch_x_api_secret = channel.get("xApiSecret") or CONFIG.TWITTER_API_SECRET
         ch_x_access_token = channel.get("xAccessToken") or CONFIG.TWITTER_ACCESS_TOKEN
         ch_x_access_secret = channel.get("xAccessSecret") or CONFIG.TWITTER_ACCESS_TOKEN_SECRET
+        ch_reddit_cid = channel.get("redditClientId") or CONFIG.REDDIT_CLIENT_ID
+        ch_reddit_cs = channel.get("redditClientSecret") or CONFIG.REDDIT_CLIENT_SECRET
+        ch_reddit_u = channel.get("redditUsername") or CONFIG.REDDIT_USERNAME
+        ch_reddit_p = channel.get("redditPassword") or CONFIG.REDDIT_PASSWORD
+        ch_reddit_rt = channel.get("redditRefreshToken") or CONFIG.REDDIT_REFRESH_TOKEN
+        ch_reddit_at = channel.get("redditAccessToken") or CONFIG.REDDIT_ACCESS_TOKEN
+        ch_reddit_sub = channel.get("redditSubreddit") or CONFIG.REDDIT_SUBREDDIT
+        post_title = data.get("hook") or data.get("topic") or ""
 
         broadcast_result = MultiPlatformPublisher.broadcast_to_all(
             platforms=target_platforms,
@@ -380,7 +388,15 @@ async def create_queue_post(post: CreateQueuePostRequest):
             x_api_secret=ch_x_api_secret,
             x_access_token=ch_x_access_token,
             x_access_secret=ch_x_access_secret,
-            x_handle=channel.get("handle")
+            x_handle=channel.get("handle"),
+            reddit_client_id=ch_reddit_cid,
+            reddit_client_secret=ch_reddit_cs,
+            reddit_username=ch_reddit_u,
+            reddit_password=ch_reddit_p,
+            reddit_refresh_token=ch_reddit_rt,
+            reddit_access_token=ch_reddit_at,
+            reddit_subreddit=ch_reddit_sub,
+            title=post_title
         )
         final_post_id = None
         if "facebook" in broadcast_result.get("platforms", {}):
@@ -481,6 +497,14 @@ async def publish_now(post_id: str):
     ch_x_api_secret = channel.get("xApiSecret") or CONFIG.TWITTER_API_SECRET
     ch_x_access_token = channel.get("xAccessToken") or CONFIG.TWITTER_ACCESS_TOKEN
     ch_x_access_secret = channel.get("xAccessSecret") or CONFIG.TWITTER_ACCESS_TOKEN_SECRET
+    ch_reddit_cid = channel.get("redditClientId") or CONFIG.REDDIT_CLIENT_ID
+    ch_reddit_cs = channel.get("redditClientSecret") or CONFIG.REDDIT_CLIENT_SECRET
+    ch_reddit_u = channel.get("redditUsername") or CONFIG.REDDIT_USERNAME
+    ch_reddit_p = channel.get("redditPassword") or CONFIG.REDDIT_PASSWORD
+    ch_reddit_rt = channel.get("redditRefreshToken") or CONFIG.REDDIT_REFRESH_TOKEN
+    ch_reddit_at = channel.get("redditAccessToken") or CONFIG.REDDIT_ACCESS_TOKEN
+    ch_reddit_sub = channel.get("redditSubreddit") or CONFIG.REDDIT_SUBREDDIT
+    post_title = post.get("hook") or post.get("topic") or ""
 
     # Multi-platform simultaneous broadcasting using channel's dedicated credentials
     broadcast_result = MultiPlatformPublisher.broadcast_to_all(
@@ -495,7 +519,15 @@ async def publish_now(post_id: str):
         x_api_secret=ch_x_api_secret,
         x_access_token=ch_x_access_token,
         x_access_secret=ch_x_access_secret,
-        x_handle=channel.get("handle")
+        x_handle=channel.get("handle"),
+        reddit_client_id=ch_reddit_cid,
+        reddit_client_secret=ch_reddit_cs,
+        reddit_username=ch_reddit_u,
+        reddit_password=ch_reddit_p,
+        reddit_refresh_token=ch_reddit_rt,
+        reddit_access_token=ch_reddit_at,
+        reddit_subreddit=ch_reddit_sub,
+        title=post_title
     )
 
     final_post_id = None
@@ -540,6 +572,13 @@ class CustomChannelConnectRequest(BaseModel):
     xApiSecret: Optional[str] = None
     xAccessToken: Optional[str] = None
     xAccessSecret: Optional[str] = None
+    redditClientId: Optional[str] = None
+    redditClientSecret: Optional[str] = None
+    redditUsername: Optional[str] = None
+    redditPassword: Optional[str] = None
+    redditRefreshToken: Optional[str] = None
+    redditAccessToken: Optional[str] = None
+    redditSubreddit: Optional[str] = None
 
 @router.delete("/channels/{channel_id}")
 async def delete_channel_endpoint(channel_id: str):
@@ -621,6 +660,73 @@ async def custom_connect_channel(req: CustomChannelConnectRequest):
         except Exception as e:
             raise HTTPException(status_code=400, detail=f"Failed to verify X credentials: {str(e)}")
 
+    if req.platform == "discord":
+        if not clean_discord:
+            raise HTTPException(status_code=400, detail="Discord Webhook URL is required.")
+        try:
+            # Discord Webhook GET returns webhook details without sending a message
+            wb_res = requests.get(clean_discord, timeout=10)
+            if wb_res.status_code == 200:
+                wb_info = wb_res.json()
+                w_name = wb_info.get("name") or "Discord Channel"
+                req.name = f"{w_name} (Discord)"
+                req.handle = f"#{w_name.lower().replace(' ', '-')}"
+            elif wb_res.status_code in (401, 404):
+                raise HTTPException(status_code=400, detail="Invalid Discord Webhook URL. Please verify your Discord Webhook in Channel Settings -> Integrations -> Webhooks.")
+        except HTTPException:
+            raise
+        except Exception as e:
+            raise HTTPException(status_code=400, detail=f"Failed to verify Discord Webhook: {str(e)}")
+
+    clean_rcid = req.redditClientId.strip() if req.redditClientId else None
+    clean_rcs = req.redditClientSecret.strip() if req.redditClientSecret else None
+    clean_ru = req.redditUsername.strip() if req.redditUsername else None
+    clean_rp = req.redditPassword.strip() if req.redditPassword else None
+    clean_rrt = req.redditRefreshToken.strip() if req.redditRefreshToken else None
+    clean_rat = req.redditAccessToken.strip() if req.redditAccessToken else None
+    clean_sub = req.redditSubreddit.strip() if req.redditSubreddit else None
+
+    if req.platform == "reddit":
+        cid = clean_rcid or CONFIG.REDDIT_CLIENT_ID
+        cs = clean_rcs or CONFIG.REDDIT_CLIENT_SECRET
+        u = clean_ru or CONFIG.REDDIT_USERNAME
+        p = clean_rp or CONFIG.REDDIT_PASSWORD
+        rt = clean_rrt or CONFIG.REDDIT_REFRESH_TOKEN
+        token = clean_rat or CONFIG.REDDIT_ACCESS_TOKEN
+
+        if not token and not (cid and cs and (rt or (u and p))):
+            raise HTTPException(
+                status_code=400,
+                detail="Reddit requires Client ID, Client Secret, and Username + Password (or Refresh Token)."
+            )
+
+        try:
+            if not token:
+                token = MultiPlatformPublisher.get_reddit_access_token(
+                    client_id=cid,
+                    client_secret=cs,
+                    username=u,
+                    password=p,
+                    refresh_token=rt
+                )
+            # Verify token with /api/v1/me
+            me_res = requests.get(
+                "https://oauth.reddit.com/api/v1/me",
+                headers={"Authorization": f"bearer {token}", "User-Agent": CONFIG.REDDIT_USER_AGENT},
+                timeout=10
+            )
+            if me_res.status_code == 200:
+                me_data = me_res.json()
+                r_name = me_data.get("name") or u or "Reddit"
+                req.handle = f"u/{r_name}"
+                req.name = f"{r_name} (Reddit)"
+            else:
+                req.handle = f"u/{u or 'reddit'}"
+                req.name = f"{u or 'Reddit User'} (Reddit)"
+        except HTTPException:
+            raise
+        except Exception as e:
+            raise HTTPException(status_code=400, detail=f"Failed to verify Reddit credentials: {str(e)}")
 
     channel_obj = {
         "id": f"chan_{int(time.time() * 1000)}",
@@ -638,7 +744,14 @@ async def custom_connect_channel(req: CustomChannelConnectRequest):
         "xApiKey": clean_ck,
         "xApiSecret": clean_cs,
         "xAccessToken": clean_at,
-        "xAccessSecret": clean_ats
+        "xAccessSecret": clean_ats,
+        "redditClientId": clean_rcid,
+        "redditClientSecret": clean_rcs,
+        "redditUsername": clean_ru,
+        "redditPassword": clean_rp,
+        "redditRefreshToken": clean_rrt,
+        "redditAccessToken": clean_rat,
+        "redditSubreddit": clean_sub,
     }
     updated = QueueService.add_channel(channel_obj)
 
@@ -648,6 +761,9 @@ async def custom_connect_channel(req: CustomChannelConnectRequest):
             "fbAccessToken": "***" if c.get("fbAccessToken") else None,
             "xApiSecret": "***" if c.get("xApiSecret") else None,
             "xAccessSecret": "***" if c.get("xAccessSecret") else None,
+            "redditClientSecret": "***" if c.get("redditClientSecret") else None,
+            "redditPassword": "***" if c.get("redditPassword") else None,
+            "redditAccessToken": "***" if c.get("redditAccessToken") else None,
         }
     safe_channel = _sanitize(channel_obj)
     safe_channels = [_sanitize(c) for c in updated]

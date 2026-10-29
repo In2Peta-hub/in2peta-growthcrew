@@ -245,6 +245,11 @@ function SocialStudio({ currentUser, onBack, onBackToSite, onLogout, onNavigate,
   const [customXApiSecret, setCustomXApiSecret] = useState('');
   const [customXAccessToken, setCustomXAccessToken] = useState('');
   const [customXAccessSecret, setCustomXAccessSecret] = useState('');
+  const [customRedditClientId, setCustomRedditClientId] = useState('');
+  const [customRedditClientSecret, setCustomRedditClientSecret] = useState('');
+  const [customRedditUsername, setCustomRedditUsername] = useState('');
+  const [customRedditPassword, setCustomRedditPassword] = useState('');
+  const [customRedditSubreddit, setCustomRedditSubreddit] = useState('');
 
   // Queue & Modals
   const [queueFilter, setQueueFilter] = useState('ALL');
@@ -336,12 +341,22 @@ function SocialStudio({ currentUser, onBack, onBackToSite, onLogout, onNavigate,
         showToast('Meta requires authorization. Please click the "1-Click Connect with Facebook & Instagram" button above, or enter both Page ID and Page Access Token.', 'error');
         return;
       }
+    } else if (cleanPlatform === 'discord') {
+      if (!customDiscordWebhook.trim()) {
+        showToast('Please provide a Discord Webhook URL to connect.', 'error');
+        return;
+      }
+    } else if (cleanPlatform === 'reddit') {
+      if (!customHandleInput.trim() && !customRedditUsername.trim()) {
+        showToast('Please provide a Reddit username or handle to connect.', 'error');
+        return;
+      }
     } else if (!customHandleInput.trim() && !customDiscordWebhook.trim()) {
       showToast('Please provide a handle or Webhook URL to connect.', 'error');
       return;
     }
 
-    const formatted = customHandleInput.trim().replace(/^@/, '');
+    const formatted = customHandleInput.trim().replace(/^@/, '') || customRedditUsername.trim();
 
     try {
       const res = await fetch(`${API_BASE}/api/channels/custom-connect`, {
@@ -349,7 +364,7 @@ function SocialStudio({ currentUser, onBack, onBackToSite, onLogout, onNavigate,
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           platform: cleanPlatform,
-          handle: formatted ? `@${formatted}` : `@${cleanPlatform}`,
+          handle: formatted ? (cleanPlatform === 'reddit' ? `u/${formatted}` : `@${formatted}`) : `@${cleanPlatform}`,
           name: formatted ? `${formatted} (${platName})` : `My ${platName}`,
           fbPageId: customFbPageId.trim() || undefined,
           fbAccessToken: customFbToken.trim() || undefined,
@@ -358,6 +373,11 @@ function SocialStudio({ currentUser, onBack, onBackToSite, onLogout, onNavigate,
           xApiSecret: customXApiSecret.trim() || undefined,
           xAccessToken: customXAccessToken.trim() || undefined,
           xAccessSecret: customXAccessSecret.trim() || undefined,
+          redditClientId: customRedditClientId.trim() || undefined,
+          redditClientSecret: customRedditClientSecret.trim() || undefined,
+          redditUsername: customRedditUsername.trim() || undefined,
+          redditPassword: customRedditPassword.trim() || undefined,
+          redditSubreddit: customRedditSubreddit.trim() || undefined,
         }),
       });
 
@@ -381,6 +401,11 @@ function SocialStudio({ currentUser, onBack, onBackToSite, onLogout, onNavigate,
       setCustomXApiSecret('');
       setCustomXAccessToken('');
       setCustomXAccessSecret('');
+      setCustomRedditClientId('');
+      setCustomRedditClientSecret('');
+      setCustomRedditUsername('');
+      setCustomRedditPassword('');
+      setCustomRedditSubreddit('');
       fetchData();
       showToast(`Connected ${platName} channel successfully!`, 'success');
     } catch (err) {
@@ -1774,6 +1799,10 @@ function SocialStudio({ currentUser, onBack, onBackToSite, onLogout, onNavigate,
                               <FacebookIcon className="w-3 h-3 text-[#38BDF8]" />
                             ) : chan.platform === 'x' ? (
                               <span className="font-bold text-white text-[11px]">𝕏</span>
+                            ) : chan.platform === 'discord' ? (
+                              <DiscordIcon className="w-3 h-3 text-[#5865F2]" />
+                            ) : chan.platform === 'reddit' ? (
+                              <RedditIcon className="w-3 h-3 text-[#FF4500]" />
                             ) : (
                               <InstagramIcon className="w-3 h-3 text-[var(--ui-lavender)]" />
                             )}
@@ -1781,6 +1810,10 @@ function SocialStudio({ currentUser, onBack, onBackToSite, onLogout, onNavigate,
                           </span>
                           {chan.platform === 'x' ? (
                             <span className="text-[9px] text-sky-400 font-semibold block">✓ X API v2 Connected</span>
+                          ) : chan.platform === 'discord' ? (
+                            <span className="text-[9px] text-indigo-400 font-semibold block">✓ Discord Webhook Active</span>
+                          ) : chan.platform === 'reddit' ? (
+                            <span className="text-[9px] text-orange-400 font-semibold block">✓ Reddit API Connected</span>
                           ) : (chan.fbPageId && (chan.fbAccessToken || chan.provider === 'Meta Graph API' || chan.provider === 'Meta 1-Click OAuth')) ? (
                             <span className="text-[9px] text-emerald-400 font-semibold block">✓ Meta Verified</span>
                           ) : (
@@ -1953,7 +1986,71 @@ function SocialStudio({ currentUser, onBack, onBackToSite, onLogout, onNavigate,
                     className="ui-input"
                   />
                   <p className="text-[13px] text-[var(--ui-faint)]">
-                    Uses the webhook URL you provide for this channel.
+                    Create a webhook in Discord (Channel Settings &rarr; Integrations &rarr; Webhooks) and paste it here for instant rich embed broadcasts.
+                  </p>
+                </div>
+              )}
+
+              {customPlatform === 'reddit' && (
+                <div className="ui-panel-raised space-y-2.5">
+                  <p className="ui-label">Reddit API &amp; Subreddit settings</p>
+                  <div>
+                    <label className="text-[12px] text-[var(--ui-faint)] block mb-1">Target Subreddit</label>
+                    <div className="relative">
+                      <span className="absolute left-3 top-2 text-[var(--ui-faint)] text-[13px]">r/</span>
+                      <input
+                        type="text"
+                        placeholder="test or growthcrew or mycommunity"
+                        value={customRedditSubreddit}
+                        onChange={(e) => setCustomRedditSubreddit(e.target.value)}
+                        className="ui-input !ps-8"
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="text-[12px] text-[var(--ui-faint)] block mb-1">Reddit Username</label>
+                    <input
+                      type="text"
+                      placeholder="Reddit username"
+                      value={customRedditUsername}
+                      onChange={(e) => setCustomRedditUsername(e.target.value)}
+                      className="ui-input"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-[12px] text-[var(--ui-faint)] block mb-1">Reddit Password</label>
+                    <input
+                      type="password"
+                      placeholder="Reddit account password"
+                      value={customRedditPassword}
+                      onChange={(e) => setCustomRedditPassword(e.target.value)}
+                      className="ui-input"
+                    />
+                  </div>
+                  <div className="grid grid-cols-2 gap-2">
+                    <div>
+                      <label className="text-[12px] text-[var(--ui-faint)] block mb-1">Client ID</label>
+                      <input
+                        type="text"
+                        placeholder="Reddit App ID"
+                        value={customRedditClientId}
+                        onChange={(e) => setCustomRedditClientId(e.target.value)}
+                        className="ui-input"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-[12px] text-[var(--ui-faint)] block mb-1">Client Secret</label>
+                      <input
+                        type="password"
+                        placeholder="Reddit App Secret"
+                        value={customRedditClientSecret}
+                        onChange={(e) => setCustomRedditClientSecret(e.target.value)}
+                        className="ui-input"
+                      />
+                    </div>
+                  </div>
+                  <p className="text-[12px] text-[var(--ui-faint)]">
+                    Create a script application on reddit.com/prefs/apps to obtain your Client ID &amp; Secret.
                   </p>
                 </div>
               )}

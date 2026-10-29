@@ -27,28 +27,214 @@ class MultiPlatformPublisher:
     }
 
     @classmethod
-    def publish_discord_webhook(cls, webhook_url: str, message: str, image_url: Optional[str] = None) -> Dict[str, Any]:
+    def publish_discord_webhook(
+        cls,
+        webhook_url: str,
+        message: str,
+        image_url: Optional[str] = None,
+        title: Optional[str] = None
+    ) -> Dict[str, Any]:
         """Direct Discord Webhook broadcast with rich embed."""
-        if not webhook_url:
+        clean_url = (webhook_url or "").strip()
+        if not clean_url:
             return {"status": "skipped", "message": "No Discord Webhook configured"}
+
+        embed: Dict[str, Any] = {
+            "title": (title or "GrowthCrew Social Studio Broadcast")[:256],
+            "description": message[:4096],
+            "color": 0x5865F2,  # Discord blurple
+            "footer": {"text": "Published via GrowthCrew Social Studio"},
+            "timestamp": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
+        }
+        if image_url:
+            embed["image"] = {"url": image_url}
 
         payload: Dict[str, Any] = {
             "content": "🚀 **New Broadcast from GrowthCrew Social Studio**",
-            "embeds": [
-                {
-                    "description": message[:2000],
-                    "color": 0xFF6B4A,  # Scalora / GrowthCrew orange
-                    "footer": {"text": "Published via GrowthCrew Multi-Platform Publisher"}
-                }
-            ]
+            "embeds": [embed]
         }
-        if image_url:
-            payload["embeds"][0]["image"] = {"url": image_url}
 
-        res = requests.post(webhook_url, json=payload, timeout=10)
+        # Request ?wait=true so Discord returns the published message object
+        post_target = clean_url if "?wait=true" in clean_url else f"{clean_url.split('?')[0]}?wait=true"
+        res = requests.post(post_target, json=payload, timeout=15)
         if res.status_code in (200, 204):
-            return {"status": "success", "message": "Broadcasted to Discord Channel"}
-        return {"status": "error", "message": f"Discord returned HTTP {res.status_code}"}
+            msg_id = None
+            msg_url = None
+            if res.content:
+                try:
+                    d = res.json()
+                    msg_id = d.get("id")
+                    channel_id = d.get("channel_id")
+                    guild_id = d.get("guild_id")
+                    if channel_id and msg_id:
+                        msg_url = f"https://discord.com/channels/{guild_id or '@me'}/{channel_id}/{msg_id}"
+                except Exception:
+                    pass
+            return {
+                "status": "success",
+                "platform": "Discord Channel",
+                "id": msg_id or f"dc_{int(time.time() * 1000)}",
+                "url": msg_url or clean_url,
+                "message": f"Broadcasted live to Discord Channel" + (f": {msg_url}" if msg_url else "")
+            }
+
+        err_detail = res.text
+        try:
+            err_json = res.json()
+            err_detail = err_json.get("message") or err_detail
+        except Exception:
+            pass
+        raise Exception(f"Discord Webhook error (HTTP {res.status_code}): {err_detail}")
+
+    @classmethod
+    def get_reddit_access_token(
+        cls,
+        client_id: Optional[str] = None,
+        client_secret: Optional[str] = None,
+        username: Optional[str] = None,
+        password: Optional[str] = None,
+        refresh_token: Optional[str] = None,
+        user_agent: Optional[str] = None
+    ) -> str:
+        """Exchange Reddit app credentials or refresh token for a Bearer access token."""
+        cid = (client_id or CONFIG.REDDIT_CLIENT_ID).strip()
+        cs = (client_secret or CONFIG.REDDIT_CLIENT_SECRET).strip()
+        u = (username or CONFIG.REDDIT_USERNAME).strip()
+        p = (password or CONFIG.REDDIT_PASSWORD).strip()
+        rt = (refresh_token or CONFIG.REDDIT_REFRESH_TOKEN).strip()
+        ua = (user_agent or CONFIG.REDDIT_USER_AGENT or f"GrowthCrew:v1.0 (by /u/{u or 'user'})").strip()
+
+        if not cid or not cs:
+            raise Exception("Reddit Client ID and Client Secret are required. Please configure them in Settings or .env")
+
+        auth = requests.auth.HTTPBasicAuth(cid, cs)
+        headers = {"User-Agent": ua}
+
+        if rt:
+            data = {"grant_type": "refresh_token", "refresh_token": rt}
+        elif u and p:
+            data = {"grant_type": "password", "username": u, "password": p}
+        else:
+            raise Exception("Reddit requires either (Username + Password) or Refresh Token. Please configure your Reddit credentials.")
+
+        resp = requests.post("https://www.reddit.com/api/v1/access_token", auth=auth, data=data, headers=headers, timeout=15)
+        if resp.status_code != 200:
+            raise Exception(f"Reddit OAuth authentication failed (HTTP {resp.status_code}): {resp.text}")
+
+        res_json = resp.json() if resp.content else {}
+        if "error" in res_json:
+            raise Exception(f"Reddit OAuth error: {res_json.get('error')} - {res_json.get('message', '')}")
+
+        token = res_json.get("access_token")
+        if not token:
+            raise Exception("Reddit did not return an access token. Please verify Client ID, Secret, and Password.")
+        return token
+
+    @classmethod
+    def publish_to_reddit(
+        cls,
+        title: str,
+        text: str,
+        media_url: Optional[str] = None,
+        subreddit: Optional[str] = None,
+        client_id: Optional[str] = None,
+        client_secret: Optional[str] = None,
+        username: Optional[str] = None,
+        password: Optional[str] = None,
+        refresh_token: Optional[str] = None,
+        access_token: Optional[str] = None,
+        user_agent: Optional[str] = None,
+        kind: Optional[str] = None
+    ) -> Dict[str, Any]:
+        """
+        Publish post to Reddit via Reddit API (/api/submit).
+        Supports text/markdown posts, image/media embed, or link posts to any subreddit.
+        """
+        token = (access_token or CONFIG.REDDIT_ACCESS_TOKEN).strip()
+        ua = (user_agent or CONFIG.REDDIT_USER_AGENT or "GrowthCrew:v1.0 (social-studio)").strip()
+        sub = (subreddit or CONFIG.REDDIT_SUBREDDIT or "test").strip()
+
+        # Normalize subreddit string (remove r/ or u/ prefix)
+        if sub.lower().startswith("r/"):
+            sub = sub[2:]
+        elif sub.lower().startswith("u/"):
+            sub = "u_" + sub[2:]
+
+        if not token:
+            token = cls.get_reddit_access_token(
+                client_id=client_id,
+                client_secret=client_secret,
+                username=username,
+                password=password,
+                refresh_token=refresh_token,
+                user_agent=ua
+            )
+
+        # Prepare title (Reddit requires 1 - 300 characters)
+        clean_title = (title or "").strip()
+        if not clean_title:
+            clean_title = text.split("\n")[0][:100].strip() if text else "GrowthCrew Broadcast"
+        clean_title = clean_title[:300]
+
+        submit_data = {
+            "sr": sub,
+            "title": clean_title,
+            "api_type": "json",
+            "resubmit": "true",
+            "sendreplies": "true",
+        }
+
+        # Determine kind (link vs self)
+        use_link = kind == "link" or (media_url and (not text or len(text.strip()) < 10) and kind != "self")
+        if use_link and media_url:
+            submit_data["kind"] = "link"
+            submit_data["url"] = media_url
+        else:
+            submit_data["kind"] = "self"
+            body_text = text or ""
+            if media_url and media_url not in body_text:
+                body_text = f"{body_text}\n\n![Media Preview]({media_url})"
+            submit_data["text"] = body_text
+
+        headers = {
+            "Authorization": f"bearer {token}",
+            "User-Agent": ua
+        }
+
+        resp = requests.post("https://oauth.reddit.com/api/submit", headers=headers, data=submit_data, timeout=25)
+        res_json = resp.json() if resp.content else {}
+
+        if resp.status_code == 401:
+            raise Exception("Reddit authentication failed (401 Unauthorized). Access token may have expired.")
+        elif resp.status_code == 403:
+            raise Exception(f"Reddit 403 Forbidden: Insufficient permissions or banned from r/{sub}.")
+        elif resp.status_code != 200:
+            raise Exception(f"Reddit API returned HTTP {resp.status_code}: {resp.text}")
+
+        # Check for errors in Reddit JSON structure
+        json_obj = res_json.get("json", {})
+        errors = json_obj.get("errors", [])
+        if errors:
+            err_msgs = []
+            for e in errors:
+                if isinstance(e, list) and len(e) >= 2:
+                    err_msgs.append(f"{e[0]}: {e[1]}")
+                else:
+                    err_msgs.append(str(e))
+            raise Exception(f"Reddit error: {'; '.join(err_msgs)}")
+
+        post_data = json_obj.get("data", {})
+        post_id = post_data.get("id") or post_data.get("name") or f"t3_{int(time.time() * 1000)}"
+        post_url = post_data.get("url") or f"https://www.reddit.com/r/{sub}/comments/{post_id}"
+
+        return {
+            "status": "success",
+            "platform": "Reddit",
+            "id": post_id,
+            "url": post_url,
+            "subreddit": f"r/{sub}",
+            "message": f"Published live to Reddit (r/{sub}): {post_url}"
+        }
 
     @classmethod
     def format_image_for_instagram(cls, media_url: str) -> str:
@@ -221,7 +407,15 @@ class MultiPlatformPublisher:
         x_api_secret: Optional[str] = None,
         x_access_token: Optional[str] = None,
         x_access_secret: Optional[str] = None,
-        x_handle: Optional[str] = None
+        x_handle: Optional[str] = None,
+        reddit_client_id: Optional[str] = None,
+        reddit_client_secret: Optional[str] = None,
+        reddit_username: Optional[str] = None,
+        reddit_password: Optional[str] = None,
+        reddit_refresh_token: Optional[str] = None,
+        reddit_access_token: Optional[str] = None,
+        reddit_subreddit: Optional[str] = None,
+        title: Optional[str] = None
     ) -> Dict[str, Any]:
         """
         Broadcast a single post simultaneously to all selected platforms.
@@ -342,17 +536,18 @@ class MultiPlatformPublisher:
         if "discord" in target_platforms:
             try:
                 if discord_url:
-                    dc_res = cls.publish_discord_webhook(discord_url, text, media_url)
-                    results["discord"] = {
-                        "status": dc_res.get("status", "success"),
-                        "platform": "Discord Channel",
-                        "message": dc_res.get("message", "Broadcasted to Discord")
-                    }
+                    dc_res = cls.publish_discord_webhook(
+                        webhook_url=discord_url,
+                        message=text,
+                        image_url=media_url,
+                        title=title
+                    )
+                    results["discord"] = dc_res
                 else:
                     results["discord"] = {
-                        "status": "success",
+                        "status": "skipped",
                         "platform": "Discord Channel",
-                        "message": "Ready to broadcast (Connect custom webhook in Settings)"
+                        "message": "Discord Webhook URL not configured. Add Webhook URL in Channel settings."
                     }
             except Exception as e:
                 results["discord"] = {
@@ -391,12 +586,26 @@ class MultiPlatformPublisher:
 
         # 6. REDDIT
         if "reddit" in target_platforms:
-            results["reddit"] = {
-                "status": "success",
-                "platform": "Reddit",
-                "id": f"t3_{int(time.time() * 1000)}",
-                "message": "Broadcasted to Reddit Community Feed"
-            }
+            try:
+                reddit_res = cls.publish_to_reddit(
+                    title=title or (text.split("\n")[0][:100] if text else "GrowthCrew Broadcast"),
+                    text=text,
+                    media_url=media_url,
+                    subreddit=reddit_subreddit,
+                    client_id=reddit_client_id,
+                    client_secret=reddit_client_secret,
+                    username=reddit_username,
+                    password=reddit_password,
+                    refresh_token=reddit_refresh_token,
+                    access_token=reddit_access_token
+                )
+                results["reddit"] = reddit_res
+            except Exception as e:
+                results["reddit"] = {
+                    "status": "error",
+                    "platform": "Reddit",
+                    "error": str(e)
+                }
 
         # 7. YOUTUBE
         if "youtube" in target_platforms:
@@ -414,12 +623,16 @@ class MultiPlatformPublisher:
         fb_failed = has_fb and results.get("facebook", {}).get("status") == "error"
         has_x = "x" in target_platforms or "twitter" in target_platforms
         x_failed = has_x and results.get("x", {}).get("status") == "error"
+        has_dc = "discord" in target_platforms
+        dc_failed = has_dc and results.get("discord", {}).get("status") == "error"
+        has_rd = "reddit" in target_platforms
+        rd_failed = has_rd and results.get("reddit", {}).get("status") == "error"
 
         successful = [k for k, v in results.items() if v.get("status") == "success"]
         failed = [k for k, v in results.items() if v.get("status") == "error"]
 
         # If primary platforms were selected and failed, DO NOT report overall success
-        overall_success = (len(successful) > 0) and not ig_failed and not fb_failed and not x_failed
+        overall_success = (len(successful) > 0) and not ig_failed and not fb_failed and not x_failed and not dc_failed and not rd_failed
 
         err_parts = []
         if ig_failed:
@@ -428,6 +641,10 @@ class MultiPlatformPublisher:
             err_parts.append(f"Facebook: {results['facebook'].get('error')}")
         if x_failed:
             err_parts.append(f"X (Twitter): {results['x'].get('error')}")
+        if dc_failed:
+            err_parts.append(f"Discord: {results['discord'].get('error')}")
+        if rd_failed:
+            err_parts.append(f"Reddit: {results['reddit'].get('error')}")
 
         return {
             "success": overall_success,
