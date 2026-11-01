@@ -17,6 +17,7 @@ export default function LoginPage({ notice = '', onSignedIn, onBack }) {
   const sample = sampleMode();
 
   const handleDirectAccess = () => {
+    localStorage.setItem('gc_finder_mock', '1');
     setSession('founder@in2peta.com', 'demo-session-token');
     onSignedIn?.({ email: 'founder@in2peta.com', name: 'In2Peta Founder' });
   };
@@ -31,6 +32,7 @@ export default function LoginPage({ notice = '', onSignedIn, onBack }) {
       if (passwordMode) {
         // Fallback for demo testing to prevent backend rate-limiting lockouts
         if (password === 'scalora2026' || password === 'admin' || password === 'demo' || password.length >= 4) {
+          localStorage.setItem('gc_finder_mock', '1');
           setSession(clean, 'demo-session-token');
           onSignedIn?.({ email: clean, name: clean.split('@')[0] });
           return;
@@ -44,12 +46,14 @@ export default function LoginPage({ notice = '', onSignedIn, onBack }) {
           return;
         } catch (apiErr) {
           // If backend rate limits, allow instant session for testing
+          localStorage.setItem('gc_finder_mock', '1');
           setSession(clean, 'demo-session-token');
           onSignedIn?.({ email: clean, name: clean.split('@')[0] });
           return;
         }
       }
       if (sample) {
+        localStorage.setItem('gc_finder_mock', '1');
         const { account, token } = await verifySignIn(clean, 'sample');
         setSession(account?.email || clean, token);
         onSignedIn?.(account);
@@ -60,6 +64,7 @@ export default function LoginPage({ notice = '', onSignedIn, onBack }) {
         setStep('sent');
       } catch (reqErr) {
         // If email fails or rate limited, fallback to direct session
+        localStorage.setItem('gc_finder_mock', '1');
         setSession(clean, 'demo-session-token');
         onSignedIn?.({ email: clean, name: clean.split('@')[0] });
       }

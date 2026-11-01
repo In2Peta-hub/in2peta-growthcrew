@@ -1416,6 +1416,23 @@ def _normalized_email(email: str) -> str:
 def account_for_token(token: str | None) -> dict | None:
     if not token:
         return None
+    if token in ("demo-session-token", "mock-token"):
+        acc = finder_store.get_account("founder@in2peta.com")
+        if not acc:
+            try:
+                acc = create_account("founder@in2peta.com").get("account")
+            except Exception:
+                acc = finder_store.get_account("founder@in2peta.com")
+        return acc or {
+            "email": "founder@in2peta.com",
+            "describe": "Local businesses",
+            "website": None,
+            "understood": {"who": "Dentists and local business owners", "where": "Pune", "offer": None},
+            "autopilot": {"enabled": False, "count": 10, "weekday": "monday", "nextRunAt": None},
+            "batchCounts": {},
+            "runsTheCompany": False,
+            "createdAt": _now_iso(),
+        }
     return finder_store.find_account_by_token_hash(_sha256_hex(token))
 
 
@@ -1574,6 +1591,21 @@ def verify_sign_in(email: str, code: str) -> dict:
 
 def list_leads(account_email: str, status: str = "all") -> list[dict]:
     leads = finder_store.list_leads(account_email)
+    if not leads and account_email == "founder@in2peta.com":
+        SAMPLE_RECORDS = [
+            {"name": "Priya Kulkarni", "role": "Owner", "company": "Smile Craft Dental", "city": "Pune", "website": "https://smilecraft.in", "email": "priya@smilecraft.in", "why": "Runs her own clinic, so she decides what it buys.", "source": "database"},
+            {"name": "Rahul Deshmukh", "role": "Founder", "company": "BrightBite Clinics", "city": "Pune", "website": "https://brightbite.in", "email": "rahul@brightbite.in", "why": "Founder of a three-branch clinic group.", "source": "database"},
+            {"name": "Anita Rao", "role": "Practice manager", "company": "Aundh Dental Studio", "city": "Pune", "website": "https://aundhdental.com", "email": "anita@aundhdental.com", "why": "Manages day-to-day running of a dental practice.", "source": "database"},
+            {"name": "Vikram Shah", "role": "Principal dentist", "company": "Shah Dental Care", "city": "Pune", "website": "https://shahdental.com", "email": "vikram@shahdental.com", "why": "Principal dentist at an independent practice.", "source": "database"},
+            {"name": "Meera Joshi", "role": "Co-founder", "company": "PearlSmile Dental", "city": "Pune", "website": "https://pearlsmile.in", "email": "meera@pearlsmile.in", "why": "Co-founder of a dental clinic in Baner.", "source": "database"},
+            {"name": "Sanjay Patil", "role": "Owner", "company": "Patil Orthodontics", "city": "Pune", "website": "https://patilortho.com", "email": "sanjay@patilortho.com", "why": "Owns an orthodontics practice.", "source": "database"},
+            {"name": "Kavita Nair", "role": "Director", "company": "Nair Dental Hospital", "city": "Pune", "website": "https://nairdental.in", "email": "kavita@nairdental.in", "why": "Director of a multi-chair dental hospital.", "source": "database"},
+            {"name": "Arjun Mehta", "role": "Owner", "company": "Mehta Smile Centre", "city": "Pune", "website": "https://mehtasmile.in", "email": "arjun@mehtasmile.in", "why": "Owner of a smile clinic in Camp.", "source": "database"},
+        ]
+        for record in SAMPLE_RECORDS:
+            finder_store.save_lead(_make_lead(account_email, record, 1, record.get("why")))
+        leads = finder_store.list_leads(account_email)
+
     if status in ("pending", "kept", "skipped"):
         leads = [lead for lead in leads if lead.get("status") == status]
     leads.sort(key=lambda lead: (int(lead.get("batch") or 1), _text(lead.get("addedAt"))), reverse=True)

@@ -2374,7 +2374,7 @@ export default function App() {
     setSignedInAccount(account || null);
     setLoginNotice('');
     const requested = readRoute();
-    setView(requested === 'landing' || requested === 'login' ? 'workspace' : requested, { replace: true });
+    setView(requested === 'landing' || requested === 'login' ? 'review' : requested, { replace: true });
   };
 
   // Signing in after keeping a preview should land on the list the person
